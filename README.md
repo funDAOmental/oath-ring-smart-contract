@@ -1,4 +1,4 @@
-# GENESIS NFTXT SMART CONTARACT
+# NFTXT SMART CONTARACT
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
