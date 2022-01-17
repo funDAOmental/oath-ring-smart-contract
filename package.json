@@ -10,7 +10,7 @@
 	"scripts": {
 		"test": "npx hardhat test",
 		"lint": "tslint -c ./tslint.json './scripts/**/*.ts'",
-		"solhint": "solhint './contracts/**/*.sol'"
+		"sollint": "solhint './contracts/**/*.sol'"
 	},
 	"dependencies": {
 		"@nomiclabs/hardhat-ethers": "^2.0.4",

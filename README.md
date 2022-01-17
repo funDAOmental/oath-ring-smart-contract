@@ -13,6 +13,8 @@
 
 ### Installation
 
+- Install typescript globally `npm install -g typescript`
+- Install npm dependencies by running `npm install | yarn install`
 - ???
 
 ### How to Use
@@ -23,3 +25,4 @@
 
 - start all test by running `npm run test`
 - start typescript linter `npm run lint`
+- start typescript linter `npm run sollint`
