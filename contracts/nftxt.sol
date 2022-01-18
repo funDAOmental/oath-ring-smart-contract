@@ -10,7 +10,7 @@ contract Nftxt is ERC721 {
 	using Counters for Counters.Counter;
 	Counters.Counter private tokenIdCount;
 
-	address payable private ownerAddress;
+	address private ownerAddress;
 	string private baseTokenURI;
 	uint256 private nftPrice;
 
@@ -25,8 +25,8 @@ contract Nftxt is ERC721 {
 		uint256 tokenId;
 		uint256 amount;
 		uint256 timestamp;
+		uint256 code;
 		string name;
-		string code;
 		string text;
 		string image;
 		string nftUniqId;
@@ -47,13 +47,13 @@ contract Nftxt is ERC721 {
 		uint256 tokenId,
 		uint256 amount,
 		uint256 timestamp,
+		uint256 code,
 		string name,
-		string code,
 		string text,
 		string image
 	);
 
-	constructor(address payable _ownerAddress, string memory _baseTokenURI) ERC721('NFTxT', 'NFTxT') {
+	constructor(address _ownerAddress, string memory _baseTokenURI) ERC721('NFTxT', 'NFTxT') {
 		ownerAddress = _ownerAddress;
 		baseTokenURI = _baseTokenURI;
 
@@ -61,20 +61,22 @@ contract Nftxt is ERC721 {
 		nftPrice = 0.1 * 10**18;
 	}
 
-	// overide base token URI format (https://www.google.com/nft/)
+	// @functionName _baseURI
+	// @functionDescription overide base token URI format (https://www.google.com/nft/)
 	function _baseURI() internal view virtual override returns (string memory) {
 		return baseTokenURI;
 	}
 
-	// mint nftxt
+	// @functionName addToBlockChain
+	// @functionDescription mint nftxt and add it to the blockchain
 	function addToBlockChain(
-		address payable _receiver,
-		string memory _name,
-		string memory _code,
-		string memory _text,
-		string memory _image,
-		string memory _nftLink,
-		string memory _nftId
+		address _receiver, // wallet to recieve NFT
+		uint256 _code, // project token address sample: "0x06012c8cf97bead5deae237070f9587f8e7a266d" -> CryptoKitties
+		string memory _name, // original NFT name
+		string memory _text, // ipfs text path
+		string memory _image, // ipfs image path
+		string memory _nftLink, // original NFT metadata link
+		string memory _nftId //  original NFT id
 	) public returns (uint256) {
 		string memory uniqId = string(abi.encodePacked(_code, _nftId));
 
@@ -96,8 +98,8 @@ contract Nftxt is ERC721 {
 				tokenId,
 				nftPrice,
 				block.timestamp,
-				_name,
 				_code,
+				_name,
 				_text,
 				_image,
 				uniqId,
@@ -114,8 +116,8 @@ contract Nftxt is ERC721 {
 			tokenId,
 			nftPrice,
 			block.timestamp,
-			_name,
 			_code,
+			_name,
 			_text,
 			_image
 		);
@@ -123,14 +125,20 @@ contract Nftxt is ERC721 {
 		return tokenId;
 	}
 
+	// @functionName getNftCount
+	// @functionDescription get nftxt count
 	function getNftCount() public view returns (uint256) {
 		return tokenIdCount.current();
 	}
 
+	// @functionName getAllNft
+	// @functionDescription get all the list of minted nftxt
 	function getAllNft() public view returns (NftStruct[] memory) {
 		return nfts;
 	}
 
+	// @functionName getOneNft
+	// @functionDescription get one nftxt
 	function getOneNft(uint256 _tokenId) public view returns (NftStruct memory) {
 		return nfts[_tokenId];
 	}
