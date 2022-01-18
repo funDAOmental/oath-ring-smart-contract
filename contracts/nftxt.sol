@@ -3,11 +3,10 @@
 pragma solidity ^0.8.8;
 
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 import 'hardhat/console.sol';
 
-contract Nftxt is ERC721, Ownable {
+contract Nftxt is ERC721 {
 	using Counters for Counters.Counter;
 	Counters.Counter private tokenIdCount;
 
@@ -15,7 +14,6 @@ contract Nftxt is ERC721, Ownable {
 	uint256 internal nftPrice;
 
 	struct NftMetaDataStruct {
-		string metaData;
 		string nftLink;
 		string nftId;
 	}
@@ -56,6 +54,8 @@ contract Nftxt is ERC721, Ownable {
 
 	constructor(address payable _ownerAddress) ERC721('NFTxT', 'NFTxT') {
 		ownerAddress = _ownerAddress;
+
+		// set nft price
 		nftPrice = 0.1 * 10**18;
 	}
 
@@ -65,7 +65,6 @@ contract Nftxt is ERC721, Ownable {
 		string memory _code,
 		string memory _text,
 		string memory _image,
-		string memory _metaData,
 		string memory _nftLink,
 		string memory _nftId
 	) public returns (uint256) {
@@ -74,6 +73,7 @@ contract Nftxt is ERC721, Ownable {
 		// check if uniqId already exists
 		require(!nftUniqIds[uniqId].exists, 'NFT already Minted');
 
+		// increase token count
 		tokenIdCount.increment();
 		uint256 tokenId = tokenIdCount.current();
 
@@ -93,9 +93,11 @@ contract Nftxt is ERC721, Ownable {
 				_text,
 				_image,
 				uniqId,
-				NftMetaDataStruct(_metaData, _nftLink, _nftId)
+				NftMetaDataStruct(_nftLink, _nftId)
 			)
 		);
+
+		// mint token
 		_safeMint(payable(_receiver), tokenId);
 
 		emit NewNftEvent(
@@ -109,6 +111,7 @@ contract Nftxt is ERC721, Ownable {
 			_text,
 			_image
 		);
+
 		return tokenId;
 	}
 
