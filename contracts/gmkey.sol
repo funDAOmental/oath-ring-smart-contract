@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
@@ -42,7 +42,7 @@ contract GMKey is ERC721URIStorage, Ownable {
 	struct ProjectStruct {
 		uint256 maxUnit;
 		uint256 currentUnit;
-		uint256 price;
+		uint256 amount;
 		string name;
 		bool exists;
 	}
@@ -54,34 +54,29 @@ contract GMKey is ERC721URIStorage, Ownable {
 		baseTokenURI = _baseTokenURI;
 	}
 
-	// @functionName _baseURI
-	// @functionDescription overide base token URI format (https://www.google.com/nft/)
-	function _baseURI() internal view virtual override returns (string memory) {
-		return baseTokenURI;
-	}
-
 	// @functionName addProject
 	// @functionDescription add available project to mint
 	function addProject(
 		uint256 _maxUnit, // max unit
-		uint256 _price, // project nft price
+		uint256 _amount, // project nft price
 		string memory _name, // project name
 		string memory _code // project token address sample: "0x06012c8cf97bead5deae237070f9587f8e7a266d" -> CryptoKitties
-	) public returns (string memory) {
-		// check if owner
+	) public returns (bool) {
+		// TODO: check if owner
 		// ???
-
-		// increase project count
-		projectCount += 1;
+		// return false;
 
 		ProjectStruct storage project = projects[_code];
 		project.maxUnit = _maxUnit;
 		project.currentUnit = 0;
-		project.price = _price;
+		project.amount = _amount;
 		project.name = _name;
 		project.exists = true;
 
-		return _code;
+		projectCount += 1;
+
+		console.log('project created code:', _code);
+		return true;
 	}
 
 	// @functionName getProjectCount
@@ -98,6 +93,20 @@ contract GMKey is ERC721URIStorage, Ownable {
 
 	// ================================================================================================================
 
+	// @overrideName _baseURI
+	// @overrideDescription overide base token URI format (https://www.google.com/nft/)
+	function _baseURI() internal view virtual override returns (string memory) {
+		return baseTokenURI;
+	}
+
+	// @functionName getBaseURI
+	// @functionDescription get base uri
+	function getBaseURI() public view returns (string memory) {
+		return baseTokenURI;
+	}
+
+	// ================================================================================================================
+
 	// @functionName addToBlockChain
 	// @functionDescription mint gmkey and add it to the blockchain
 	function addToBlockChain(
@@ -106,12 +115,10 @@ contract GMKey is ERC721URIStorage, Ownable {
 		string memory _name, // nft name
 		string memory _text, // ipfs text path
 		string memory _image // ipfs image path
-	) public returns (uint256) {
+	) public returns (bool) {
 		// check if project code dosent exits
-		require(!projects[_code].exists, 'project code dosent exixts');
+		require(projects[_code].exists, 'project code dosent exixts');
 
-		// increase token count
-		nftCount.increment();
 		uint256 tokenId = nftCount.current();
 
 		// increase project token
@@ -123,7 +130,7 @@ contract GMKey is ERC721URIStorage, Ownable {
 				payable(msg.sender),
 				payable(_receiver),
 				tokenId,
-				project.price,
+				project.amount,
 				block.timestamp,
 				_code,
 				_name,
@@ -131,22 +138,26 @@ contract GMKey is ERC721URIStorage, Ownable {
 				_image
 			)
 		);
+		nftCount.increment();
 
 		// mint token
 		_safeMint(payable(_receiver), tokenId);
 
+		// send to event listener
 		emit NewNftEvent(
 			payable(msg.sender),
 			payable(_receiver),
 			tokenId,
-			project.price,
+			project.amount,
 			block.timestamp,
 			_code,
 			_name,
 			_text,
 			_image
 		);
-		return tokenId;
+
+		console.log('nft created token:', tokenId);
+		return true;
 	}
 
 	// @functionName getNftCount
