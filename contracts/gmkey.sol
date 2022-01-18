@@ -62,9 +62,8 @@ contract GMKey is ERC721URIStorage, Ownable {
 		string memory _name, // project name
 		string memory _code // project token address sample: "0x06012c8cf97bead5deae237070f9587f8e7a266d" -> CryptoKitties
 	) public returns (bool) {
-		// TODO: check if owner
-		// ???
-		// return false;
+		// TODO: check if ownerAddress
+		// require(???, 'can only run by owner adress');
 
 		ProjectStruct storage project = projects[_code];
 		project.maxUnit = _maxUnit;
@@ -120,9 +119,12 @@ contract GMKey is ERC721URIStorage, Ownable {
 		require(projects[_code].exists, 'project code dosent exixts');
 
 		uint256 tokenId = nftCount.current();
+		ProjectStruct storage project = projects[_code];
+
+		// TODO: check if maxUnit has been reach
+		// require(???, 'max token has benn mint');
 
 		// increase project token
-		ProjectStruct storage project = projects[_code];
 		project.currentUnit += 1;
 
 		nfts.push(
@@ -169,6 +171,9 @@ contract GMKey is ERC721URIStorage, Ownable {
 	// @functionName getAllNft
 	// @functionDescription get all the list of minted gmkey
 	function getAllNft() public view returns (NftStruct[] memory) {
+		// TODO: add pagination and filtering
+		// ???
+
 		return nfts;
 	}
 
