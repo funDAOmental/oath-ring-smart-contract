@@ -10,8 +10,9 @@ contract Nftxt is ERC721 {
 	using Counters for Counters.Counter;
 	Counters.Counter private tokenIdCount;
 
-	address payable internal ownerAddress;
-	uint256 internal nftPrice;
+	address payable private ownerAddress;
+	string private baseTokenURI;
+	uint256 private nftPrice;
 
 	struct NftMetaDataStruct {
 		string nftLink;
@@ -52,13 +53,20 @@ contract Nftxt is ERC721 {
 		string image
 	);
 
-	constructor(address payable _ownerAddress) ERC721('NFTxT', 'NFTxT') {
+	constructor(address payable _ownerAddress, string memory _baseTokenURI) ERC721('NFTxT', 'NFTxT') {
 		ownerAddress = _ownerAddress;
+		baseTokenURI = _baseTokenURI;
 
 		// set nft price
 		nftPrice = 0.1 * 10**18;
 	}
 
+	// overide base token URI format (https://www.google.com/nft/)
+	function _baseURI() internal view virtual override returns (string memory) {
+		return baseTokenURI;
+	}
+
+	// mint nftxt
 	function addToBlockChain(
 		address payable _receiver,
 		string memory _name,
