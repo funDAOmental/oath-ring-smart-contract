@@ -174,6 +174,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	// @functionName removeFromBlockChain
 	// @functionDescription burn gmkey and remove it to the blockchain
 	function removeFromBlockChain(uint256 _tokenId) public payable returns (bool) {
+		delete nfts[_tokenId];
 		_burn(_tokenId);
 
 		nftCount.decrement();
