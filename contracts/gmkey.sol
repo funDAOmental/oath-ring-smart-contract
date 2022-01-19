@@ -3,11 +3,12 @@
 pragma solidity ^0.8.4;
 
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
+import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 import 'hardhat/console.sol';
 
-contract GMKey is ERC721, Ownable {
+contract GMKey is ERC721, ERC721Burnable, Ownable {
 	using Counters for Counters.Counter;
 
 	string private baseTokenURI;
@@ -51,7 +52,7 @@ contract GMKey is ERC721, Ownable {
 		address _code // project token address sample: "0x06012c8cf97bead5deae237070f9587f8e7a266d" -> CryptoKitties
 	) public onlyOwner returns (bool) {
 		// check if address already exists
-		require(projects[_code].exists, 'project already exixts');
+		require(!projects[_code].exists, 'project already exixts');
 
 		ProjectStruct storage project1 = projects[_code];
 		project1.maxUnit = _maxUnit;
@@ -95,7 +96,7 @@ contract GMKey is ERC721, Ownable {
 		address _address // user/wallet address name sample: "0x924634D6964E171498f2a292185b1554893D95E5" -> JNPL rinkeby testnet
 	) internal returns (bool) {
 		// check if address already exists
-		require(addresses[_address].exists, 'address already exixts');
+		require(!addresses[_address].exists, 'address already exixts');
 
 		AddressStruct storage address1 = addresses[_address];
 		address1.maxUnit = _maxUnit;
@@ -147,11 +148,11 @@ contract GMKey is ERC721, Ownable {
 
 		ProjectStruct storage project1 = projects[_code];
 		require(msg.value >= project1.amount, 'not enough coins');
-		require(project1.currentUnit >= project1.maxUnit, 'max project has been mint');
+		require(project1.maxUnit >= project1.currentUnit, 'max project has been mint');
 
 		AddressStruct storage address1 = addresses[_receiver];
 		if (address1.exists) {
-			require(address1.currentUnit >= address1.maxUnit, 'max user/address been mint');
+			require(address1.maxUnit >= address1.currentUnit, 'max user/address been mint');
 			address1.currentUnit += 1;
 		} else {
 			addAddress(3, _receiver);
@@ -167,6 +168,17 @@ contract GMKey is ERC721, Ownable {
 		nftCount.increment();
 
 		console.log('nft created token:', tokenId);
+		return true;
+	}
+
+	// @functionName removeFromBlockChain
+	// @functionDescription burn gmkey and remove it to the blockchain
+	function removeFromBlockChain(uint256 _tokenId) public payable returns (bool) {
+		_burn(_tokenId);
+
+		nftCount.decrement();
+
+		console.log('nft burned token:', _tokenId);
 		return true;
 	}
 

@@ -3,6 +3,7 @@
 /* eslint-disable */
 export type { Ownable } from "./Ownable";
 export type { ERC721 } from "./ERC721";
+export type { ERC721Burnable } from "./ERC721Burnable";
 export type { ERC721URIStorage } from "./ERC721URIStorage";
 export type { IERC721Metadata } from "./IERC721Metadata";
 export type { IERC721 } from "./IERC721";
@@ -14,6 +15,7 @@ export type { Nftxt } from "./Nftxt";
 
 export { Ownable__factory } from "./factories/Ownable__factory";
 export { ERC721__factory } from "./factories/ERC721__factory";
+export { ERC721Burnable__factory } from "./factories/ERC721Burnable__factory";
 export { ERC721URIStorage__factory } from "./factories/ERC721URIStorage__factory";
 export { IERC721Metadata__factory } from "./factories/IERC721Metadata__factory";
 export { IERC721__factory } from "./factories/IERC721__factory";
