@@ -3,12 +3,11 @@
 pragma solidity ^0.8.4;
 
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
-import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 import 'hardhat/console.sol';
 
-contract GMKey is ERC721, ERC721URIStorage, Ownable {
+contract GMKey is ERC721, Ownable {
 	using Counters for Counters.Counter;
 
 	string private baseTokenURI;
@@ -19,18 +18,6 @@ contract GMKey is ERC721, ERC721URIStorage, Ownable {
 	}
 
 	// OVERIDE FUNCTION ===========================================================================================
-	// @overrideName _burn
-	// @overrideDescription overide burn function
-	function _burn(uint256 _tokenId) internal override(ERC721, ERC721URIStorage) {
-		super._burn(_tokenId);
-	}
-
-	// @overrideName tokenURI
-	// @overrideDescription overide tokenURI function
-	function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
-		return super.tokenURI(tokenId);
-	}
-
 	// @overrideName _baseURI
 	// @overrideDescription overide base token URI format (https://www.google.com/nft/)
 	function _baseURI() internal view override returns (string memory) {
@@ -156,7 +143,6 @@ contract GMKey is ERC721, ERC721URIStorage, Ownable {
 		string memory _text, // ipfs text path
 		string memory _image // ipfs image path
 	) public payable returns (bool) {
-		// check if project code dosent exits
 		require(projects[_code].exists, 'project code dosent exixts');
 
 		ProjectStruct storage project1 = projects[_code];
