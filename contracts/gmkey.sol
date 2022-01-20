@@ -19,14 +19,18 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	}
 
 	// OVERIDE FUNCTION ===========================================================================================
-	// @overrideName _baseURI
-	// @overrideDescription overide base token URI format (https://www.google.com/nft/)
+	/*
+	 * @overrideName _baseURI
+	 * @overrideDescription overide base token URI format (https://www.google.com/nft/)
+	 */
 	function _baseURI() internal view override returns (string memory) {
 		return baseTokenURI;
 	}
 
-	// @functionName getBaseURI
-	// @functionDescription get base uri
+	/*
+	 * @functionName getBaseURI
+	 * @functionDescription get base uri
+	 */
 	function getBaseURI() public view returns (string memory) {
 		return baseTokenURI;
 	}
@@ -43,8 +47,10 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	uint256 public projectCount;
 	mapping(address => ProjectStruct) public projects;
 
-	// @functionName addProject
-	// @functionDescription add available project to mint
+	/*
+	 * @functionName addProject
+	 * @functionDescription add available project to mint
+	 */
 	function addProject(
 		uint256 _maxUnit, // max unit
 		uint256 _amount, // project nft price
@@ -67,14 +73,18 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		return true;
 	}
 
-	// @functionName getProjectCount
-	// @functionDescription get project count
+	/*
+	 * @functionName getProjectCount
+	 * @functionDescription get project count
+	 */
 	function getProjectCount() public view returns (uint256) {
 		return projectCount;
 	}
 
-	// @functionName getOneProject
-	// @functionDescription get project information
+	/*
+	 * @functionName getOneProject
+	 * @functionDescription get project information
+	 */
 	function getOneProject(address _code) public view returns (ProjectStruct memory) {
 		return projects[_code];
 	}
@@ -89,8 +99,10 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	uint256 public addressCount;
 	mapping(address => AddressStruct) public addresses;
 
-	// @functionName addAddress
-	// @functionDescription add address of nft owner
+	/*
+	 * @functionName addAddress
+	 * @functionDescription add address of nft owner
+	 */
 	function addAddress(
 		uint256 _maxUnit, // max unit
 		address _address // user/wallet address name sample: "0x924634D6964E171498f2a292185b1554893D95E5" -> JNPL rinkeby testnet
@@ -109,14 +121,18 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		return true;
 	}
 
-	// @functionName getAddressCount
-	// @functionDescription get address count
+	/*
+	 * @functionName getAddressCount
+	 * @functionDescription get address count
+	 */
 	function getAddressCount() public view returns (uint256) {
 		return addressCount;
 	}
 
-	// @functionName getOneAddress
-	// @functionDescription get address information
+	/*
+	 * @functionName getOneAddress
+	 * @functionDescription get address information
+	 */
 	function getOneAddress(address _address) public view returns (AddressStruct memory) {
 		return addresses[_address];
 	}
@@ -135,8 +151,10 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	Counters.Counter private nftCount;
 	NftStruct[] public nfts;
 
-	// @functionName addToBlockChain
-	// @functionDescription mint gmkey and add it to the blockchain
+	/*
+	 * @functionName addToBlockChain
+	 * @functionDescription mint gmkey and add it to the blockchain
+	 */
 	function addToBlockChain(
 		address _receiver, // user/wallet to recieve NFT
 		address _code, // project token address sample: "0x06012c8cf97bead5deae237070f9587f8e7a266d" -> CryptoKitties
@@ -171,8 +189,10 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		return true;
 	}
 
-	// @functionName removeFromBlockChain
-	// @functionDescription burn gmkey and remove it to the blockchain
+	/*
+	 * @functionName removeFromBlockChain
+	 * @functionDescription burn gmkey and remove it to the blockchain
+	 */
 	function removeFromBlockChain(uint256 _tokenId) public payable returns (bool) {
 		require(nfts.length > _tokenId, 'invalid tokenId');
 
@@ -185,23 +205,65 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		return true;
 	}
 
-	// @functionName getNftCount
-	// @functionDescription get gmkey count
+	/*
+	 * @functionName getNftCount
+	 * @functionDescription get gmkey count
+	 */
 	function getNftCount() public view returns (uint256) {
 		return nftCount.current();
 	}
 
-	// @functionName getAllNft
-	// @functionDescription get all the list of minted gmkey
+	/*
+	 * @functionName getAllNft
+	 * @functionDescription get all the list of minted gmkey
+	 */
 	function getAllNft() public view returns (NftStruct[] memory) {
-		// TODO: add pagination and filtering
-		// ???
-
 		return nfts;
 	}
 
-	// @functionName getOneNft
-	// @functionDescription get gmkey information
+	/*
+	 * @functionName getFilteredNft
+	 * @functionDescription get all the list of minted gmkey
+	 */
+	function getFilteredNft(uint256 _page, uint256 _resultsPerPage) public view returns (NftStruct[] memory, uint256) {
+		uint256 len = nfts.length;
+
+		// limit per page result to 20
+		if (_resultsPerPage > 20) {
+			_resultsPerPage = 20;
+		}
+
+		// limit per page result to max nfts
+		if (_resultsPerPage > len) {
+			_resultsPerPage = len;
+		}
+
+		uint256 nftIndex = _resultsPerPage * _page - _resultsPerPage;
+		// return emptry nfts
+		if (len == 0 || nftIndex > len) {
+			return (new NftStruct[](_resultsPerPage), len);
+		}
+
+		// create temp nfts data
+		NftStruct[] memory tempNfts = new NftStruct[](_resultsPerPage);
+		uint256 returnCounter = 0;
+
+		for (nftIndex; nftIndex < _resultsPerPage * _page; nftIndex++) {
+			// add array item unless out of bounds
+			if (nftIndex < len) {
+				tempNfts[returnCounter] = nfts[nftIndex];
+			}
+
+			returnCounter++;
+		}
+
+		return (tempNfts, len);
+	}
+
+	/*
+	 * @functionName getOneNft
+	 * @functionDescription get gmkey information
+	 */
 	function getOneNft(uint256 _tokenId) public view returns (NftStruct memory) {
 		return nfts[_tokenId];
 	}

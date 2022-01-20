@@ -70,7 +70,7 @@ describe('gmkey contract', async () => {
 	});
 
 	it('should add to blockchain', async () => {
-		const blockChain = await gMKey.addToBlockChain(receiver1, project1Code, nftName, ipfsText, ipfsImage, {
+		const blockChain = await gMKey.addToBlockChain(receiver1, project1Code, `${nftName}-1`, ipfsText, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		const blockChainWait = await blockChain.wait();
@@ -111,25 +111,25 @@ describe('gmkey contract', async () => {
 		expect(blockChainOne['receiver']).to.equal(receiver1);
 		expect(blockChainOne['amount']).to.equal(ethers.utils.parseEther('0.1'));
 		expect(blockChainOne['code']).to.equal(project1Code);
-		expect(blockChainOne['name']).to.equal(nftName);
+		expect(blockChainOne['name']).to.equal(`${nftName}-1`);
 		expect(blockChainOne['text']).to.equal(ipfsText);
 		expect(blockChainOne['image']).to.equal(ipfsImage);
 	});
 
 	it('should max blockchain project creation (CryptoPunks)', async () => {
-		const blockChain1 = await gMKey.addToBlockChain(receiver1, project2Code, nftName, ipfsText, ipfsImage, {
+		const blockChain1 = await gMKey.addToBlockChain(receiver1, project2Code, `${nftName}-2`, ipfsText, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain1.wait();
 		expect(await gMKey.getNftCount()).to.equal(2);
 
-		const blockChain2 = await gMKey.addToBlockChain(receiver1, project2Code, nftName, ipfsText, ipfsImage, {
+		const blockChain2 = await gMKey.addToBlockChain(receiver1, project2Code, `${nftName}-3`, ipfsText, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain2.wait();
 		expect(await gMKey.getNftCount()).to.equal(3);
 
-		const blockChain3 = await gMKey.addToBlockChain(receiver1, project2Code, nftName, ipfsText, ipfsImage, {
+		const blockChain3 = await gMKey.addToBlockChain(receiver1, project2Code, `${nftName}-4`, ipfsText, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain3.wait();
@@ -161,7 +161,7 @@ describe('gmkey contract', async () => {
 	});
 
 	it('should add to blockchain new reciever', async () => {
-		const blockChain1 = await gMKey.addToBlockChain(receiver2, project1Code, nftName, ipfsText, ipfsImage, {
+		const blockChain1 = await gMKey.addToBlockChain(receiver2, project1Code, `${nftName}-5`, ipfsText, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain1.wait();
@@ -176,19 +176,19 @@ describe('gmkey contract', async () => {
 	});
 
 	it('should max blockchain user creation (0x58933D8678b574349bE3CdDd3de115468e8cb3f0)', async () => {
-		const blockChain1 = await gMKey.addToBlockChain(receiver3, project1Code, nftName, ipfsText, ipfsImage, {
+		const blockChain1 = await gMKey.addToBlockChain(receiver3, project1Code, `${nftName}-6`, ipfsText, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain1.wait();
 		expect(await gMKey.getNftCount()).to.equal(6);
 
-		const blockChain2 = await gMKey.addToBlockChain(receiver3, project1Code, nftName, ipfsText, ipfsImage, {
+		const blockChain2 = await gMKey.addToBlockChain(receiver3, project1Code, `${nftName}-7`, ipfsText, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain2.wait();
 		expect(await gMKey.getNftCount()).to.equal(7);
 
-		const blockChain3 = await gMKey.addToBlockChain(receiver3, project1Code, nftName, ipfsText, ipfsImage, {
+		const blockChain3 = await gMKey.addToBlockChain(receiver3, project1Code, `${nftName}-8`, ipfsText, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain3.wait();
@@ -207,5 +207,24 @@ describe('gmkey contract', async () => {
 		const blockChainAll = await gMKey.getAllNft();
 		// console.log(blockChainAll);
 		expect(blockChainAll.length).to.equal(8);
+	});
+
+	it('should get all filtered blockchain data', async () => {
+		const [blockChainFiltered1, len1] = await gMKey.getFilteredNft(1, 999);
+		// console.log(blockChainFiltered1);
+		expect(blockChainFiltered1.length).to.equal(8);
+		expect(len1).to.equal(8);
+
+		const [blockChainFiltered2, len2] = await gMKey.getFilteredNft(2, 3);
+		// console.log(blockChainFiltered2);
+		expect(blockChainFiltered2.length).to.equal(3);
+
+		const [blockChainFiltered3, len3] = await gMKey.getFilteredNft(3, 3);
+		// console.log(blockChainFiltered3);
+		expect(blockChainFiltered3.length).to.equal(3);
+
+		const [blockChainFiltered4, len4] = await gMKey.getFilteredNft(4, 3);
+		// console.log(blockChainFiltered4);
+		expect(blockChainFiltered4.length).to.equal(3);
 	});
 });

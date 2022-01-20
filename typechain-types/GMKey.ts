@@ -99,6 +99,7 @@ export interface GMKeyInterface extends utils.Interface {
     "getAllNft()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getBaseURI()": FunctionFragment;
+    "getFilteredNft(uint256,uint256)": FunctionFragment;
     "getNftCount()": FunctionFragment;
     "getOneAddress(address)": FunctionFragment;
     "getOneNft(uint256)": FunctionFragment;
@@ -153,6 +154,10 @@ export interface GMKeyInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getBaseURI",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getFilteredNft",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getNftCount",
@@ -247,6 +252,10 @@ export interface GMKeyInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getBaseURI", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getFilteredNft",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getNftCount",
     data: BytesLike
@@ -434,6 +443,12 @@ export interface GMKey extends BaseContract {
 
     getBaseURI(overrides?: CallOverrides): Promise<[string]>;
 
+    getFilteredNft(
+      _page: BigNumberish,
+      _resultsPerPage: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[GMKey.NftStructStructOutput[], BigNumber]>;
+
     getNftCount(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getOneAddress(
@@ -608,6 +623,12 @@ export interface GMKey extends BaseContract {
 
   getBaseURI(overrides?: CallOverrides): Promise<string>;
 
+  getFilteredNft(
+    _page: BigNumberish,
+    _resultsPerPage: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<[GMKey.NftStructStructOutput[], BigNumber]>;
+
   getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
 
   getOneAddress(
@@ -774,6 +795,12 @@ export interface GMKey extends BaseContract {
     ): Promise<string>;
 
     getBaseURI(overrides?: CallOverrides): Promise<string>;
+
+    getFilteredNft(
+      _page: BigNumberish,
+      _resultsPerPage: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[GMKey.NftStructStructOutput[], BigNumber]>;
 
     getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -977,6 +1004,12 @@ export interface GMKey extends BaseContract {
 
     getBaseURI(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getFilteredNft(
+      _page: BigNumberish,
+      _resultsPerPage: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
 
     getOneAddress(
@@ -1120,6 +1153,12 @@ export interface GMKey extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getBaseURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getFilteredNft(
+      _page: BigNumberish,
+      _resultsPerPage: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     getNftCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
