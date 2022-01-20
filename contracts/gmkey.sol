@@ -63,7 +63,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 
 		projectCount += 1;
 
-		console.log('project created code:', _code);
+		// console.log('project created code:', _code);
 		return true;
 	}
 
@@ -105,7 +105,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 
 		addressCount += 1;
 
-		console.log('adress created address:', _address);
+		// console.log('adress created address:', _address);
 		return true;
 	}
 
@@ -148,11 +148,11 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 
 		ProjectStruct storage project1 = projects[_code];
 		require(msg.value >= project1.amount, 'not enough coins');
-		require(project1.maxUnit >= project1.currentUnit, 'max project has been mint');
+		require(project1.maxUnit > project1.currentUnit, 'max project has been mint');
 
 		AddressStruct storage address1 = addresses[_receiver];
 		if (address1.exists) {
-			require(address1.maxUnit >= address1.currentUnit, 'max user/address been mint');
+			require(address1.maxUnit > address1.currentUnit, 'max user/address been mint');
 			address1.currentUnit += 1;
 		} else {
 			addAddress(3, _receiver);
@@ -167,7 +167,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		project1.currentUnit += 1;
 		nftCount.increment();
 
-		console.log('nft created token:', tokenId);
+		// console.log('nft created token:', tokenId);
 		return true;
 	}
 
@@ -181,7 +181,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 
 		nftCount.decrement();
 
-		console.log('nft burned token:', _tokenId);
+		// console.log('nft burned token:', _tokenId);
 		return true;
 	}
 
