@@ -99,7 +99,7 @@ export interface GMKeyInterface extends utils.Interface {
     "getAllNft()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getBaseURI()": FunctionFragment;
-    "getFilteredNft(uint256,uint256)": FunctionFragment;
+    "getFilteredNft(uint256,uint256,address)": FunctionFragment;
     "getNftCount()": FunctionFragment;
     "getOneAddress(address)": FunctionFragment;
     "getOneNft(uint256)": FunctionFragment;
@@ -157,7 +157,7 @@ export interface GMKeyInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getFilteredNft",
-    values: [BigNumberish, BigNumberish]
+    values: [BigNumberish, BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "getNftCount",
@@ -446,6 +446,7 @@ export interface GMKey extends BaseContract {
     getFilteredNft(
       _page: BigNumberish,
       _resultsPerPage: BigNumberish,
+      _code: string,
       overrides?: CallOverrides
     ): Promise<[GMKey.NftStructStructOutput[], BigNumber]>;
 
@@ -626,6 +627,7 @@ export interface GMKey extends BaseContract {
   getFilteredNft(
     _page: BigNumberish,
     _resultsPerPage: BigNumberish,
+    _code: string,
     overrides?: CallOverrides
   ): Promise<[GMKey.NftStructStructOutput[], BigNumber]>;
 
@@ -799,6 +801,7 @@ export interface GMKey extends BaseContract {
     getFilteredNft(
       _page: BigNumberish,
       _resultsPerPage: BigNumberish,
+      _code: string,
       overrides?: CallOverrides
     ): Promise<[GMKey.NftStructStructOutput[], BigNumber]>;
 
@@ -1007,6 +1010,7 @@ export interface GMKey extends BaseContract {
     getFilteredNft(
       _page: BigNumberish,
       _resultsPerPage: BigNumberish,
+      _code: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1157,6 +1161,7 @@ export interface GMKey extends BaseContract {
     getFilteredNft(
       _page: BigNumberish,
       _resultsPerPage: BigNumberish,
+      _code: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

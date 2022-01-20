@@ -225,7 +225,11 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	 * @functionName getFilteredNft
 	 * @functionDescription get all the list of minted gmkey
 	 */
-	function getFilteredNft(uint256 _page, uint256 _resultsPerPage) public view returns (NftStruct[] memory, uint256) {
+	function getFilteredNft(
+		uint256 _page,
+		uint256 _resultsPerPage,
+		address _code
+	) public view returns (NftStruct[] memory, uint256) {
 		uint256 len = nfts.length;
 
 		// limit per page result to 20
@@ -234,30 +238,36 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		}
 
 		// limit per page result to max nfts
-		if (_resultsPerPage > len) {
-			_resultsPerPage = len;
-		}
+		// if (_resultsPerPage > len) {
+		// 	_resultsPerPage = len;
+		// }
 
 		uint256 nftIndex = _resultsPerPage * _page - _resultsPerPage;
 		// return emptry nfts
 		if (len == 0 || nftIndex > len) {
-			return (new NftStruct[](_resultsPerPage), len);
+			return (new NftStruct[](_resultsPerPage), 0);
 		}
 
 		// create temp nfts data
 		NftStruct[] memory tempNfts = new NftStruct[](_resultsPerPage);
-		uint256 returnCounter = 0;
+		uint256 tempNftCount = 0;
 
 		for (nftIndex; nftIndex < _resultsPerPage * _page; nftIndex++) {
 			// add array item unless out of bounds
 			if (nftIndex < len) {
-				tempNfts[returnCounter] = nfts[nftIndex];
+				if (_code == address(0)) {
+					tempNfts[tempNftCount] = nfts[nftIndex];
+					tempNftCount++;
+				} else {
+					if (nfts[nftIndex].code == _code) {
+						tempNfts[tempNftCount] = nfts[nftIndex];
+						tempNftCount++;
+					}
+				}
 			}
-
-			returnCounter++;
 		}
 
-		return (tempNfts, len);
+		return (tempNfts, tempNftCount);
 	}
 
 	/*

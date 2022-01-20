@@ -210,21 +210,30 @@ describe('gmkey contract', async () => {
 	});
 
 	it('should get all filtered blockchain data', async () => {
-		const [blockChainFiltered1, len1] = await gMKey.getFilteredNft(1, 999);
+		const [blockChainFiltered1, len1] = await gMKey.getFilteredNft(1, 99, '0x0000000000000000000000000000000000000000');
 		// console.log(blockChainFiltered1);
-		expect(blockChainFiltered1.length).to.equal(8);
 		expect(len1).to.equal(8);
 
-		const [blockChainFiltered2, len2] = await gMKey.getFilteredNft(2, 3);
+		const [blockChainFiltered2, len2] = await gMKey.getFilteredNft(2, 3, '0x0000000000000000000000000000000000000000');
 		// console.log(blockChainFiltered2);
-		expect(blockChainFiltered2.length).to.equal(3);
+		expect(len2).to.equal(3);
 
-		const [blockChainFiltered3, len3] = await gMKey.getFilteredNft(3, 3);
+		const [blockChainFiltered3, len3] = await gMKey.getFilteredNft(3, 3, '0x0000000000000000000000000000000000000000');
 		// console.log(blockChainFiltered3);
-		expect(blockChainFiltered3.length).to.equal(3);
+		expect(len3).to.equal(2);
 
-		const [blockChainFiltered4, len4] = await gMKey.getFilteredNft(4, 3);
+		const [blockChainFiltered4, len4] = await gMKey.getFilteredNft(4, 3, '0x0000000000000000000000000000000000000000');
 		// console.log(blockChainFiltered4);
-		expect(blockChainFiltered4.length).to.equal(3);
+		expect(len4).to.equal(0);
+	});
+
+	it('should get all filtered blockchain data by project code', async () => {
+		const [blockChainFiltered1, len1] = await gMKey.getFilteredNft(1, 10, project1Code);
+		// console.log(blockChainFiltered1);
+		expect(len1).to.equal(5);
+
+		const [blockChainFiltered2, len2] = await gMKey.getFilteredNft(1, 10, project2Code);
+		// console.log(blockChainFiltered2);
+		expect(len2).to.equal(3);
 	});
 });
