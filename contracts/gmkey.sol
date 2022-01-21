@@ -35,7 +35,48 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		return baseTokenURI;
 	}
 
-	// PROJECT FUNCTION =============================================================================================
+	// WHITELIST FUNCTION ===========================================================================================
+	// add whitelist address
+	// mapping(address => bool) public whitelistedAddresses;
+
+	// /*
+	//  * @functionName addWhitelistedUser
+	//  * @functionDescription add whitelisted user
+	//  */
+	// function addWhitelistedUser(
+	// 	address _address // user/wallet address name
+	// ) public onlyOwner returns (bool) {
+	// 	whitelistedAddresses[_address] = true;
+
+	// 	return true;
+	// }
+
+	// /*
+	//  * @functionName addAllWhitelistedUser
+	//  * @functionDescription add all whitelisted user
+	//  */
+	// function addAllWhitelistedUser(
+	// 	address[] memory _address // user/wallet address name
+	// ) public onlyOwner returns (bool) {
+	// 	for (uint256 i = 0; i < _address.length; i++) {
+	// 		whitelistedAddresses[_address[i]] = true;
+	// 	}
+
+	// 	return true;
+	// }
+
+	// /*
+	//  * @functionName verifyWhitelistedUser
+	//  * @functionDescription verify whitelisted user
+	//  */
+	// function verifyWhitelistedUser(
+	// 	address _address // user/wallet address name
+	// ) public view returns (bool) {
+	// 	bool userIsWhitelisted = whitelistedAddresses[_address];
+	// 	return userIsWhitelisted;
+	// }
+
+	// PROJECT FUNCTION ===========================================================================================
 	// add validation that project can only mint 500 nft (based on maxUnit)
 	struct ProjectStruct {
 		uint256 maxUnit;
@@ -55,7 +96,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		uint256 _maxUnit, // max unit
 		uint256 _amount, // project nft price
 		string memory _name, // project name
-		address _code // project token address sample: "0x06012c8cf97bead5deae237070f9587f8e7a266d" -> CryptoKitties
+		address _code // project token address
 	) public onlyOwner returns (bool) {
 		// check if address already exists
 		require(!projects[_code].exists, 'project already exixts');
@@ -69,7 +110,6 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 
 		projectCount += 1;
 
-		// console.log('project created code:', _code);
 		return true;
 	}
 
@@ -89,7 +129,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		return projects[_code];
 	}
 
-	// ADDRESS FUNCTION =============================================================================================
+	// ADDRESS FUNCTION ===========================================================================================
 	// add validation that user/wallet address can only mint 3 nft (based on maxUnit)
 	struct AddressStruct {
 		uint256 maxUnit;
@@ -105,7 +145,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	 */
 	function addAddress(
 		uint256 _maxUnit, // max unit
-		address _address // user/wallet address name sample: "0x924634D6964E171498f2a292185b1554893D95E5" -> JNPL rinkeby testnet
+		address _address // user/wallet address name
 	) internal returns (bool) {
 		// check if address already exists
 		require(!addresses[_address].exists, 'address already exixts');
@@ -117,7 +157,6 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 
 		addressCount += 1;
 
-		// console.log('adress created address:', _address);
 		return true;
 	}
 
@@ -157,11 +196,13 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	 */
 	function addToBlockChain(
 		address _receiver, // user/wallet to recieve NFT
-		address _code, // project token address sample: "0x06012c8cf97bead5deae237070f9587f8e7a266d" -> CryptoKitties
+		address _code, // project token address
 		string memory _name, // nft name
 		string memory _text, // ipfs text path
 		string memory _image // ipfs image path
 	) public payable returns (bool) {
+		// require(whitelistedAddresses[_receiver], 'receiver is not whitelisted');
+
 		require(projects[_code].exists, 'project code dosent exixts');
 
 		ProjectStruct storage project1 = projects[_code];
@@ -185,7 +226,6 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		project1.currentUnit += 1;
 		nftCount.increment();
 
-		// console.log('nft created token:', tokenId);
 		return true;
 	}
 
@@ -201,7 +241,6 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 
 		nftCount.decrement();
 
-		// console.log('nft burned token:', _tokenId);
 		return true;
 	}
 

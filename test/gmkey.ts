@@ -83,6 +83,14 @@ describe('gmkey contract', async () => {
 		expect(tokenURI).to.equal(`${baseTokenURI}${newTokenId}`);
 	});
 
+	// it('should reject to blockchain (receiver is not whitelisted', async () => {
+	// 	await expect(
+	// 		gMKey.addToBlockChain(receiver1, '0xF5b0A3eFB8e8E4c201e2A935F110eAaF3FFEcb8d', nftName, ipfsText, ipfsImage, {
+	// 			value: ethers.utils.parseEther('0.1'),
+	// 		})
+	// 	).to.be.revertedWith('receiver is not whitelisted');
+	// });
+
 	it('should reject to blockchain (project dosent exists)', async () => {
 		await expect(
 			gMKey.addToBlockChain(receiver1, '0xF5b0A3eFB8e8E4c201e2A935F110eAaF3FFEcb8d', nftName, ipfsText, ipfsImage, {
