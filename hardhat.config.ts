@@ -23,7 +23,20 @@ task('accounts', 'Prints the list of accounts', async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
-	solidity: '0.8.4',
+	defaultNetwork: 'hardhat',
+	solidity: {
+		compilers: [
+			{
+				version: '0.8.11',
+				settings: {
+					optimizer: {
+						enabled: true,
+						runs: 200,
+					},
+				},
+			},
+		],
+	},
 	networks: {
 		[process.env.ETHEREUM_NETWORK as string]: {
 			url: process.env.ETHEREUM_URL || '',

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.11;
 
 import '@openzeppelin/contracts/token/ERC721/ERC721.sol';
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol';
@@ -13,8 +13,41 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 
 	string private baseTokenURI;
 
+	struct ProjectStruct {
+		uint128 maxUnit;
+		uint128 currentUnit;
+		uint256 amount;
+		bytes32 name;
+		bool exists;
+	}
+
+	struct AddressStruct {
+		uint128 maxUnit;
+		uint128 currentUnit;
+		bool exists;
+	}
+
+	struct NftStruct {
+		address sender;
+		address receiver;
+		uint256 amount;
+		uint8 status;
+		address code;
+		string text;
+		string image;
+		uint256 timestamp;
+	}
+
+	mapping(address => bool) public whitelistedAddresses;
+	mapping(address => ProjectStruct) public projects;
+	mapping(address => AddressStruct) public addresses;
+
+	Counters.Counter private nftCount;
+	NftStruct[] public nfts;
+
 	constructor(address _ownerAddress, string memory _baseTokenURI) ERC721('GMKey by NFTxT', 'GMKEY') {
-		addAddress(99999, _ownerAddress); // owner address can mint 99999 number of nft
+		addAddress(9999, _ownerAddress); // owner address can mint 9999 number of nft
+		addWhitelistedUser(_ownerAddress); // owner is whitelisted by default
 		baseTokenURI = _baseTokenURI;
 	}
 
@@ -36,70 +69,62 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	}
 
 	// WHITELIST FUNCTION ===========================================================================================
-	// add whitelist address
-	// mapping(address => bool) public whitelistedAddresses;
+	// add whitelist address list of address that allowed to mint nft
+	// ERROR MSG:
+	// AAE: address already exists
 
-	// /*
-	//  * @functionName addWhitelistedUser
-	//  * @functionDescription add whitelisted user
-	//  */
-	// function addWhitelistedUser(
-	// 	address _address // user/wallet address name
-	// ) public onlyOwner returns (bool) {
-	// 	whitelistedAddresses[_address] = true;
+	/*
+	 * @functionName addWhitelistedUser
+	 * @functionDescription add whitelisted user
+	 */
+	function addWhitelistedUser(
+		address _address // user/wallet address name
+	) public onlyOwner {
+		require(!whitelistedAddresses[_address], 'AAE');
 
-	// 	return true;
-	// }
+		whitelistedAddresses[_address] = true;
+	}
 
-	// /*
-	//  * @functionName addAllWhitelistedUser
-	//  * @functionDescription add all whitelisted user
-	//  */
-	// function addAllWhitelistedUser(
-	// 	address[] memory _address // user/wallet address name
-	// ) public onlyOwner returns (bool) {
-	// 	for (uint256 i = 0; i < _address.length; i++) {
-	// 		whitelistedAddresses[_address[i]] = true;
-	// 	}
+	/*
+	 * @functionName addAllWhitelistedUser
+	 * @functionDescription add all whitelisted user
+	 */
+	function addAllWhitelistedUser(
+		address[] memory _address // user/wallet address name
+	) public onlyOwner {
+		for (uint256 i = 0; i < _address.length; i++) {
+			if (!whitelistedAddresses[_address[i]]) {
+				whitelistedAddresses[_address[i]] = true;
+			}
+		}
+	}
 
-	// 	return true;
-	// }
-
-	// /*
-	//  * @functionName verifyWhitelistedUser
-	//  * @functionDescription verify whitelisted user
-	//  */
-	// function verifyWhitelistedUser(
-	// 	address _address // user/wallet address name
-	// ) public view returns (bool) {
-	// 	bool userIsWhitelisted = whitelistedAddresses[_address];
-	// 	return userIsWhitelisted;
-	// }
+	/*
+	 * @functionName verifyWhitelistedUser
+	 * @functionDescription verify whitelisted user
+	 */
+	function verifyWhitelistedUser(
+		address _address // user/wallet address name
+	) public view returns (bool) {
+		return whitelistedAddresses[_address];
+	}
 
 	// PROJECT FUNCTION ===========================================================================================
 	// add validation that project can only mint 500 nft (based on maxUnit)
-	struct ProjectStruct {
-		uint256 maxUnit;
-		uint256 currentUnit;
-		uint256 amount;
-		string name;
-		bool exists;
-	}
-	uint256 public projectCount;
-	mapping(address => ProjectStruct) public projects;
+	// ERROR MSG:
+	// PAE: project already exists
 
 	/*
 	 * @functionName addProject
 	 * @functionDescription add available project to mint
 	 */
 	function addProject(
-		uint256 _maxUnit, // max unit
-		uint256 _amount, // project nft price
-		string memory _name, // project name
+		uint128 _maxUnit, // max unit
+		uint128 _amount, // project nft price
+		bytes32 _name, // project name
 		address _code // project token address
-	) public onlyOwner returns (bool) {
-		// check if address already exists
-		require(!projects[_code].exists, 'project already exixts');
+	) public onlyOwner {
+		require(!projects[_code].exists, 'PAE');
 
 		ProjectStruct storage project1 = projects[_code];
 		project1.maxUnit = _maxUnit;
@@ -107,18 +132,6 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		project1.amount = _amount;
 		project1.name = _name;
 		project1.exists = true;
-
-		projectCount += 1;
-
-		return true;
-	}
-
-	/*
-	 * @functionName getProjectCount
-	 * @functionDescription get project count
-	 */
-	function getProjectCount() public view returns (uint256) {
-		return projectCount;
 	}
 
 	/*
@@ -131,41 +144,23 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 
 	// ADDRESS FUNCTION ===========================================================================================
 	// add validation that user/wallet address can only mint 3 nft (based on maxUnit)
-	struct AddressStruct {
-		uint256 maxUnit;
-		uint256 currentUnit;
-		bool exists;
-	}
-	uint256 public addressCount;
-	mapping(address => AddressStruct) public addresses;
+	// ERROR MSG:
+	// PAE: address already exists
 
 	/*
 	 * @functionName addAddress
 	 * @functionDescription add address of nft owner
 	 */
 	function addAddress(
-		uint256 _maxUnit, // max unit
+		uint128 _maxUnit, // max unit
 		address _address // user/wallet address name
-	) internal returns (bool) {
-		// check if address already exists
-		require(!addresses[_address].exists, 'address already exixts');
+	) internal {
+		require(!addresses[_address].exists, 'AAE');
 
 		AddressStruct storage address1 = addresses[_address];
 		address1.maxUnit = _maxUnit;
 		address1.currentUnit = 1;
 		address1.exists = true;
-
-		addressCount += 1;
-
-		return true;
-	}
-
-	/*
-	 * @functionName getAddressCount
-	 * @functionDescription get address count
-	 */
-	function getAddressCount() public view returns (uint256) {
-		return addressCount;
 	}
 
 	/*
@@ -177,18 +172,14 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	}
 
 	// BLOCKCHAIN FUNCTION ==========================================================================================
-	struct NftStruct {
-		address sender;
-		address receiver;
-		uint256 amount;
-		address code;
-		string name;
-		string text;
-		string image;
-		uint256 timestamp;
-	}
-	Counters.Counter private nftCount;
-	NftStruct[] public nfts;
+	// blockchain mint and burn
+	// ERROR MSG:
+	// RNW: receiver is not whitelisted
+	// PDE: project dosent exists
+	// NEC: not enough coins
+	// PMM: max project has been mint
+	// AMM: max user/address been mint
+	// TID: token id dosent exists
 
 	/*
 	 * @functionName addToBlockChain
@@ -197,51 +188,42 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	function addToBlockChain(
 		address _receiver, // user/wallet to recieve NFT
 		address _code, // project token address
-		string memory _name, // nft name
 		string memory _text, // ipfs text path
 		string memory _image // ipfs image path
-	) public payable returns (bool) {
-		// require(whitelistedAddresses[_receiver], 'receiver is not whitelisted');
-
-		require(projects[_code].exists, 'project code dosent exixts');
+	) public payable {
+		require(whitelistedAddresses[_receiver], 'RNW');
+		require(projects[_code].exists, 'PDE');
 
 		ProjectStruct storage project1 = projects[_code];
-		require(msg.value >= project1.amount, 'not enough coins');
-		require(project1.maxUnit > project1.currentUnit, 'max project has been mint');
+		require(msg.value >= project1.amount, 'NEC');
+		require(project1.maxUnit > project1.currentUnit, 'PMM');
 
 		AddressStruct storage address1 = addresses[_receiver];
 		if (address1.exists) {
-			require(address1.maxUnit > address1.currentUnit, 'max user/address been mint');
+			require(address1.maxUnit > address1.currentUnit, 'AMM');
 			address1.currentUnit += 1;
 		} else {
 			addAddress(3, _receiver);
 		}
 
-		uint256 tokenId = nftCount.current();
 		nfts.push(
-			NftStruct(payable(msg.sender), payable(_receiver), project1.amount, _code, _name, _text, _image, block.timestamp)
+			NftStruct(payable(msg.sender), payable(_receiver), project1.amount, 0, _code, _text, _image, block.timestamp)
 		);
-		_safeMint(payable(_receiver), tokenId);
+		_safeMint(payable(_receiver), nftCount.current());
 
 		project1.currentUnit += 1;
 		nftCount.increment();
-
-		return true;
 	}
 
 	/*
 	 * @functionName removeFromBlockChain
 	 * @functionDescription burn gmkey and remove it to the blockchain
 	 */
-	function removeFromBlockChain(uint256 _tokenId) public payable returns (bool) {
-		require(nfts.length > _tokenId, 'invalid tokenId');
+	function removeFromBlockChain(uint256 _tokenId) public {
+		require(nfts.length > _tokenId, 'TID');
 
 		delete nfts[_tokenId];
 		_burn(_tokenId);
-
-		nftCount.decrement();
-
-		return true;
 	}
 
 	/*
@@ -265,35 +247,28 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	 * @functionDescription get all the list of minted gmkey
 	 */
 	function getFilteredNft(
-		uint256 _page,
-		uint256 _resultsPerPage,
+		uint128 _page,
+		uint128 _resultsPerPage,
 		address _code
-	) public view returns (NftStruct[] memory, uint256) {
-		uint256 len = nfts.length;
-
+	) public view returns (NftStruct[] memory, uint128) {
 		// limit per page result to 20
 		if (_resultsPerPage > 20) {
 			_resultsPerPage = 20;
 		}
 
-		// limit per page result to max nfts
-		// if (_resultsPerPage > len) {
-		// 	_resultsPerPage = len;
-		// }
-
-		uint256 nftIndex = _resultsPerPage * _page - _resultsPerPage;
+		uint128 nftIndex = _resultsPerPage * _page - _resultsPerPage;
 		// return emptry nfts
-		if (len == 0 || nftIndex > len) {
+		if (nfts.length == 0 || nftIndex > nfts.length) {
 			return (new NftStruct[](_resultsPerPage), 0);
 		}
 
 		// create temp nfts data
 		NftStruct[] memory tempNfts = new NftStruct[](_resultsPerPage);
-		uint256 tempNftCount = 0;
+		uint128 tempNftCount = 0;
 
 		for (nftIndex; nftIndex < _resultsPerPage * _page; nftIndex++) {
 			// add array item unless out of bounds
-			if (nftIndex < len) {
+			if (nftIndex < nfts.length) {
 				if (_code == address(0)) {
 					tempNfts[tempNftCount] = nfts[nftIndex];
 					tempNftCount++;
@@ -314,6 +289,8 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	 * @functionDescription get gmkey information
 	 */
 	function getOneNft(uint256 _tokenId) public view returns (NftStruct memory) {
+		require(nfts.length > _tokenId, 'TID');
+
 		return nfts[_tokenId];
 	}
 }

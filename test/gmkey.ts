@@ -8,14 +8,12 @@ describe('gmkey contract', async () => {
 	const ownerAddress: string = '0x924634D6964E171498f2a292185b1554893D95E5';
 	const baseTokenURI: string = 'https://www.jnpl.me/metadata?id=';
 
-	const project1Name: string = 'CryptoKittens'; // set limit to 500
+	const project1Name: string = ethers.utils.formatBytes32String('CryptoKittens'); // set limit to 500
 	const project1Code: string = '0x06012c8cf97BEaD5deAe237070F9587f8E7A266d';
-	const project2Name: string = 'CryptoPunks'; // set limit to 3
+	const project2Name: string = ethers.utils.formatBytes32String('CryptoPunks'); // set limit to 3
 	const project2Code: string = '0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb';
 
 	// add to blockchain test data
-	let newTokenId: number;
-	const nftName: string = 'random-name';
 	const ipfsText: string = 'QmcJ3ZVxrj2Py1Jt7DWR8HksVaXeR6T8ZM9CSVJZzSEHuG'; // 'https://ipfs.io/ipfs/QmcJ3ZVxrj2Py1Jt7DWR8HksVaXeR6T8ZM9CSVJZzSEHuG'
 	const ipfsImage: string = 'QmPsVS4jM5e1JmJR7Sp6ULui1PqbmpwsajaVTT6HNxrvQT'; // 'https://ipfs.io/ipfs/QmPsVS4jM5e1JmJR7Sp6ULui1PqbmpwsajaVTT6HNxrvQT'
 
@@ -30,9 +28,6 @@ describe('gmkey contract', async () => {
 	});
 
 	it('should initialize gmkey contract', async () => {
-		expect(await gMKey.getProjectCount()).to.equal(0);
-		expect(await gMKey.getAddressCount()).to.equal(1);
-
 		const project1 = await gMKey.getOneProject('0x9A32c490883adb80BDf05355D7D3FFBd283ddc67'); // sample invalid project
 		expect(project1['exists']).to.equal(false);
 
@@ -45,17 +40,35 @@ describe('gmkey contract', async () => {
 		expect(await gMKey.getBaseURI()).to.equal('https://www.jnpl.me/metadata?id=');
 	});
 
+	it('should add whitelisted user', async () => {
+		await gMKey.addWhitelistedUser(receiver2);
+		const whitelistedUser1 = await gMKey.verifyWhitelistedUser(receiver2);
+		expect(whitelistedUser1).to.equal(true);
+	});
+
+	it('should add multiple whitelisted user', async () => {
+		await gMKey.addAllWhitelistedUser([receiver2, receiver3]);
+		const whitelistedUser2 = await gMKey.verifyWhitelistedUser(receiver3);
+		expect(whitelistedUser2).to.equal(true);
+	});
+
+	it('should reject whitelisted user (address already exixts)', async () => {
+		await expect(gMKey.addWhitelistedUser(receiver2)).to.be.revertedWith('AAE');
+	});
+
 	it('should add project', async () => {
 		await gMKey.addProject(500, ethers.utils.parseEther('0.1'), project1Name, project1Code);
-		expect(await gMKey.getProjectCount()).to.equal(1);
+		const project1 = await gMKey.getOneProject(project1Code);
+		expect(project1['exists']).to.equal(true);
 
 		await gMKey.addProject(3, ethers.utils.parseEther('0.1'), project2Name, project2Code);
-		expect(await gMKey.getProjectCount()).to.equal(2);
+		const project2 = await gMKey.getOneProject(project1Code);
+		expect(project2['exists']).to.equal(true);
 	});
 
 	it('should reject duplicate project (project already exixts)', async () => {
 		await expect(gMKey.addProject(500, ethers.utils.parseEther('0.1'), project1Name, project1Code)).to.be.revertedWith(
-			'project already exixts'
+			'PAE'
 		);
 	});
 
@@ -65,79 +78,83 @@ describe('gmkey contract', async () => {
 		expect(project1['maxUnit']).to.equal(500);
 		expect(project1['currentUnit']).to.equal(0);
 		expect(project1['amount']).to.equal(ethers.utils.parseEther('0.1'));
-		expect(project1['name']).to.equal(project1Name);
+		expect(ethers.utils.parseBytes32String(project1['name'])).to.equal('CryptoKittens');
 		expect(project1['exists']).to.equal(true);
 	});
 
 	it('should add to blockchain', async () => {
-		const blockChain = await gMKey.addToBlockChain(receiver1, project1Code, `${nftName}-1`, ipfsText, ipfsImage, {
+		const blockChain = await gMKey.addToBlockChain(receiver1, project1Code, `${ipfsText}-1`, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		const blockChainWait = await blockChain.wait();
 		const blockChainEvent = blockChainWait.events[0];
-		newTokenId = Number(blockChainEvent.args['tokenId']);
+		const newTokenId: number = Number(blockChainEvent.args['tokenId']);
 
+		expect(newTokenId).to.equal(0);
 		expect(await gMKey.getNftCount()).to.equal(1);
 
 		const tokenURI = await gMKey.tokenURI(newTokenId);
 		expect(tokenURI).to.equal(`${baseTokenURI}${newTokenId}`);
 	});
 
-	// it('should reject to blockchain (receiver is not whitelisted', async () => {
-	// 	await expect(
-	// 		gMKey.addToBlockChain(receiver1, '0xF5b0A3eFB8e8E4c201e2A935F110eAaF3FFEcb8d', nftName, ipfsText, ipfsImage, {
-	// 			value: ethers.utils.parseEther('0.1'),
-	// 		})
-	// 	).to.be.revertedWith('receiver is not whitelisted');
-	// });
+	it('should reject to blockchain (receiver is not whitelisted)', async () => {
+		await expect(
+			gMKey.addToBlockChain('0xF5b0A3eFB8e8E4c201e2A935F110eAaF3FFEcb8d', project1Code, `${ipfsText}-1`, ipfsImage, {
+				value: ethers.utils.parseEther('0.1'),
+			})
+		).to.be.revertedWith('RNW');
+	});
 
 	it('should reject to blockchain (project dosent exists)', async () => {
 		await expect(
-			gMKey.addToBlockChain(receiver1, '0xF5b0A3eFB8e8E4c201e2A935F110eAaF3FFEcb8d', nftName, ipfsText, ipfsImage, {
+			gMKey.addToBlockChain(receiver1, '0xF5b0A3eFB8e8E4c201e2A935F110eAaF3FFEcb8d', `${ipfsText}-1`, ipfsImage, {
 				value: ethers.utils.parseEther('0.1'),
 			})
-		).to.be.revertedWith('project code dosent exixts');
+		).to.be.revertedWith('PDE');
 	});
 
 	it('should reject to blockchain (not enough coins)', async () => {
 		await expect(
-			gMKey.addToBlockChain(receiver1, project1Code, nftName, ipfsText, ipfsImage, {
+			gMKey.addToBlockChain(receiver1, project1Code, `${ipfsText}-1`, ipfsImage, {
 				value: ethers.utils.parseEther('0.01'),
 			})
-		).to.be.revertedWith('not enough coins');
+		).to.be.revertedWith('NEC');
 	});
 
-	it('should get all blockchain data 1', async () => {
+	it('should get all blockchain data (result 1)', async () => {
 		const blockChainAll = await gMKey.getAllNft();
 		// console.log(blockChainAll);
 		expect(blockChainAll.length).to.equal(1);
 	});
 
-	it('should get blockchain data 1', async () => {
-		const blockChainOne = await gMKey.getOneNft(newTokenId);
+	it('should get blockchain data 0', async () => {
+		const blockChainOne = await gMKey.getOneNft('0');
 		// console.log(blockChainOne);
 		expect(blockChainOne['receiver']).to.equal(receiver1);
 		expect(blockChainOne['amount']).to.equal(ethers.utils.parseEther('0.1'));
 		expect(blockChainOne['code']).to.equal(project1Code);
-		expect(blockChainOne['name']).to.equal(`${nftName}-1`);
-		expect(blockChainOne['text']).to.equal(ipfsText);
+		expect(blockChainOne['text']).to.equal(`${ipfsText}-1`);
 		expect(blockChainOne['image']).to.equal(ipfsImage);
 	});
 
+	it('should reject get blockchain (token id dosent exists)', async () => {
+		await expect(gMKey.getOneNft('10')).to.be.revertedWith('TID');
+	});
+
 	it('should max blockchain project creation (CryptoPunks)', async () => {
-		const blockChain1 = await gMKey.addToBlockChain(receiver1, project2Code, `${nftName}-2`, ipfsText, ipfsImage, {
+		const blockChain1 = await gMKey.addToBlockChain(receiver1, project2Code, `${ipfsText}-2`, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain1.wait();
 		expect(await gMKey.getNftCount()).to.equal(2);
 
-		const blockChain2 = await gMKey.addToBlockChain(receiver1, project2Code, `${nftName}-3`, ipfsText, ipfsImage, {
+		const blockChain2 = await gMKey.addToBlockChain(receiver1, project2Code, `${ipfsText}-3`, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain2.wait();
 		expect(await gMKey.getNftCount()).to.equal(3);
 
-		const blockChain3 = await gMKey.addToBlockChain(receiver1, project2Code, `${nftName}-4`, ipfsText, ipfsImage, {
+		const blockChain3 = await gMKey.addToBlockChain(receiver1, project2Code, `${ipfsText}-4`, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain3.wait();
@@ -146,10 +163,10 @@ describe('gmkey contract', async () => {
 
 	it('should reject to blockchain (max project has been mint)', async () => {
 		await expect(
-			gMKey.addToBlockChain(receiver1, project2Code, nftName, ipfsText, ipfsImage, {
+			gMKey.addToBlockChain(receiver1, project2Code, `${ipfsText}-1`, ipfsImage, {
 				value: ethers.utils.parseEther('0.1'),
 			})
-		).to.be.revertedWith('max project has been mint');
+		).to.be.revertedWith('PMM');
 	});
 
 	it('should get project data 2', async () => {
@@ -158,23 +175,22 @@ describe('gmkey contract', async () => {
 		expect(project1['maxUnit']).to.equal(3);
 		expect(project1['currentUnit']).to.equal(3);
 		expect(project1['amount']).to.equal(ethers.utils.parseEther('0.1'));
-		expect(project1['name']).to.equal(project2Name);
+		expect(ethers.utils.parseBytes32String(project1['name'])).to.equal('CryptoPunks');
 		expect(project1['exists']).to.equal(true);
 	});
 
-	it('should get all blockchain data 2', async () => {
+	it('should get all blockchain data (result 4)', async () => {
 		const blockChainAll = await gMKey.getAllNft();
 		// console.log(blockChainAll);
 		expect(blockChainAll.length).to.equal(4);
 	});
 
 	it('should add to blockchain new reciever', async () => {
-		const blockChain1 = await gMKey.addToBlockChain(receiver2, project1Code, `${nftName}-5`, ipfsText, ipfsImage, {
+		const blockChain1 = await gMKey.addToBlockChain(receiver2, project1Code, `${ipfsText}-5`, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain1.wait();
 		expect(await gMKey.getNftCount()).to.equal(5);
-		expect(await gMKey.getAddressCount()).to.equal(2);
 
 		const address1 = await gMKey.getOneAddress(receiver2);
 		// console.log(address1);
@@ -184,19 +200,19 @@ describe('gmkey contract', async () => {
 	});
 
 	it('should max blockchain user creation (0x58933D8678b574349bE3CdDd3de115468e8cb3f0)', async () => {
-		const blockChain1 = await gMKey.addToBlockChain(receiver3, project1Code, `${nftName}-6`, ipfsText, ipfsImage, {
+		const blockChain1 = await gMKey.addToBlockChain(receiver3, project1Code, `${ipfsText}-6`, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain1.wait();
 		expect(await gMKey.getNftCount()).to.equal(6);
 
-		const blockChain2 = await gMKey.addToBlockChain(receiver3, project1Code, `${nftName}-7`, ipfsText, ipfsImage, {
+		const blockChain2 = await gMKey.addToBlockChain(receiver3, project1Code, `${ipfsText}-7`, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain2.wait();
 		expect(await gMKey.getNftCount()).to.equal(7);
 
-		const blockChain3 = await gMKey.addToBlockChain(receiver3, project1Code, `${nftName}-8`, ipfsText, ipfsImage, {
+		const blockChain3 = await gMKey.addToBlockChain(receiver3, project1Code, `${ipfsText}-8`, ipfsImage, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain3.wait();
@@ -205,13 +221,13 @@ describe('gmkey contract', async () => {
 
 	it('should reject to blockchain (max user/address been mint)', async () => {
 		await expect(
-			gMKey.addToBlockChain(receiver3, project1Code, nftName, ipfsText, ipfsImage, {
+			gMKey.addToBlockChain(receiver3, project1Code, `${ipfsText}-1`, ipfsImage, {
 				value: ethers.utils.parseEther('0.1'),
 			})
-		).to.be.revertedWith('max user/address been mint');
+		).to.be.revertedWith('AMM');
 	});
 
-	it('should get all blockchain data 3', async () => {
+	it('should get all blockchain data (result 8)', async () => {
 		const blockChainAll = await gMKey.getAllNft();
 		// console.log(blockChainAll);
 		expect(blockChainAll.length).to.equal(8);
@@ -243,5 +259,52 @@ describe('gmkey contract', async () => {
 		const [blockChainFiltered2, len2] = await gMKey.getFilteredNft(1, 10, project2Code);
 		// console.log(blockChainFiltered2);
 		expect(len2).to.equal(3);
+	});
+
+	it('should get remove from blockchain', async () => {
+		const blockChain = await gMKey.removeFromBlockChain('1');
+		const blockChainWait = await blockChain.wait();
+		const blockChainEvent = blockChainWait.events[0];
+		const newTokenId: number = Number(blockChainEvent.args['tokenId']);
+
+		expect(newTokenId).to.equal(1);
+	});
+
+	it('should reject to blockchain (token id dosent exists)', async () => {
+		await expect(gMKey.removeFromBlockChain('10')).to.be.revertedWith('TID');
+	});
+
+	it('should reject to blockchain (project dosent exists)', async () => {
+		await expect(gMKey.removeFromBlockChain('1')).to.be.revertedWith('ERC721: owner query for nonexistent token');
+	});
+
+	it('should get removed blockchain data 1', async () => {
+		const blockChainOne = await gMKey.getOneNft('1');
+		// console.log(blockChainOne);
+		expect(blockChainOne['receiver']).to.equal('0x0000000000000000000000000000000000000000');
+		expect(blockChainOne['amount']).to.equal(0);
+		expect(blockChainOne['code']).to.equal('0x0000000000000000000000000000000000000000');
+		expect(blockChainOne['text']).to.equal('');
+		expect(blockChainOne['image']).to.equal('');
+	});
+
+	it('should add to blockchain old reciever', async () => {
+		const blockChain1 = await gMKey.addToBlockChain(receiver1, project1Code, `${ipfsText}-9`, ipfsImage, {
+			value: ethers.utils.parseEther('0.1'),
+		});
+		await blockChain1.wait();
+		expect(await gMKey.getNftCount()).to.equal(9);
+
+		const blockChain2 = await gMKey.addToBlockChain(receiver1, project1Code, `${ipfsText}-10`, ipfsImage, {
+			value: ethers.utils.parseEther('0.1'),
+		});
+		await blockChain2.wait();
+		expect(await gMKey.getNftCount()).to.equal(10);
+	});
+
+	it('should get all blockchain data (result 10)', async () => {
+		const blockChainAll = await gMKey.getAllNft();
+		// console.log(blockChainAll);
+		expect(blockChainAll.length).to.equal(10);
 	});
 });
