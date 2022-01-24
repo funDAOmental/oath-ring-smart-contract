@@ -52,10 +52,6 @@ declare module "hardhat/types/runtime" {
       name: "GMKey",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.GMKey__factory>;
-    getContractFactory(
-      name: "Nftxt",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Nftxt__factory>;
 
     getContractAt(
       name: "Ownable",
@@ -107,11 +103,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.GMKey>;
-    getContractAt(
-      name: "Nftxt",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Nftxt>;
 
     // default types
     getContractFactory(

@@ -25,8 +25,8 @@ export declare namespace GMKey {
     amount: BigNumberish;
     status: BigNumberish;
     code: string;
-    text: string;
-    image: string;
+    text: BytesLike;
+    image: BytesLike;
     timestamp: BigNumberish;
   };
 
@@ -90,7 +90,7 @@ export interface GMKeyInterface extends utils.Interface {
   functions: {
     "addAllWhitelistedUser(address[])": FunctionFragment;
     "addProject(uint128,uint128,bytes32,address)": FunctionFragment;
-    "addToBlockChain(address,address,string,string)": FunctionFragment;
+    "addToBlockChain(address,address,bytes32,bytes32)": FunctionFragment;
     "addWhitelistedUser(address)": FunctionFragment;
     "addresses(address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
@@ -133,7 +133,7 @@ export interface GMKeyInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "addToBlockChain",
-    values: [string, string, string, string]
+    values: [string, string, BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "addWhitelistedUser",
@@ -403,8 +403,8 @@ export interface GMKey extends BaseContract {
     addToBlockChain(
       _receiver: string,
       _code: string,
-      _text: string,
-      _image: string,
+      _text: BytesLike,
+      _image: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -597,8 +597,8 @@ export interface GMKey extends BaseContract {
   addToBlockChain(
     _receiver: string,
     _code: string,
-    _text: string,
-    _image: string,
+    _text: BytesLike,
+    _image: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -783,8 +783,8 @@ export interface GMKey extends BaseContract {
     addToBlockChain(
       _receiver: string,
       _code: string,
-      _text: string,
-      _image: string,
+      _text: BytesLike,
+      _image: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1011,8 +1011,8 @@ export interface GMKey extends BaseContract {
     addToBlockChain(
       _receiver: string,
       _code: string,
-      _text: string,
-      _image: string,
+      _text: BytesLike,
+      _image: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1167,8 +1167,8 @@ export interface GMKey extends BaseContract {
     addToBlockChain(
       _receiver: string,
       _code: string,
-      _text: string,
-      _image: string,
+      _text: BytesLike,
+      _image: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

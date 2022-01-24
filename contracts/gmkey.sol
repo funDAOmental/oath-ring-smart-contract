@@ -31,10 +31,10 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		address sender;
 		address receiver;
 		uint256 amount;
-		uint8 status;
+		uint8 status; // 0 initial value, 1 win, 2 lose
 		address code;
-		string text;
-		string image;
+		bytes32 text;
+		bytes32 image;
 		uint256 timestamp;
 	}
 
@@ -188,8 +188,8 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	function addToBlockChain(
 		address _receiver, // user/wallet to recieve NFT
 		address _code, // project token address
-		string memory _text, // ipfs text path
-		string memory _image // ipfs image path
+		bytes32 _text, // ipfs text path
+		bytes32 _image // ipfs image path
 	) public payable {
 		require(whitelistedAddresses[_receiver], 'RNW');
 		require(projects[_code].exists, 'PDE');

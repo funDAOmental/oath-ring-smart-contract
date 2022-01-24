@@ -17,6 +17,7 @@
 		"@nomiclabs/hardhat-etherscan": "^3.0.0",
 		"@nomiclabs/hardhat-waffle": "^2.0.1",
 		"@openzeppelin/contracts": "^4.4.2",
+		"bs58": "^4.0.1",
 		"dotenv": "^11.0.0",
 		"ethereum-waffle": "^3.4.0",
 		"ethers": "^5.5.3",
@@ -33,6 +34,7 @@
 	"devDependencies": {
 		"@typechain/ethers-v5": "^9.0.0",
 		"@typechain/hardhat": "^4.0.0",
+		"@types/bs58": "^4.0.1",
 		"@types/chai": "^4.3.0",
 		"@types/chai-as-promised": "^7.1.4",
 		"@types/mocha": "^9.0.0",
