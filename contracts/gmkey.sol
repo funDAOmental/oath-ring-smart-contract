@@ -28,9 +28,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	}
 
 	struct NftStruct {
-		address sender;
 		address receiver;
-		uint256 amount;
 		uint8 status; // 0 initial value, 1 win, 2 lose
 		address code;
 		bytes32 text;
@@ -46,7 +44,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	NftStruct[] public nfts;
 
 	constructor(address _ownerAddress, string memory _baseTokenURI) ERC721('GMKey by NFTxT', 'GMKEY') {
-		addAddress(9999, _ownerAddress); // owner address can mint 9999 number of nft
+		addAddress(20, _ownerAddress); // owner address can mint 20 number of nft
 		addWhitelistedUser(_ownerAddress); // owner is whitelisted by default
 		baseTokenURI = _baseTokenURI;
 	}
@@ -66,6 +64,15 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	 */
 	function getBaseURI() public view returns (string memory) {
 		return baseTokenURI;
+	}
+
+	/*
+	 * @functionName getBalance
+	 * @functionDescription get all nft balance
+	 */
+	function getBalance() public onlyOwner {
+		(bool os, ) = payable(owner()).call{ value: address(this).balance }('');
+		require(os);
 	}
 
 	// WHITELIST FUNCTION ===========================================================================================
@@ -127,7 +134,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		require(!projects[_code].exists, 'PAE');
 
 		ProjectStruct storage project1 = projects[_code];
-		project1.maxUnit = _maxUnit;
+		project1.maxUnit = _maxUnit; // default: 500
 		project1.currentUnit = 0;
 		project1.amount = _amount;
 		project1.name = _name;
@@ -158,7 +165,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		require(!addresses[_address].exists, 'AAE');
 
 		AddressStruct storage address1 = addresses[_address];
-		address1.maxUnit = _maxUnit;
+		address1.maxUnit = _maxUnit; // default: 3
 		address1.currentUnit = 1;
 		address1.exists = true;
 	}
@@ -179,6 +186,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	// NEC: not enough coins
 	// PMM: max project has been mint
 	// AMM: max user/address been mint
+	// ADE: address dosent exists
 	// TID: token id dosent exists
 
 	/*
@@ -206,9 +214,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 			addAddress(3, _receiver);
 		}
 
-		nfts.push(
-			NftStruct(payable(msg.sender), payable(_receiver), project1.amount, 0, _code, _text, _image, block.timestamp)
-		);
+		nfts.push(NftStruct(payable(_receiver), 0, _code, _text, _image, block.timestamp));
 		_safeMint(payable(_receiver), nftCount.current());
 
 		project1.currentUnit += 1;
@@ -247,16 +253,16 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 	 * @functionDescription get all the list of minted gmkey
 	 */
 	function getFilteredNft(
-		uint128 _page,
-		uint128 _resultsPerPage,
+		uint256 _page,
+		uint256 _resultsPerPage,
 		address _code
-	) public view returns (NftStruct[] memory, uint128) {
+	) public view returns (NftStruct[] memory, uint256) {
 		// limit per page result to 20
 		if (_resultsPerPage > 20) {
 			_resultsPerPage = 20;
 		}
 
-		uint128 nftIndex = _resultsPerPage * _page - _resultsPerPage;
+		uint256 nftIndex = _resultsPerPage * _page - _resultsPerPage;
 		// return emptry nfts
 		if (nfts.length == 0 || nftIndex > nfts.length) {
 			return (new NftStruct[](_resultsPerPage), 0);
@@ -264,7 +270,7 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 
 		// create temp nfts data
 		NftStruct[] memory tempNfts = new NftStruct[](_resultsPerPage);
-		uint128 tempNftCount = 0;
+		uint256 tempNftCount = 0;
 
 		for (nftIndex; nftIndex < _resultsPerPage * _page; nftIndex++) {
 			// add array item unless out of bounds
@@ -278,6 +284,38 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 						tempNftCount++;
 					}
 				}
+			}
+		}
+
+		return (tempNfts, tempNftCount);
+	}
+
+	/*
+	 * @functionName getMyNft
+	 * @functionDescription get nft of the user
+	 */
+	function getMyNft(
+		address _address // user/wallet address name
+	) public view returns (NftStruct[] memory, uint256) {
+		require(addresses[_address].exists, 'ADE');
+
+		uint256 resultsPerPage = addresses[_address].maxUnit;
+		uint256 nftIndex = 0;
+
+		// only show top 20
+		if (resultsPerPage > 20) {
+			resultsPerPage = 20;
+		}
+
+		// create temp nfts data
+		NftStruct[] memory tempNfts = new NftStruct[](resultsPerPage);
+		uint256 tempNftCount = 0;
+
+		for (nftIndex; nftIndex < nfts.length; nftIndex++) {
+			// add array item unless out of bounds
+			if (nftIndex < nfts.length && tempNftCount < resultsPerPage && nfts[nftIndex].receiver == _address) {
+				tempNfts[tempNftCount] = nfts[nftIndex];
+				tempNftCount++;
 			}
 		}
 

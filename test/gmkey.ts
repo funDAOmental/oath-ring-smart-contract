@@ -150,7 +150,6 @@ describe('gmkey contract', async () => {
 		const blockChainOne = await gMKey.getOneNft('0');
 		// console.log(blockChainOne);
 		expect(blockChainOne['receiver']).to.equal(receiver1);
-		expect(blockChainOne['amount']).to.equal(ethers.utils.parseEther('0.1'));
 		expect(blockChainOne['code']).to.equal(project1Code);
 		expect(bytes32ToIPFSHash(blockChainOne['text'])).to.equal('QmcJ3ZVxrj2Py1Jt7DWR8HksVaXeR6T8ZM9CSVJZzSEHuG');
 		expect(bytes32ToIPFSHash(blockChainOne['image'])).to.equal('QmPsVS4jM5e1JmJR7Sp6ULui1PqbmpwsajaVTT6HNxrvQT');
@@ -301,7 +300,6 @@ describe('gmkey contract', async () => {
 		const blockChainOne = await gMKey.getOneNft('1');
 		// console.log(blockChainOne);
 		expect(blockChainOne['receiver']).to.equal('0x0000000000000000000000000000000000000000');
-		expect(blockChainOne['amount']).to.equal(0);
 		expect(blockChainOne['code']).to.equal('0x0000000000000000000000000000000000000000');
 		expect(bytes32ToIPFSHash(blockChainOne['text'])).to.equal('');
 		expect(bytes32ToIPFSHash(blockChainOne['image'])).to.equal('');
@@ -325,5 +323,15 @@ describe('gmkey contract', async () => {
 		const blockChainAll = await gMKey.getAllNft();
 		// console.log(blockChainAll);
 		expect(blockChainAll.length).to.equal(10);
+	});
+
+	it('should get my nft', async () => {
+		const [blockChainFiltered1, len1] = await gMKey.getMyNft(receiver1);
+		// console.log(blockChainFiltered1);
+		expect(len1).to.equal(5);
+
+		const [blockChainFiltered2, len2] = await gMKey.getMyNft(receiver2);
+		// console.log(blockChainFiltered2);
+		expect(len2).to.equal(1);
 	});
 });
