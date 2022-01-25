@@ -9,6 +9,8 @@
 	"license": "MIT",
 	"scripts": {
 		"test": "npx hardhat test",
+		"test:gmkey": "npx hardhat test test/gmkey",
+		"test:randomness": "npx hardhat test test/randomness",
 		"lint": "tslint -c ./tslint.json './scripts/**/*.ts'",
 		"sollint": "solhint './contracts/**/*.sol'"
 	},

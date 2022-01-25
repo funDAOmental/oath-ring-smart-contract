@@ -92,7 +92,6 @@ export interface GMKeyInterface extends utils.Interface {
     "burn(uint256)": FunctionFragment;
     "getAllNft()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
-    "getBalance()": FunctionFragment;
     "getBaseURI()": FunctionFragment;
     "getFilteredNft(uint256,uint256,address)": FunctionFragment;
     "getMyNft(address)": FunctionFragment;
@@ -146,10 +145,6 @@ export interface GMKeyInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getBalance",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getBaseURI",
@@ -252,7 +247,6 @@ export interface GMKeyInterface extends utils.Interface {
     functionFragment: "getApproved",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getBalance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getBaseURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getFilteredNft",
@@ -449,10 +443,6 @@ export interface GMKey extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    getBalance(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     getBaseURI(overrides?: CallOverrides): Promise<[string]>;
 
     getFilteredNft(
@@ -648,10 +638,6 @@ export interface GMKey extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  getBalance(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   getBaseURI(overrides?: CallOverrides): Promise<string>;
 
   getFilteredNft(
@@ -839,8 +825,6 @@ export interface GMKey extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    getBalance(overrides?: CallOverrides): Promise<void>;
 
     getBaseURI(overrides?: CallOverrides): Promise<string>;
 
@@ -1065,10 +1049,6 @@ export interface GMKey extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getBalance(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     getBaseURI(overrides?: CallOverrides): Promise<BigNumber>;
 
     getFilteredNft(
@@ -1231,10 +1211,6 @@ export interface GMKey extends BaseContract {
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getBalance(
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     getBaseURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;

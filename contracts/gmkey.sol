@@ -66,15 +66,6 @@ contract GMKey is ERC721, ERC721Burnable, Ownable {
 		return baseTokenURI;
 	}
 
-	/*
-	 * @functionName getBalance
-	 * @functionDescription get all nft balance
-	 */
-	function getBalance() public onlyOwner {
-		(bool os, ) = payable(owner()).call{ value: address(this).balance }('');
-		require(os);
-	}
-
 	// WHITELIST FUNCTION ===========================================================================================
 	// add whitelist address list of address that allowed to mint nft
 	// ERROR MSG:

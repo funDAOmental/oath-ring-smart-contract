@@ -20,7 +20,7 @@ const bytes32ToIPFSHash = (hashHex: string): string => {
 	return bs58.encode(buf);
 };
 
-describe('gmkey contract', async () => {
+describe.only('gmkey', async () => {
 	let GMKey: any;
 	let gMKey: any;
 
