@@ -18,35 +18,48 @@ contract Randomness is VRFConsumerBase {
 	struct NftStruct {
 		address receiver;
 		STATUS status;
+		uint256 randomNumber;
 		uint256 timestamp;
 	}
 
-	mapping(bytes32 => NftStruct) public nfts;
+	mapping(bytes32 => string) public nftKeys;
+	mapping(string => bool) public uniqKeys;
+	mapping(string => NftStruct) public nfts;
 	Counters.Counter private nftCount;
 
 	bytes32 internal keyHash;
 	uint256 internal fee;
 
-	constructor()
+	constructor(
+		address _vrfCoordinator,
+		address _link,
+		bytes32 _keyHash,
+		uint256 _fee
+	)
 		VRFConsumerBase(
-			0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B, // VRF coordinator
-			0x01BE23585060835E02B77ef475b0Cc51aA1e0709 // LINT token address
+			_vrfCoordinator, // VRF Coordinator
+			_link // LINK Token
 		)
 	{
-		keyHash = 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311;
-		fee = 0.1 * 10**18; // 0.1 LINK
+		keyHash = _keyHash;
+		fee = _fee;
 	}
 
-	function getRandomNumber() internal returns (bytes32 requestId) {
-		return requestRandomness(keyHash, fee);
+	function getRandomNumber(string memory _identifier) internal returns (bytes32 requestId) {
+		bytes32 currentRequestId = requestRandomness(keyHash, fee);
+		nftKeys[currentRequestId] = _identifier;
+
+		return currentRequestId;
 	}
 
-	function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
-		STATUS randomStatus = STATUS(randomness % 2);
+	function fulfillRandomness(bytes32 _requestId, uint256 _randomness) internal override {
+		STATUS randomStatus = STATUS(_randomness % 2);
 
-		NftStruct storage nft = nfts[requestId];
+		uniqKeys[nftKeys[_requestId]] = true;
+		NftStruct storage nft = nfts[nftKeys[_requestId]];
 		nft.receiver = msg.sender;
 		nft.status = randomStatus;
+		nft.randomNumber = _randomness;
 		nft.timestamp = block.timestamp;
 
 		nftCount.increment();
@@ -56,15 +69,33 @@ contract Randomness is VRFConsumerBase {
 	// unlock gmkeys to identify if win/lose
 	// ERROR MSG:
 	// NEC: not enough coins
+	// KAE: key identifier already exists
 
 	/*
 	 * @functionName unlockNft
 	 * @functionDescription run the random number generator
 	 */
-	function unlockNft() public {
+	function unlockNft(string memory _identifier) public {
 		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
+		require(!uniqKeys[_identifier], 'KAE');
 
-		getRandomNumber();
+		getRandomNumber(_identifier);
+	}
+
+	/*
+	 * @functionName getKeyHash
+	 * @functionDescription get key hash
+	 */
+	function getKeyHash() public view returns (bytes32) {
+		return keyHash;
+	}
+
+	/*
+	 * @functionName getFee
+	 * @functionDescription get contract fee
+	 */
+	function getFee() public view returns (uint256) {
+		return fee;
 	}
 
 	/*
@@ -87,7 +118,7 @@ contract Randomness is VRFConsumerBase {
 	 * @functionName getAllNft
 	 * @functionDescription get nft data
 	 */
-	function getAllNft(bytes32 requestId) public view returns (NftStruct memory) {
-		return nfts[requestId];
+	function getOneNft(string memory _identifier) public view returns (NftStruct memory) {
+		return nfts[_identifier];
 	}
 }
