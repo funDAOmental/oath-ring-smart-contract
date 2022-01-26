@@ -13,6 +13,14 @@ import * as Contracts from ".";
 declare module "hardhat/types/runtime" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
     getContractFactory(
+      name: "LinkTokenInterface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.LinkTokenInterface__factory>;
+    getContractFactory(
+      name: "VRFConsumerBase",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VRFConsumerBase__factory>;
+    getContractFactory(
       name: "Ownable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Ownable__factory>;
@@ -52,7 +60,21 @@ declare module "hardhat/types/runtime" {
       name: "GMKey",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.GMKey__factory>;
+    getContractFactory(
+      name: "Randomness",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Randomness__factory>;
 
+    getContractAt(
+      name: "LinkTokenInterface",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.LinkTokenInterface>;
+    getContractAt(
+      name: "VRFConsumerBase",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VRFConsumerBase>;
     getContractAt(
       name: "Ownable",
       address: string,
@@ -103,6 +125,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.GMKey>;
+    getContractAt(
+      name: "Randomness",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Randomness>;
 
     // default types
     getContractFactory(

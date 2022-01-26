@@ -1,6 +1,6 @@
 {
-	"name": "genesis-nftxt-smart-contract",
-	"description": "genesis nftxt smart contract",
+	"name": "nftxt-smart-contract",
+	"description": "nftxt smart contract",
 	"version": "1.0.0",
 	"main": "index.js",
 	"private": true,
@@ -15,6 +15,7 @@
 		"sollint": "solhint './contracts/**/*.sol'"
 	},
 	"dependencies": {
+		"@chainlink/contracts": "^0.3.1",
 		"@nomiclabs/hardhat-ethers": "^2.0.4",
 		"@nomiclabs/hardhat-etherscan": "^3.0.0",
 		"@nomiclabs/hardhat-waffle": "^2.0.1",
