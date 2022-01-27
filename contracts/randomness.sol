@@ -3,10 +3,11 @@
 pragma solidity ^0.8.11;
 
 import '@chainlink/contracts/src/v0.8/VRFConsumerBase.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 import 'hardhat/console.sol';
 
-contract Randomness is VRFConsumerBase {
+contract Randomness is VRFConsumerBase, Ownable {
 	using Counters for Counters.Counter;
 
 	// check if win or lose
@@ -22,6 +23,9 @@ contract Randomness is VRFConsumerBase {
 		uint256 timestamp;
 	}
 
+	uint256 public totalKeys = 0; // total number of minted key
+	uint8 public mintPhase = 0; // minting phase 0 stop, 1 start
+
 	mapping(bytes32 => string) public nftKeys;
 	mapping(string => bool) public uniqKeys;
 	mapping(string => NftStruct) public nfts;
@@ -32,24 +36,22 @@ contract Randomness is VRFConsumerBase {
 
 	constructor(
 		address _vrfCoordinator,
-		address _link,
+		address _linkToken,
 		bytes32 _keyHash,
 		uint256 _fee
 	)
 		VRFConsumerBase(
 			_vrfCoordinator, // VRF Coordinator
-			_link // LINK Token
+			_linkToken // LINK Token
 		)
 	{
 		keyHash = _keyHash;
 		fee = _fee;
 	}
 
-	function getRandomNumber(string memory _identifier) internal returns (bytes32 requestId) {
-		bytes32 currentRequestId = requestRandomness(keyHash, fee);
-		nftKeys[currentRequestId] = _identifier;
-
-		return currentRequestId;
+	function getRandomNumber(string memory _identifier) internal {
+		bytes32 requestId = requestRandomness(keyHash, fee);
+		nftKeys[requestId] = _identifier;
 	}
 
 	function fulfillRandomness(bytes32 _requestId, uint256 _randomness) internal override {
@@ -65,19 +67,57 @@ contract Randomness is VRFConsumerBase {
 		nftCount.increment();
 	}
 
+	// CORE FUNCTION ===========================================================================================
+	// core owner functionality
+
+	/*
+	 * @functionName addWhitelistedUser
+	 * @functionDescription add whitelisted user
+	 */
+	function updateTotalKeys(uint256 _totalKey) public onlyOwner {
+		totalKeys = _totalKey;
+	}
+
+	/*
+	 * @functionName startMintPhase
+	 * @functionDescription start minting phase
+	 */
+	function startMintPhase() public onlyOwner {
+		mintPhase = 1;
+	}
+
+	/*
+	 * @functionName stopMintPhase
+	 * @functionDescription stop minting phase
+	 */
+	function stopMintPhase() public onlyOwner {
+		mintPhase = 0;
+	}
+
+	/*
+	 * @functionName isMintingStart
+	 * @functionDescription check if minting started
+	 */
+	function isMintingStart() public view returns (bool) {
+		return mintPhase == 1;
+	}
+
 	// UNLOCK FUNCTION ===========================================================================================
 	// unlock gmkeys to identify if win/lose
 	// ERROR MSG:
 	// NEC: not enough coins
 	// KAE: key identifier already exists
+	// MPS: minting phase stop
 
 	/*
 	 * @functionName unlockNft
 	 * @functionDescription run the random number generator
 	 */
 	function unlockNft(string memory _identifier) public {
-		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
 		require(!uniqKeys[_identifier], 'KAE');
+		require(mintPhase == 1, 'MPS');
+
+		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
 
 		getRandomNumber(_identifier);
 	}
@@ -96,14 +136,6 @@ contract Randomness is VRFConsumerBase {
 	 */
 	function getFee() public view returns (uint256) {
 		return fee;
-	}
-
-	/*
-	 * @functionName getBalance
-	 * @functionDescription get contract balance
-	 */
-	function getBalance() public view returns (uint256) {
-		return address(this).balance;
 	}
 
 	/*
