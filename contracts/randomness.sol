@@ -93,6 +93,14 @@ contract Randomness is VRFConsumerBase, Ownable {
 	}
 
 	/*
+	 * @functionName getTotalKeys
+	 * @functionDescription get total keys minted
+	 */
+	function getTotalKeys() public view returns (uint256) {
+		return totalKeys;
+	}
+
+	/*
 	 * @functionName startMintPhase
 	 * @functionDescription start minting phase
 	 */

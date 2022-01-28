@@ -38,6 +38,7 @@ export interface RandomnessInterface extends utils.Interface {
     "getKeyHash()": FunctionFragment;
     "getNftCount()": FunctionFragment;
     "getOneNft(bytes32)": FunctionFragment;
+    "getTotalKeys()": FunctionFragment;
     "isMintingStart()": FunctionFragment;
     "mintPhase()": FunctionFragment;
     "nftKeys(bytes32)": FunctionFragment;
@@ -66,6 +67,10 @@ export interface RandomnessInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getOneNft",
     values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTotalKeys",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "isMintingStart",
@@ -113,6 +118,10 @@ export interface RandomnessInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getOneNft", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getTotalKeys",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "isMintingStart",
     data: BytesLike
@@ -203,6 +212,8 @@ export interface Randomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[Randomness.NftStructStructOutput]>;
 
+    getTotalKeys(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     isMintingStart(overrides?: CallOverrides): Promise<[boolean]>;
 
     mintPhase(overrides?: CallOverrides): Promise<[number]>;
@@ -271,6 +282,8 @@ export interface Randomness extends BaseContract {
     overrides?: CallOverrides
   ): Promise<Randomness.NftStructStructOutput>;
 
+  getTotalKeys(overrides?: CallOverrides): Promise<BigNumber>;
+
   isMintingStart(overrides?: CallOverrides): Promise<boolean>;
 
   mintPhase(overrides?: CallOverrides): Promise<number>;
@@ -338,6 +351,8 @@ export interface Randomness extends BaseContract {
       _identifier: BytesLike,
       overrides?: CallOverrides
     ): Promise<Randomness.NftStructStructOutput>;
+
+    getTotalKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
     isMintingStart(overrides?: CallOverrides): Promise<boolean>;
 
@@ -410,6 +425,8 @@ export interface Randomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getTotalKeys(overrides?: CallOverrides): Promise<BigNumber>;
+
     isMintingStart(overrides?: CallOverrides): Promise<BigNumber>;
 
     mintPhase(overrides?: CallOverrides): Promise<BigNumber>;
@@ -469,6 +486,8 @@ export interface Randomness extends BaseContract {
       _identifier: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    getTotalKeys(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     isMintingStart(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

@@ -35,9 +35,10 @@ describe.only('randomness', async () => {
 	});
 
 	it('should update total key', async () => {
-		const totalkeys = await randomness.updateTotalKeys(1000);
+		await randomness.updateTotalKeys(1000);
 
-		expect(totalkeys['hash']).to.be.a('string');
+		const gettotalkey = await randomness.getTotalKeys();
+		expect(gettotalkey).to.equal(1000);
 	});
 
 	it('should start/stop minting', async () => {
