@@ -17,7 +17,6 @@ contract Randomness is VRFConsumerBase, Ownable {
 	}
 
 	struct NftStruct {
-		address receiver;
 		STATUS status;
 		uint256 randomNumber;
 		uint256 timestamp;
@@ -26,9 +25,9 @@ contract Randomness is VRFConsumerBase, Ownable {
 	uint256 public totalKeys = 0; // total number of minted key
 	uint8 public mintPhase = 0; // minting phase 0 stop, 1 start
 
-	mapping(bytes32 => string) public nftKeys;
-	mapping(string => bool) public uniqKeys;
-	mapping(string => NftStruct) public nfts;
+	mapping(bytes32 => bytes32) public nftKeys;
+	mapping(bytes32 => bool) public uniqKeys;
+	mapping(bytes32 => NftStruct) public nfts;
 	Counters.Counter private nftCount;
 
 	bytes32 internal keyHash;
@@ -49,7 +48,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 		fee = _fee;
 	}
 
-	function getRandomNumber(string memory _identifier) internal {
+	function getRandomNumber(bytes32 _identifier) internal {
 		bytes32 requestId = requestRandomness(keyHash, fee);
 		nftKeys[requestId] = _identifier;
 	}
@@ -59,7 +58,6 @@ contract Randomness is VRFConsumerBase, Ownable {
 
 		uniqKeys[nftKeys[_requestId]] = true;
 		NftStruct storage nft = nfts[nftKeys[_requestId]];
-		nft.receiver = msg.sender;
 		nft.status = randomStatus;
 		nft.randomNumber = _randomness;
 		nft.timestamp = block.timestamp;
@@ -67,12 +65,28 @@ contract Randomness is VRFConsumerBase, Ownable {
 		nftCount.increment();
 	}
 
+	/*
+	 * @functionName getKeyHash
+	 * @functionDescription get key hash
+	 */
+	function getKeyHash() public view returns (bytes32) {
+		return keyHash;
+	}
+
+	/*
+	 * @functionName getFee
+	 * @functionDescription get contract fee
+	 */
+	function getFee() public view returns (uint256) {
+		return fee;
+	}
+
 	// CORE FUNCTION ===========================================================================================
 	// core owner functionality
 
 	/*
-	 * @functionName addWhitelistedUser
-	 * @functionDescription add whitelisted user
+	 * @functionName updateTotalKeys
+	 * @functionDescription update total keys minted
 	 */
 	function updateTotalKeys(uint256 _totalKey) public onlyOwner {
 		totalKeys = _totalKey;
@@ -113,29 +127,13 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName unlockNft
 	 * @functionDescription run the random number generator
 	 */
-	function unlockNft(string memory _identifier) public {
+	function unlockNft(bytes32 _identifier) public {
 		require(!uniqKeys[_identifier], 'KAE');
 		require(mintPhase == 1, 'MPS');
 
-		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
+		// require(LINK.balanceOf(address(this)) >= fee, 'NEC');
 
 		getRandomNumber(_identifier);
-	}
-
-	/*
-	 * @functionName getKeyHash
-	 * @functionDescription get key hash
-	 */
-	function getKeyHash() public view returns (bytes32) {
-		return keyHash;
-	}
-
-	/*
-	 * @functionName getFee
-	 * @functionDescription get contract fee
-	 */
-	function getFee() public view returns (uint256) {
-		return fee;
 	}
 
 	/*
@@ -150,7 +148,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName getAllNft
 	 * @functionDescription get nft data
 	 */
-	function getOneNft(string memory _identifier) public view returns (NftStruct memory) {
+	function getOneNft(bytes32 _identifier) public view returns (NftStruct memory) {
 		return nfts[_identifier];
 	}
 }
