@@ -131,7 +131,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 		require(!uniqKeys[_identifier], 'KAE');
 		require(mintPhase == 1, 'MPS');
 
-		// require(LINK.balanceOf(address(this)) >= fee, 'NEC');
+		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
 
 		getRandomNumber(_identifier);
 	}
