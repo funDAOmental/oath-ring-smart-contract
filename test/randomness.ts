@@ -11,6 +11,7 @@ describe.only('randomness', async () => {
 	const user1: string = ethers.utils.formatBytes32String('USERA-1');
 	const user2: string = ethers.utils.formatBytes32String('USERA-2');
 	const user3: string = ethers.utils.formatBytes32String('USERB-1');
+	// console.log(user1, user2, user3);
 
 	const vrfCoordinator: string = '0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9';
 	const linkToken: string = '0xa36085F69e2889c224210F603D836748e7dC0088';
@@ -54,5 +55,58 @@ describe.only('randomness', async () => {
 
 		const mintStatus3 = await randomness.isMintingStart();
 		expect(mintStatus3).to.equal(false);
+	});
+
+	it('should reject unlock nft (minting phase stop)', async () => {
+		await expect(randomness.unlockNft(user1)).to.be.revertedWith('MPS');
+	});
+
+	it('should unlock nft', async () => {
+		await randomness.startMintPhase();
+
+		const getnftwincount = await randomness.getNftWinCount();
+		expect(getnftwincount).to.equal(1);
+
+		await randomness.unlockNft(user1);
+
+		const getnftcount = await randomness.getNftCount();
+		expect(getnftcount).to.equal(1);
+	});
+
+	it('should show user1 nft data', async () => {
+		const user1Data = await randomness.getOneNft(user1);
+		// console.log('user1', user1Data['status']);
+		expect(user1Data['status']).to.be.a('number');
+	});
+
+	it('should reject unlock nft (key identifier already exists)', async () => {
+		await expect(randomness.unlockNft(user1)).to.be.revertedWith('KAE');
+	});
+
+	it('should unlock more nft', async () => {
+		await randomness.unlockNft(user2);
+
+		const getnftcount1 = await randomness.getNftCount();
+		expect(getnftcount1).to.equal(2);
+
+		await randomness.unlockNft(user3);
+
+		const getnftcount2 = await randomness.getNftCount();
+		expect(getnftcount2).to.equal(3);
+	});
+
+	it('should show user2, user3 nft data', async () => {
+		const user2Data = await randomness.getOneNft(user2);
+		// console.log('user2', user2Data['status']);
+		expect(user2Data['status']).to.be.a('number');
+
+		const user3Data = await randomness.getOneNft(user3);
+		// console.log('user3', user3Data['status']);
+		expect(user3Data['status']).to.be.a('number');
+	});
+
+	it('should get win count', async () => {
+		const getnftwincount = await randomness.getNftWinCount();
+		expect(getnftwincount).to.equal(4);
 	});
 });
