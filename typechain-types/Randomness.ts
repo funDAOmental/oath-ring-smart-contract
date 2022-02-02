@@ -37,7 +37,6 @@ export interface RandomnessInterface extends utils.Interface {
     "getFee()": FunctionFragment;
     "getKeyHash()": FunctionFragment;
     "getNftCount()": FunctionFragment;
-    "getNftWinCount()": FunctionFragment;
     "getOneNft(bytes32)": FunctionFragment;
     "getTotalKeys()": FunctionFragment;
     "isMintingStart()": FunctionFragment;
@@ -58,10 +57,6 @@ export interface RandomnessInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getNftCount",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getNftWinCount",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -110,10 +105,6 @@ export interface RandomnessInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "getKeyHash", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getNftCount",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getNftWinCount",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getOneNft", data: BytesLike): Result;
@@ -201,8 +192,6 @@ export interface Randomness extends BaseContract {
 
     getNftCount(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    getNftWinCount(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     getOneNft(
       _identifier: BytesLike,
       overrides?: CallOverrides
@@ -254,8 +243,6 @@ export interface Randomness extends BaseContract {
 
   getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getNftWinCount(overrides?: CallOverrides): Promise<BigNumber>;
-
   getOneNft(
     _identifier: BytesLike,
     overrides?: CallOverrides
@@ -306,8 +293,6 @@ export interface Randomness extends BaseContract {
     getKeyHash(overrides?: CallOverrides): Promise<string>;
 
     getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getNftWinCount(overrides?: CallOverrides): Promise<BigNumber>;
 
     getOneNft(
       _identifier: BytesLike,
@@ -363,8 +348,6 @@ export interface Randomness extends BaseContract {
 
     getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getNftWinCount(overrides?: CallOverrides): Promise<BigNumber>;
-
     getOneNft(
       _identifier: BytesLike,
       overrides?: CallOverrides
@@ -416,8 +399,6 @@ export interface Randomness extends BaseContract {
     getKeyHash(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getNftCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getNftWinCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getOneNft(
       _identifier: BytesLike,

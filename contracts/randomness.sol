@@ -16,12 +16,14 @@ contract Randomness is VRFConsumerBase, Ownable {
 		uint256 timestamp;
 	}
 
+	uint256 private EPOCH_END_TIME = 268560; // 4476 min
+
 	uint256 private totalKeys = 0; // total number of minted key
 	uint8 private mintPhase = 0; // minting phase 0 stop, 1 start
-	Counters.Counter private winCount;
+	uint256 private mintStartTime = 0; // minting start time based on block.timestamp
 
+	mapping(bytes32 => bool) private uniqKeys; // user can mint 1x per epoch
 	mapping(bytes32 => bytes32) private nftKeys;
-	mapping(bytes32 => bool) private uniqKeys;
 	mapping(bytes32 => NftStruct) private nfts;
 	Counters.Counter private nftCount;
 
@@ -41,6 +43,8 @@ contract Randomness is VRFConsumerBase, Ownable {
 	{
 		keyHash = _keyHash;
 		fee = _fee;
+
+		nftCount.increment(); // should start with 1
 	}
 
 	// function getRandomNumberTest(bytes32 _identifier) internal {
@@ -50,14 +54,22 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// 	nftKeys[requestIdTest] = _identifier;
 
 	// 	uint8 randomStatus;
-	// 	uint256 chance = (randomnessTest % (100 - 1 + 1)) + 1;
-	// 	uint256 chanceOfWinning = uint256(totalKeys) / uint256(winCount.current());
+	// 	uint256 chanceOfWinning = totalKeys / uint256(nftCount.current());
 
-	// 	if (chanceOfWinning >= chance) {
-	// 		randomStatus = 1;
-	// 		winCount.increment();
+	// 	if (chanceOfWinning >= 100) {
+	// 		randomStatus = 1; // sure win
 	// 	} else {
-	// 		randomStatus = 2;
+	// 		if (chanceOfWinning < 10) {
+	// 			chanceOfWinning = 10; // mantain 10% chance of winning
+	// 		}
+
+	// 		uint256 chance = (randomnessTest % (100 - 1 + 1)) + 1;
+
+	// 		if (chanceOfWinning >= chance) {
+	// 			randomStatus = 1;
+	// 		} else {
+	// 			randomStatus = 2;
+	// 		}
 	// 	}
 
 	// 	uniqKeys[nftKeys[requestIdTest]] = true;
@@ -70,15 +82,31 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// }
 
 	function getRandomNumber(bytes32 _identifier) internal {
-		bytes32 requestId = requestRandomness(keyHash, fee);
+		uint256 chanceOfWinning = totalKeys / nftCount.current();
 
-		nftKeys[requestId] = _identifier;
+		if (chanceOfWinning >= 100) {
+			// sure win
+			uniqKeys[_identifier] = true;
+			NftStruct storage nft = nfts[_identifier];
+			nft.status = 1;
+			nft.randomNumber = 0;
+			nft.timestamp = block.timestamp;
+
+			nftCount.increment();
+		} else {
+			bytes32 requestId = requestRandomness(keyHash, fee);
+			nftKeys[requestId] = _identifier;
+		}
 	}
 
 	function fulfillRandomness(bytes32 _requestId, uint256 _randomness) internal override {
 		uint8 randomStatus;
+		uint256 chanceOfWinning = totalKeys / nftCount.current();
+		if (chanceOfWinning < 10) {
+			chanceOfWinning = 10; // mantain 10% chance of winning
+		}
+
 		uint256 chance = (_randomness % (100 - 1 + 1)) + 1;
-		uint256 chanceOfWinning = uint256(totalKeys) / uint256(winCount.current());
 
 		if (chanceOfWinning >= chance) {
 			randomStatus = 1;
@@ -136,9 +164,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 */
 	function startMintPhase() public onlyOwner {
 		mintPhase = 1;
-
-		winCount.reset();
-		winCount.increment(); // start the count to 1
+		mintStartTime = block.timestamp + EPOCH_END_TIME;
 	}
 
 	/*
@@ -172,19 +198,16 @@ contract Randomness is VRFConsumerBase, Ownable {
 		require(!uniqKeys[_identifier], 'KAE');
 		require(mintPhase == 1, 'MPS');
 
-		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
-		getRandomNumber(_identifier);
+		if (mintStartTime > block.timestamp) {
+			require(LINK.balanceOf(address(this)) >= fee, 'NEC');
+			getRandomNumber(_identifier);
 
-		// for test
-		// getRandomNumberTest(_identifier);
-	}
-
-	/*
-	 * @functionName getNftWinCount
-	 * @functionDescription get nft win count
-	 */
-	function getNftWinCount() public view returns (uint256) {
-		return winCount.current();
+			// for test
+			// getRandomNumberTest(_identifier);
+		} else {
+			stopMintPhase();
+			require(false, 'MPS');
+		}
 	}
 
 	/*
