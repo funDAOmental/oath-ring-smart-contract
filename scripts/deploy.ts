@@ -1,8 +1,4 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
+import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
 
 async function main() {
@@ -13,18 +9,29 @@ async function main() {
 	// manually to make sure everything is compiled
 	// await hre.run('compile');
 
+	const [deployer] = await ethers.getSigners(); //get the account to deploy the contract
+	console.log('deploying contract with the account:', deployer.address);
+	console.log('account balance:', (await deployer.getBalance()).toString());
+
 	// We get the contract to deploy
-	const Greeter = await ethers.getContractFactory('Greeter');
-	const greeter = await Greeter.deploy('Hello, Hardhat!');
+	const vrfCoordinator: string = '0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9';
+	const linkToken: string = '0xa36085F69e2889c224210F603D836748e7dC0088';
+	const keyHash: string = '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4';
+	const fee: BigNumber = ethers.utils.parseEther('0.1');
 
-	await greeter.deployed();
+	const Randomness = await ethers.getContractFactory('Randomness');
+	const randomness = await Randomness.deploy(vrfCoordinator, linkToken, keyHash, fee);
 
-	console.log('Greeter deployed to:', greeter.address);
+	await randomness.deployed();
+
+	console.log('contract deployed to:', randomness.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
-main().catch((error) => {
-	console.error(error);
-	process.exitCode = 1;
-});
+main()
+	.then(() => process.exit(0))
+	.catch((error) => {
+		console.error(error);
+		process.exit(1);
+	});

@@ -8,6 +8,7 @@
 	"author": "john paul onte <jnpl.onte@gmail.com>",
 	"license": "MIT",
 	"scripts": {
+		"deploy:rinkeby": "npx hardhat run scripts/deploy.ts --network rinkeby",
 		"test": "npx hardhat test",
 		"test:gmkey": "npx hardhat test test/gmkey",
 		"test:randomness": "npx hardhat test test/randomness",

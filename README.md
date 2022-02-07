@@ -21,6 +21,10 @@
 
 - ???
 
+### Deployment
+
+- deploy on rinkeby `npm run deploy:rinkeby`
+
 ### Testing
 
 - start all test by running `npm run test`
