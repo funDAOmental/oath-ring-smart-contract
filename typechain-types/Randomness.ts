@@ -20,12 +20,14 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export declare namespace Randomness {
   export type NftStructStruct = {
     status: BigNumberish;
+    tickets: BigNumberish;
     randomNumber: BigNumberish;
     timestamp: BigNumberish;
   };
 
-  export type NftStructStructOutput = [number, BigNumber, BigNumber] & {
+  export type NftStructStructOutput = [number, number, BigNumber, BigNumber] & {
     status: number;
+    tickets: number;
     randomNumber: BigNumber;
     timestamp: BigNumber;
   };

@@ -12,6 +12,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 
 	struct NftStruct {
 		uint8 status; // 1 win, 2 lose
+		uint8 tickets; // 5, 3, 1 tickets
 		uint256 randomNumber;
 		uint256 timestamp;
 	}
@@ -75,6 +76,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// 	uniqKeys[nftKeys[requestIdTest]] = true;
 	// 	NftStruct storage nft = nfts[nftKeys[requestIdTest]];
 	// 	nft.status = randomStatus;
+	// 	nft.tickets = 5;
 	// 	nft.randomNumber = randomnessTest;
 	// 	nft.timestamp = block.timestamp;
 
@@ -89,6 +91,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 			uniqKeys[_identifier] = true;
 			NftStruct storage nft = nfts[_identifier];
 			nft.status = 1;
+			nft.tickets = 5;
 			nft.randomNumber = 0;
 			nft.timestamp = block.timestamp;
 
@@ -117,6 +120,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 		uniqKeys[nftKeys[_requestId]] = true;
 		NftStruct storage nft = nfts[nftKeys[_requestId]];
 		nft.status = randomStatus;
+		nft.tickets = 5;
 		nft.randomNumber = _randomness;
 		nft.timestamp = block.timestamp;
 
