@@ -23,6 +23,7 @@
 
 ### Deployment
 
+- clean cache `npm run clean:cache`
 - deploy on rinkeby `npm run deploy:rinkeby`
 
 ### Testing

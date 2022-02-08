@@ -13,7 +13,8 @@
 		"test:gmkey": "npx hardhat test test/gmkey",
 		"test:randomness": "npx hardhat test test/randomness",
 		"lint": "tslint -c ./tslint.json './scripts/**/*.ts'",
-		"sollint": "solhint './contracts/**/*.sol'"
+		"sollint": "solhint './contracts/**/*.sol'",
+		"clean:cache": "npx hardhat clean"
 	},
 	"dependencies": {
 		"@chainlink/contracts": "^0.3.1",

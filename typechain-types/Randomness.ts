@@ -45,7 +45,7 @@ export interface RandomnessInterface extends utils.Interface {
     "owner()": FunctionFragment;
     "rawFulfillRandomness(bytes32,uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "startMintPhase()": FunctionFragment;
+    "startMintPhase(uint8)": FunctionFragment;
     "stopMintPhase()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "unlockNft(bytes32)": FunctionFragment;
@@ -84,7 +84,7 @@ export interface RandomnessInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "startMintPhase",
-    values?: undefined
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "stopMintPhase",
@@ -216,6 +216,7 @@ export interface Randomness extends BaseContract {
     ): Promise<ContractTransaction>;
 
     startMintPhase(
+      _chanceOfWinningPercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -267,6 +268,7 @@ export interface Randomness extends BaseContract {
   ): Promise<ContractTransaction>;
 
   startMintPhase(
+    _chanceOfWinningPercentage: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -315,7 +317,10 @@ export interface Randomness extends BaseContract {
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    startMintPhase(overrides?: CallOverrides): Promise<void>;
+    startMintPhase(
+      _chanceOfWinningPercentage: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     stopMintPhase(overrides?: CallOverrides): Promise<void>;
 
@@ -372,6 +377,7 @@ export interface Randomness extends BaseContract {
     ): Promise<BigNumber>;
 
     startMintPhase(
+      _chanceOfWinningPercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -424,6 +430,7 @@ export interface Randomness extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     startMintPhase(
+      _chanceOfWinningPercentage: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

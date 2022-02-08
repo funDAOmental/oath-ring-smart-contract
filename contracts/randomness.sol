@@ -10,9 +10,19 @@ import 'hardhat/console.sol';
 contract Randomness is VRFConsumerBase, Ownable {
 	using Counters for Counters.Counter;
 
+	enum STATUS {
+		LOSE,
+		WIN
+	}
+	enum TICKETS {
+		ONE,
+		THREE,
+		FIVE
+	}
+
 	struct NftStruct {
-		uint8 status; // 1 win, 2 lose
-		uint8 tickets; // 5, 3, 1 tickets
+		STATUS status; // 0 lose, 1 win
+		uint8 tickets;
 		uint256 randomNumber;
 		uint256 timestamp;
 	}
@@ -20,7 +30,9 @@ contract Randomness is VRFConsumerBase, Ownable {
 	uint256 private EPOCH_END_TIME = 268560; // 4476 min
 
 	uint256 private totalKeys = 0; // total number of minted key
+
 	uint8 private mintPhase = 0; // minting phase 0 stop, 1 start
+	uint8 private chanceOfWinningPercentage = 100; // chance of winning percentage
 	uint256 private mintStartTime = 0; // minting start time based on block.timestamp
 
 	mapping(bytes32 => bool) private uniqKeys; // user can mint 1x per epoch
@@ -48,35 +60,21 @@ contract Randomness is VRFConsumerBase, Ownable {
 		nftCount.increment(); // should start with 1
 	}
 
-	// function getRandomNumberTest(bytes32 _identifier) internal {
+	// function getTestRandomNumber(bytes32 _identifier) internal {
 	// 	bytes32 requestIdTest = _identifier;
 	// 	uint256 randomnessTest = 67868570531905125450905257968959569476979017743827885017162909765141947220640; // should mock chain.link data
 
 	// 	nftKeys[requestIdTest] = _identifier;
 
-	// 	uint8 randomStatus;
-	// 	uint256 chanceOfWinning = totalKeys / uint256(nftCount.current());
+	// 	uint256 chance = (randomnessTest % 100) + 1;
+	// 	uint256 ticketChance = randomnessTest % 3;
 
-	// 	if (chanceOfWinning >= 100) {
-	// 		randomStatus = 1; // sure win
-	// 	} else {
-	// 		if (chanceOfWinning < 10) {
-	// 			chanceOfWinning = 10; // mantain 10% chance of winning
-	// 		}
-
-	// 		uint256 chance = (randomnessTest % (100 - 1 + 1)) + 1;
-
-	// 		if (chanceOfWinning >= chance) {
-	// 			randomStatus = 1;
-	// 		} else {
-	// 			randomStatus = 2;
-	// 		}
-	// 	}
+	// 	STATUS status = getStatus(chanceOfWinningPercentage >= chance);
 
 	// 	uniqKeys[nftKeys[requestIdTest]] = true;
 	// 	NftStruct storage nft = nfts[nftKeys[requestIdTest]];
-	// 	nft.status = randomStatus;
-	// 	nft.tickets = 5;
+	// 	nft.status = status;
+	// 	nft.tickets = getTickets(status, TICKETS(ticketChance));
 	// 	nft.randomNumber = randomnessTest;
 	// 	nft.timestamp = block.timestamp;
 
@@ -84,47 +82,52 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// }
 
 	function getRandomNumber(bytes32 _identifier) internal {
-		uint256 chanceOfWinning = totalKeys / nftCount.current();
-
-		if (chanceOfWinning >= 100) {
-			// sure win
-			uniqKeys[_identifier] = true;
-			NftStruct storage nft = nfts[_identifier];
-			nft.status = 1;
-			nft.tickets = 5;
-			nft.randomNumber = 0;
-			nft.timestamp = block.timestamp;
-
-			nftCount.increment();
-		} else {
-			bytes32 requestId = requestRandomness(keyHash, fee);
-			nftKeys[requestId] = _identifier;
-		}
+		bytes32 requestId = requestRandomness(keyHash, fee);
+		nftKeys[requestId] = _identifier;
 	}
 
 	function fulfillRandomness(bytes32 _requestId, uint256 _randomness) internal override {
-		uint8 randomStatus;
-		uint256 chanceOfWinning = totalKeys / nftCount.current();
-		if (chanceOfWinning < 10) {
-			chanceOfWinning = 10; // mantain 10% chance of winning
-		}
+		uint256 chance = (_randomness % 100) + 1;
+		uint256 ticketChance = _randomness % 3;
 
-		uint256 chance = (_randomness % (100 - 1 + 1)) + 1;
-
-		if (chanceOfWinning >= chance) {
-			randomStatus = 1;
-		} else {
-			randomStatus = 2;
-		}
+		STATUS status = getStatus(chanceOfWinningPercentage >= chance);
 
 		uniqKeys[nftKeys[_requestId]] = true;
 		NftStruct storage nft = nfts[nftKeys[_requestId]];
-		nft.status = randomStatus;
-		nft.tickets = 5;
+		nft.status = status;
+		nft.tickets = getTickets(status, TICKETS(ticketChance));
 		nft.randomNumber = _randomness;
 		nft.timestamp = block.timestamp;
 
 		nftCount.increment();
+	}
+
+	/*
+	 * @functionName getStatus
+	 * @functionDescription get status value
+	 */
+	function getStatus(bool _status) internal pure returns (STATUS) {
+		if (_status) {
+			return STATUS.WIN;
+		}
+
+		return STATUS.LOSE;
+	}
+
+	/*
+	 * @functionName getTickets
+	 * @functionDescription get status value
+	 */
+	function getTickets(STATUS _status, TICKETS _ticket) internal pure returns (uint8) {
+		if (_status == STATUS.LOSE) {
+			return 0;
+		} else {
+			if (_ticket == TICKETS.ONE) return 1;
+			if (_ticket == TICKETS.THREE) return 3;
+			if (_ticket == TICKETS.FIVE) return 5;
+
+			return 0;
+		}
 	}
 
 	/*
@@ -166,8 +169,9 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName startMintPhase
 	 * @functionDescription start minting phase
 	 */
-	function startMintPhase() public onlyOwner {
+	function startMintPhase(uint8 _chanceOfWinningPercentage) public onlyOwner {
 		mintPhase = 1;
+		chanceOfWinningPercentage = _chanceOfWinningPercentage;
 		mintStartTime = block.timestamp + EPOCH_END_TIME;
 	}
 
@@ -202,12 +206,12 @@ contract Randomness is VRFConsumerBase, Ownable {
 		require(!uniqKeys[_identifier], 'KAE');
 		require(mintPhase == 1, 'MPS');
 
-		if (mintStartTime > block.timestamp) {
+		if (mintStartTime >= block.timestamp) {
 			require(LINK.balanceOf(address(this)) >= fee, 'NEC');
 			getRandomNumber(_identifier);
 
 			// for test
-			// getRandomNumberTest(_identifier);
+			// getTestRandomNumber(_identifier);
 		} else {
 			stopMintPhase();
 			require(false, 'MPS');
