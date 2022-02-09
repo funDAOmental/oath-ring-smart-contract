@@ -56,8 +56,6 @@ contract Randomness is VRFConsumerBase, Ownable {
 	{
 		keyHash = _keyHash;
 		fee = _fee;
-
-		nftCount.increment(); // should start with 1
 	}
 
 	// function getTestRandomNumber(bytes32 _identifier) internal {
@@ -150,27 +148,13 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// core owner functionality
 
 	/*
-	 * @functionName updateTotalKeys
-	 * @functionDescription update total keys minted
-	 */
-	function updateTotalKeys(uint256 _totalKey) public onlyOwner {
-		totalKeys = _totalKey;
-	}
-
-	/*
-	 * @functionName getTotalKeys
-	 * @functionDescription get total keys minted
-	 */
-	function getTotalKeys() public view returns (uint256) {
-		return totalKeys;
-	}
-
-	/*
 	 * @functionName startMintPhase
 	 * @functionDescription start minting phase
 	 */
-	function startMintPhase(uint8 _chanceOfWinningPercentage) public onlyOwner {
+	function startMintPhase(uint8 _chanceOfWinningPercentage, uint256 _totalKey) public onlyOwner {
 		mintPhase = 1;
+
+		totalKeys = _totalKey;
 		chanceOfWinningPercentage = _chanceOfWinningPercentage;
 		mintStartTime = block.timestamp + EPOCH_END_TIME;
 	}
@@ -189,6 +173,22 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 */
 	function isMintingStart() public view returns (bool) {
 		return mintPhase == 1;
+	}
+
+	/*
+	 * @functionName getTotalKeys
+	 * @functionDescription get total keys minted
+	 */
+	function getTotalKeys() public view returns (uint256) {
+		return totalKeys;
+	}
+
+	/*
+	 * @functionName getWinningPercentage
+	 * @functionDescription get winning percentage
+	 */
+	function getWinningPercentage() public view returns (uint256) {
+		return chanceOfWinningPercentage;
 	}
 
 	// UNLOCK FUNCTION ===========================================================================================

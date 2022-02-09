@@ -32,21 +32,20 @@ describe.only('randomness', async () => {
 		expect(getfee).to.equal(fee);
 
 		const getnftcount = await randomness.getNftCount();
-		expect(getnftcount).to.equal(1);
-	});
-
-	it('should update total key', async () => {
-		await randomness.updateTotalKeys(1000);
-
-		const gettotalkey = await randomness.getTotalKeys();
-		expect(gettotalkey).to.equal(1000);
+		expect(getnftcount).to.equal(0);
 	});
 
 	it('should start/stop minting', async () => {
 		const mintStatus1 = await randomness.isMintingStart();
 		expect(mintStatus1).to.equal(false);
 
-		await randomness.startMintPhase(70);
+		await randomness.startMintPhase(70, 1000);
+
+		const gettotalkey = await randomness.getTotalKeys();
+		expect(gettotalkey).to.equal(1000);
+
+		const getwinningpercentahe = await randomness.getWinningPercentage();
+		expect(getwinningpercentahe).to.equal(70);
 
 		const mintStatus2 = await randomness.isMintingStart();
 		expect(mintStatus2).to.equal(true);
@@ -62,11 +61,11 @@ describe.only('randomness', async () => {
 	});
 
 	it('should unlock nft', async () => {
-		await randomness.startMintPhase(70);
+		await randomness.startMintPhase(70, 1000);
 		await randomness.unlockNft(user1);
 
 		const getnftcount = await randomness.getNftCount();
-		expect(getnftcount).to.equal(2);
+		expect(getnftcount).to.equal(1);
 	});
 
 	it('should show user1 nft data', async () => {
@@ -83,12 +82,12 @@ describe.only('randomness', async () => {
 		await randomness.unlockNft(user2);
 
 		const getnftcount1 = await randomness.getNftCount();
-		expect(getnftcount1).to.equal(3);
+		expect(getnftcount1).to.equal(2);
 
 		await randomness.unlockNft(user3);
 
 		const getnftcount2 = await randomness.getNftCount();
-		expect(getnftcount2).to.equal(4);
+		expect(getnftcount2).to.equal(3);
 	});
 
 	it('should show user2, user3 nft data', async () => {
