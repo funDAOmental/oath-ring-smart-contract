@@ -11,12 +11,13 @@ describe.only('randomness', async () => {
 	const user1: string = ethers.utils.formatBytes32String('USERA-1');
 	const user2: string = ethers.utils.formatBytes32String('USERA-2');
 	const user3: string = ethers.utils.formatBytes32String('USERB-1');
-	// console.log(user1, user2, user3);
 
 	const vrfCoordinator: string = '0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9';
 	const linkToken: string = '0xa36085F69e2889c224210F603D836748e7dC0088';
 	const keyHash: string = '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4';
 	const fee: BigNumber = ethers.utils.parseEther('0.1');
+
+	console.log(user1, user2, user3, fee);
 
 	before(async () => {
 		Randomness = await ethers.getContractFactory('Randomness');
