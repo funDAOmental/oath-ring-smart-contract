@@ -32,6 +32,6 @@ async function main() {
 main()
 	.then(() => process.exit(0))
 	.catch((error) => {
-		console.error(error);
+		console.error('deployment error:', error);
 		process.exit(1);
 	});
