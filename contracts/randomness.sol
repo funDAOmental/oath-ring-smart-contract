@@ -187,7 +187,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName getWinningPercentage
 	 * @functionDescription get winning percentage
 	 */
-	function getWinningPercentage() public view returns (uint256) {
+	function getWinningPercentage() public view returns (uint8) {
 		return chanceOfWinningPercentage;
 	}
 

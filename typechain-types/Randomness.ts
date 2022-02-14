@@ -201,7 +201,7 @@ export interface Randomness extends BaseContract {
 
     getTotalKeys(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    getWinningPercentage(overrides?: CallOverrides): Promise<[BigNumber]>;
+    getWinningPercentage(overrides?: CallOverrides): Promise<[number]>;
 
     isMintingStart(overrides?: CallOverrides): Promise<[boolean]>;
 
@@ -251,7 +251,7 @@ export interface Randomness extends BaseContract {
 
   getTotalKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getWinningPercentage(overrides?: CallOverrides): Promise<BigNumber>;
+  getWinningPercentage(overrides?: CallOverrides): Promise<number>;
 
   isMintingStart(overrides?: CallOverrides): Promise<boolean>;
 
@@ -301,7 +301,7 @@ export interface Randomness extends BaseContract {
 
     getTotalKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getWinningPercentage(overrides?: CallOverrides): Promise<BigNumber>;
+    getWinningPercentage(overrides?: CallOverrides): Promise<number>;
 
     isMintingStart(overrides?: CallOverrides): Promise<boolean>;
 

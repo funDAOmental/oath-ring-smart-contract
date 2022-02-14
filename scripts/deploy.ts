@@ -13,10 +13,10 @@ async function main() {
 	console.log('deploying contract with the account:', deployer.address);
 	console.log('account balance:', (await deployer.getBalance()).toString());
 
-	// We get the contract to deploy
-	const vrfCoordinator: string = '0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9';
-	const linkToken: string = '0xa36085F69e2889c224210F603D836748e7dC0088';
-	const keyHash: string = '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4';
+	// reference https://docs.chain.link/docs/vrf-contracts/
+	const vrfCoordinator: string = '0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B';
+	const linkToken: string = '0x01BE23585060835E02B77ef475b0Cc51aA1e0709';
+	const keyHash: string = '0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311';
 	const fee: BigNumber = ethers.utils.parseEther('0.1');
 
 	const Randomness = await ethers.getContractFactory('Randomness');
