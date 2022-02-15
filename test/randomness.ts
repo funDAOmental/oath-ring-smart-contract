@@ -59,12 +59,12 @@ describe.only('randomness', async () => {
 	});
 
 	it('should reject unlock nft (minting phase stop)', async () => {
-		await expect(randomness.unlockNft(user1)).to.be.revertedWith('MPS');
+		await expect(randomness.unlocTestkNft(user1)).to.be.revertedWith('MPS');
 	});
 
 	it('should unlock nft', async () => {
 		await randomness.startMintPhase(70, 1000);
-		await randomness.unlockNft(user1);
+		await randomness.unlocTestkNft(user1);
 
 		const getnftcount = await randomness.getNftCount();
 		expect(getnftcount).to.equal(1);
@@ -77,16 +77,16 @@ describe.only('randomness', async () => {
 	});
 
 	it('should reject unlock nft (key identifier already exists)', async () => {
-		await expect(randomness.unlockNft(user1)).to.be.revertedWith('KAE');
+		await expect(randomness.unlocTestkNft(user1)).to.be.revertedWith('KAE');
 	});
 
 	it('should unlock more nft', async () => {
-		await randomness.unlockNft(user2);
+		await randomness.unlocTestkNft(user2);
 
 		const getnftcount1 = await randomness.getNftCount();
 		expect(getnftcount1).to.equal(2);
 
-		await randomness.unlockNft(user3);
+		await randomness.unlocTestkNft(user3);
 
 		const getnftcount2 = await randomness.getNftCount();
 		expect(getnftcount2).to.equal(3);

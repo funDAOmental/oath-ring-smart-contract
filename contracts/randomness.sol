@@ -191,6 +191,14 @@ contract Randomness is VRFConsumerBase, Ownable {
 		return chanceOfWinningPercentage;
 	}
 
+	/*
+	 * @functionName getLinkBalance
+	 * @functionDescription get link token balance
+	 */
+	function getLinkBalance() public view returns (uint256) {
+		return LINK.balanceOf(address(this));
+	}
+
 	// UNLOCK FUNCTION ===========================================================================================
 	// unlock gmkeys to identify if win/lose
 	// ERROR MSG:
@@ -209,13 +217,25 @@ contract Randomness is VRFConsumerBase, Ownable {
 		if (mintStartTime >= block.timestamp) {
 			require(LINK.balanceOf(address(this)) >= fee, 'NEC');
 			getRandomNumber(_identifier);
-
-			// for test
-			// getTestRandomNumber(_identifier);
 		} else {
 			stopMintPhase();
 			require(false, 'MPS');
 		}
+	}
+
+	/*
+	 * @functionName unlocTestkNft
+	 * @functionDescription run the test random number generator
+	 */
+	function unlocTestkNft(bytes32 _identifier) public {
+		require(!uniqKeys[_identifier], 'KAE');
+		require(mintPhase == 1, 'MPS');
+
+		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
+		getRandomNumber(_identifier);
+
+		// for test
+		// getTestRandomNumber(_identifier);
 	}
 
 	/*
