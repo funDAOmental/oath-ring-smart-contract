@@ -42,6 +42,7 @@ export interface RandomnessInterface extends utils.Interface {
     "getNftCount()": FunctionFragment;
     "getOneNft(bytes32)": FunctionFragment;
     "getTotalKeys()": FunctionFragment;
+    "getTotalTickets()": FunctionFragment;
     "getWinningPercentage()": FunctionFragment;
     "isMintingStart()": FunctionFragment;
     "owner()": FunctionFragment;
@@ -50,7 +51,6 @@ export interface RandomnessInterface extends utils.Interface {
     "startMintPhase(uint8,uint256)": FunctionFragment;
     "stopMintPhase()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "unlocTestkNft(bytes32)": FunctionFragment;
     "unlockNft(bytes32)": FunctionFragment;
   };
 
@@ -73,6 +73,10 @@ export interface RandomnessInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getTotalKeys",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTotalTickets",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -105,10 +109,6 @@ export interface RandomnessInterface extends utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "unlocTestkNft",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "unlockNft",
     values: [BytesLike]
   ): string;
@@ -126,6 +126,10 @@ export interface RandomnessInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "getOneNft", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getTotalKeys",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTotalTickets",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -155,10 +159,6 @@ export interface RandomnessInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "unlocTestkNft",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unlockNft", data: BytesLike): Result;
@@ -221,6 +221,8 @@ export interface Randomness extends BaseContract {
 
     getTotalKeys(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    getTotalTickets(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getWinningPercentage(overrides?: CallOverrides): Promise<[number]>;
 
     isMintingStart(overrides?: CallOverrides): Promise<[boolean]>;
@@ -252,11 +254,6 @@ export interface Randomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    unlocTestkNft(
-      _identifier: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     unlockNft(
       _identifier: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -277,6 +274,8 @@ export interface Randomness extends BaseContract {
   ): Promise<Randomness.NftStructStructOutput>;
 
   getTotalKeys(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getTotalTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
   getWinningPercentage(overrides?: CallOverrides): Promise<number>;
 
@@ -309,11 +308,6 @@ export interface Randomness extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  unlocTestkNft(
-    _identifier: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   unlockNft(
     _identifier: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -334,6 +328,8 @@ export interface Randomness extends BaseContract {
     ): Promise<Randomness.NftStructStructOutput>;
 
     getTotalKeys(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getTotalTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
     getWinningPercentage(overrides?: CallOverrides): Promise<number>;
 
@@ -359,11 +355,6 @@ export interface Randomness extends BaseContract {
 
     transferOwnership(
       newOwner: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    unlocTestkNft(
-      _identifier: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -397,6 +388,8 @@ export interface Randomness extends BaseContract {
 
     getTotalKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getTotalTickets(overrides?: CallOverrides): Promise<BigNumber>;
+
     getWinningPercentage(overrides?: CallOverrides): Promise<BigNumber>;
 
     isMintingStart(overrides?: CallOverrides): Promise<BigNumber>;
@@ -428,11 +421,6 @@ export interface Randomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    unlocTestkNft(
-      _identifier: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     unlockNft(
       _identifier: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -454,6 +442,8 @@ export interface Randomness extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getTotalKeys(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getTotalTickets(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getWinningPercentage(
       overrides?: CallOverrides
@@ -485,11 +475,6 @@ export interface Randomness extends BaseContract {
 
     transferOwnership(
       newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    unlocTestkNft(
-      _identifier: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

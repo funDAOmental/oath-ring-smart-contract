@@ -14,11 +14,6 @@ contract Randomness is VRFConsumerBase, Ownable {
 		LOSE,
 		WIN
 	}
-	enum TICKETS {
-		ONE,
-		THREE,
-		FIVE
-	}
 
 	struct NftStruct {
 		STATUS status; // 0 lose, 1 win
@@ -30,6 +25,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	uint256 private EPOCH_END_TIME = 268560; // 4476 min
 
 	uint256 private totalKeys = 0; // total number of minted key
+	uint256 private totalTickets = 0; // total number of minted tickets
 
 	uint8 private mintPhase = 0; // minting phase 0 stop, 1 start
 	uint8 private chanceOfWinningPercentage = 100; // chance of winning percentage
@@ -60,19 +56,20 @@ contract Randomness is VRFConsumerBase, Ownable {
 
 	// function getTestRandomNumber(bytes32 _identifier) internal {
 	// 	bytes32 requestIdTest = _identifier;
-	// 	uint256 randomnessTest = 67868570531905125450905257968959569476979017743827885017162909765141947220640; // should mock chain.link data
+	// 	uint256 randomnessTest = 67868570531905125450905257968959569476979017743827885017162909765141947220652; // should mock chain.link data
 
+	// 	uniqKeys[_identifier] = true;
 	// 	nftKeys[requestIdTest] = _identifier;
 
 	// 	uint256 chance = (randomnessTest % 100) + 1;
-	// 	uint256 ticketChance = randomnessTest % 3;
+	// 	uint256 ticketChance = (randomnessTest % 10) + 1;
 
 	// 	STATUS status = getStatus(chanceOfWinningPercentage >= chance);
+	// 	uint8 tickets = getTickets(status, ticketChance);
 
-	// 	uniqKeys[nftKeys[requestIdTest]] = true;
 	// 	NftStruct storage nft = nfts[nftKeys[requestIdTest]];
 	// 	nft.status = status;
-	// 	nft.tickets = getTickets(status, TICKETS(ticketChance));
+	// 	nft.tickets = tickets;
 	// 	nft.randomNumber = randomnessTest;
 	// 	nft.timestamp = block.timestamp;
 
@@ -81,19 +78,23 @@ contract Randomness is VRFConsumerBase, Ownable {
 
 	function getRandomNumber(bytes32 _identifier) internal {
 		bytes32 requestId = requestRandomness(keyHash, fee);
+
+		uniqKeys[_identifier] = true;
 		nftKeys[requestId] = _identifier;
 	}
 
 	function fulfillRandomness(bytes32 _requestId, uint256 _randomness) internal override {
 		uint256 chance = (_randomness % 100) + 1;
-		uint256 ticketChance = _randomness % 3;
+		uint256 ticketChance = (_randomness % 10) + 1;
 
 		STATUS status = getStatus(chanceOfWinningPercentage >= chance);
+		uint8 tickets = getTickets(status, ticketChance);
 
-		uniqKeys[nftKeys[_requestId]] = true;
+		totalTickets = totalTickets + tickets;
+
 		NftStruct storage nft = nfts[nftKeys[_requestId]];
 		nft.status = status;
-		nft.tickets = getTickets(status, TICKETS(ticketChance));
+		nft.tickets = tickets;
 		nft.randomNumber = _randomness;
 		nft.timestamp = block.timestamp;
 
@@ -116,15 +117,11 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName getTickets
 	 * @functionDescription get status value
 	 */
-	function getTickets(STATUS _status, TICKETS _ticket) internal pure returns (uint8) {
+	function getTickets(STATUS _status, uint256 _ticket) internal pure returns (uint8) {
 		if (_status == STATUS.LOSE) {
 			return 0;
 		} else {
-			if (_ticket == TICKETS.ONE) return 1;
-			if (_ticket == TICKETS.THREE) return 3;
-			if (_ticket == TICKETS.FIVE) return 5;
-
-			return 0;
+			return uint8(_ticket);
 		}
 	}
 
@@ -155,6 +152,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 		mintPhase = 1;
 
 		totalKeys = _totalKey;
+		totalTickets = 0;
 		chanceOfWinningPercentage = _chanceOfWinningPercentage;
 		mintStartTime = block.timestamp + EPOCH_END_TIME;
 	}
@@ -184,6 +182,14 @@ contract Randomness is VRFConsumerBase, Ownable {
 	}
 
 	/*
+	 * @functionName getTotalTickets
+	 * @functionDescription get total tickets minted
+	 */
+	function getTotalTickets() public view returns (uint256) {
+		return totalTickets;
+	}
+
+	/*
 	 * @functionName getWinningPercentage
 	 * @functionDescription get winning percentage
 	 */
@@ -205,38 +211,34 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// NEC: not enough coins
 	// KAE: key identifier already exists
 	// MPS: minting phase stop
+	// MPE: minting phase expired
 
 	/*
 	 * @functionName unlockNft
 	 * @functionDescription run the random number generator
 	 */
 	function unlockNft(bytes32 _identifier) public {
-		require(!uniqKeys[_identifier], 'KAE');
 		require(mintPhase == 1, 'MPS');
+		require(!uniqKeys[_identifier], 'KAE');
 
 		if (mintStartTime >= block.timestamp) {
 			require(LINK.balanceOf(address(this)) >= fee, 'NEC');
 			getRandomNumber(_identifier);
 		} else {
-			stopMintPhase();
-			require(false, 'MPS');
+			require(false, 'MPE');
 		}
 	}
 
 	/*
-	 * @functionName unlocTestkNft
+	 * @functionName unlockTestNft
 	 * @functionDescription run the test random number generator
 	 */
-	function unlocTestkNft(bytes32 _identifier) public {
-		require(!uniqKeys[_identifier], 'KAE');
-		require(mintPhase == 1, 'MPS');
+	// function unlockTestNft(bytes32 _identifier) public {
+	// 	require(mintPhase == 1, 'MPS');
+	// 	require(!uniqKeys[_identifier], 'KAE');
 
-		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
-		getRandomNumber(_identifier);
-
-		// for test
-		// getTestRandomNumber(_identifier);
-	}
+	// 	getTestRandomNumber(_identifier);
+	// }
 
 	/*
 	 * @functionName getNftCount

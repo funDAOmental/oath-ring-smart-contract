@@ -18,7 +18,8 @@ describe.only('randomness', async () => {
 	const keyHash: string = '0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311';
 	const fee: BigNumber = ethers.utils.parseEther('0.1');
 
-	console.log(user1, user2, user3, fee);
+	console.log('user:', user1, user2, user3);
+	console.log('fee:', fee);
 
 	before(async () => {
 		Randomness = await ethers.getContractFactory('Randomness');
@@ -46,6 +47,9 @@ describe.only('randomness', async () => {
 		const gettotalkey = await randomness.getTotalKeys();
 		expect(gettotalkey).to.equal(1000);
 
+		const gettotalticket = await randomness.getTotalTickets();
+		expect(gettotalticket).to.equal(0);
+
 		const getwinningpercentahe = await randomness.getWinningPercentage();
 		expect(getwinningpercentahe).to.equal(70);
 
@@ -59,12 +63,12 @@ describe.only('randomness', async () => {
 	});
 
 	it('should reject unlock nft (minting phase stop)', async () => {
-		await expect(randomness.unlocTestkNft(user1)).to.be.revertedWith('MPS');
+		await expect(randomness.unlockTestNft(user1)).to.be.revertedWith('MPS');
 	});
 
 	it('should unlock nft', async () => {
 		await randomness.startMintPhase(70, 1000);
-		await randomness.unlocTestkNft(user1);
+		await randomness.unlockTestNft(user1);
 
 		const getnftcount = await randomness.getNftCount();
 		expect(getnftcount).to.equal(1);
@@ -77,16 +81,16 @@ describe.only('randomness', async () => {
 	});
 
 	it('should reject unlock nft (key identifier already exists)', async () => {
-		await expect(randomness.unlocTestkNft(user1)).to.be.revertedWith('KAE');
+		await expect(randomness.unlockTestNft(user1)).to.be.revertedWith('KAE');
 	});
 
 	it('should unlock more nft', async () => {
-		await randomness.unlocTestkNft(user2);
+		await randomness.unlockTestNft(user2);
 
 		const getnftcount1 = await randomness.getNftCount();
 		expect(getnftcount1).to.equal(2);
 
-		await randomness.unlocTestkNft(user3);
+		await randomness.unlockTestNft(user3);
 
 		const getnftcount2 = await randomness.getNftCount();
 		expect(getnftcount2).to.equal(3);
