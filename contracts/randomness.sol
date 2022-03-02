@@ -56,7 +56,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 
 	// function getTestRandomNumber(bytes32 _identifier) internal {
 	// 	bytes32 requestIdTest = _identifier;
-	// 	uint256 randomnessTest = 67868570531905125450905257968959569476979017743827885017162909765141947220652; // should mock chain.link data
+	// 	uint256 randomnessTest = 67868570531905125450905257968959569476979017743827885017162909765141947220651; // should mock chain.link data
 
 	// 	uniqKeys[_identifier] = true;
 	// 	nftKeys[requestIdTest] = _identifier;
@@ -66,6 +66,8 @@ contract Randomness is VRFConsumerBase, Ownable {
 
 	// 	STATUS status = getStatus(chanceOfWinningPercentage >= chance);
 	// 	uint8 tickets = getTickets(status, ticketChance);
+
+	// 	totalTickets = totalTickets + tickets;
 
 	// 	NftStruct storage nft = nfts[nftKeys[requestIdTest]];
 	// 	nft.status = status;

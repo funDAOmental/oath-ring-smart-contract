@@ -9,7 +9,7 @@ async function main() {
 	// manually to make sure everything is compiled
 	// await hre.run('compile');
 
-	const [deployer] = await ethers.getSigners(); //get the account to deploy the contract
+	const [deployer] = await ethers.getSigners(); // get the account to deploy the contract
 	console.log('deploying contract with the account:', deployer.address);
 	console.log('account balance:', (await deployer.getBalance()).toString());
 

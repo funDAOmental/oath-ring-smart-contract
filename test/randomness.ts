@@ -72,6 +72,9 @@ describe.only('randomness', async () => {
 
 		const getnftcount = await randomness.getNftCount();
 		expect(getnftcount).to.equal(1);
+
+		const gettotalticket = await randomness.getTotalTickets();
+		expect(gettotalticket).to.equal(2);
 	});
 
 	it('should show user1 nft data', async () => {
@@ -94,6 +97,9 @@ describe.only('randomness', async () => {
 
 		const getnftcount2 = await randomness.getNftCount();
 		expect(getnftcount2).to.equal(3);
+
+		const gettotalticket = await randomness.getTotalTickets();
+		expect(gettotalticket).to.equal(6);
 	});
 
 	it('should show user2, user3 nft data', async () => {
