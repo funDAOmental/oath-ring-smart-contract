@@ -10,7 +10,7 @@ async function main() {
 	// await hre.run('compile');
 
 	const [deployer] = await ethers.getSigners(); // get the account to deploy the contract
-	console.log('deploying contract with the account:', deployer.address);
+	console.log('deploying randomness contract with the account:', deployer.address);
 	console.log('account balance:', (await deployer.getBalance()).toString());
 
 	// reference https://docs.chain.link/docs/vrf-contracts/
@@ -24,7 +24,7 @@ async function main() {
 
 	await randomness.deployed();
 
-	console.log('contract deployed to:', randomness.address);
+	console.log('randomness contract deployed to:', randomness.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
@@ -32,6 +32,6 @@ async function main() {
 main()
 	.then(() => process.exit(0))
 	.catch((error) => {
-		console.error('deployment error:', error);
+		console.error('randomness deployment error:', error);
 		process.exit(1);
 	});

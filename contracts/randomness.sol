@@ -22,13 +22,14 @@ contract Randomness is VRFConsumerBase, Ownable {
 		uint256 timestamp;
 	}
 
-	uint256 private EPOCH_END_TIME = 268560; // 4476 min
+	uint256 private vEPOCHENDTIME = 268560; // 4476 min
 
-	uint256 private totalKeys = 0; // total number of minted key
-	uint256 private totalTickets = 0; // total number of minted tickets
+	uint8 private chanceOfWinningPercentage = 100; // chance of winning percentage
+	uint256 private totalTickets = 0; // total number of tickets available
+	uint256 private totalRegisteredUser = 0; // total registered user
+	uint256 private mintedTickets = 0; // total number of minted tickets
 
 	uint8 private mintPhase = 0; // minting phase 0 stop, 1 start
-	uint8 private chanceOfWinningPercentage = 100; // chance of winning percentage
 	uint256 private mintStartTime = 0; // minting start time based on block.timestamp
 
 	mapping(bytes32 => bool) private uniqKeys; // user can mint 1x per epoch
@@ -67,7 +68,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// 	STATUS status = getStatus(chanceOfWinningPercentage >= chance);
 	// 	uint8 tickets = getTickets(status, ticketChance);
 
-	// 	totalTickets = totalTickets + tickets;
+	// 	mintedTickets = mintedTickets + tickets;
 
 	// 	NftStruct storage nft = nfts[nftKeys[requestIdTest]];
 	// 	nft.status = status;
@@ -92,7 +93,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 		STATUS status = getStatus(chanceOfWinningPercentage >= chance);
 		uint8 tickets = getTickets(status, ticketChance);
 
-		totalTickets = totalTickets + tickets;
+		mintedTickets = mintedTickets + tickets;
 
 		NftStruct storage nft = nfts[nftKeys[_requestId]];
 		nft.status = status;
@@ -150,13 +151,19 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName startMintPhase
 	 * @functionDescription start minting phase
 	 */
-	function startMintPhase(uint8 _chanceOfWinningPercentage, uint256 _totalKey) public onlyOwner {
+	function startMintPhase(
+		uint8 _chanceOfWinningPercentage,
+		uint256 _totalTickets,
+		uint256 _totalRegisteredUser
+	) public onlyOwner {
 		mintPhase = 1;
 
-		totalKeys = _totalKey;
-		totalTickets = 0;
 		chanceOfWinningPercentage = _chanceOfWinningPercentage;
-		mintStartTime = block.timestamp + EPOCH_END_TIME;
+		totalTickets = _totalTickets;
+		totalRegisteredUser = _totalRegisteredUser;
+
+		mintedTickets = 0;
+		mintStartTime = block.timestamp + vEPOCHENDTIME;
 	}
 
 	/*
@@ -176,19 +183,27 @@ contract Randomness is VRFConsumerBase, Ownable {
 	}
 
 	/*
-	 * @functionName getTotalKeys
-	 * @functionDescription get total keys minted
-	 */
-	function getTotalKeys() public view returns (uint256) {
-		return totalKeys;
-	}
-
-	/*
 	 * @functionName getTotalTickets
-	 * @functionDescription get total tickets minted
+	 * @functionDescription get total tickets available
 	 */
 	function getTotalTickets() public view returns (uint256) {
 		return totalTickets;
+	}
+
+	/*
+	 * @functionName getRegisteredUser
+	 * @functionDescription get total registered user
+	 */
+	function getRegisteredUser() public view returns (uint256) {
+		return totalRegisteredUser;
+	}
+
+	/*
+	 * @functionName getMintedTickets
+	 * @functionDescription get total tickets minted
+	 */
+	function getMintedTickets() public view returns (uint256) {
+		return mintedTickets;
 	}
 
 	/*
