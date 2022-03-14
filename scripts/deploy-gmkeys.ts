@@ -17,7 +17,7 @@ async function main() {
 	const baseTokenURI: string = 'https://www.nftxt.xyz/metadata?id=';
 
 	const GMKeys = await ethers.getContractFactory('GMKeys');
-	const gmkeys = await GMKeys.deploy(baseTokenURI);
+	const gmkeys = await GMKeys.deploy(baseTokenURI, ethers.utils.parseEther('0.1'));
 
 	await gmkeys.deployed();
 
