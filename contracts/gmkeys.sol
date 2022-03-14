@@ -12,6 +12,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	using Counters for Counters.Counter;
 
 	string private baseTokenURI;
+	uint256 private price;
 
 	struct NftStruct {
 		address receiver;
@@ -31,8 +32,9 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	Counters.Counter private nftCount;
 	NftStruct[] public nfts;
 
-	constructor(string memory _baseTokenURI) ERC721('GMKeys by NFTxT', 'GMKEYS') {
+	constructor(string memory _baseTokenURI, uint256 _price) ERC721('GMKeys by NFTxT', 'GMKEYS') {
 		baseTokenURI = _baseTokenURI;
+		price = _price;
 	}
 
 	// OVERIDE FUNCTION ===========================================================================================
@@ -42,6 +44,14 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	 */
 	function _baseURI() internal view override returns (string memory) {
 		return baseTokenURI;
+	}
+
+	/*
+	 * @functionName getPrice
+	 * @functionDescription get price
+	 */
+	function getPrice() public view returns (uint256) {
+		return price;
 	}
 
 	/*
@@ -84,18 +94,21 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// BLOCKCHAIN FUNCTION ==========================================================================================
 	// blockchain mint and burn
 	// 	// ERROR MSG:
+	// 	// NEC: not enough coins
 	// 	// ADE: address dosent exists
 	// 	// TID: token id dosent exists
 	// 	// AMM: max user/address max gmkeys has been mint
 
 	/*
-	 * @functionName addToBlockChain
+	 * @functionName mintKeys
 	 * @functionDescription mint gmkeys and add it to the blockchain
 	 */
-	function addToBlockChain(
+	function mintKeys(
 		address _receiver, // user/wallet to recieve NFT
 		string memory _epoch // epoch number
 	) public payable {
+		require(msg.value >= price, 'NEC');
+
 		AddressStruct storage address1 = addresses[_receiver];
 		if (address1.exists) {
 			require(address1.maxUnit > address1.currentUnit, 'AMM');
@@ -111,10 +124,10 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	}
 
 	/*
-	 * @functionName removeFromBlockChain
+	 * @functionName burnKeys
 	 * @functionDescription burn gmkeys and remove it to the blockchain
 	 */
-	function removeFromBlockChain(uint256 _tokenId) public {
+	function burnKeys(uint256 _tokenId) public {
 		require(nfts.length > _tokenId, 'TID');
 
 		delete nfts[_tokenId];

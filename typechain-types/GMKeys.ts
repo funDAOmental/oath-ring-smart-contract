@@ -49,11 +49,11 @@ export declare namespace GMKeys {
 export interface GMKeysInterface extends utils.Interface {
   contractName: "GMKeys";
   functions: {
-    "addToBlockChain(address,string)": FunctionFragment;
     "addresses(address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
+    "burnKeys(uint256)": FunctionFragment;
     "getAllNft()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getBaseURI()": FunctionFragment;
@@ -61,12 +61,13 @@ export interface GMKeysInterface extends utils.Interface {
     "getNftCount()": FunctionFragment;
     "getOneAddress(address)": FunctionFragment;
     "getOneNft(uint256)": FunctionFragment;
+    "getPrice()": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "mintKeys(address,string)": FunctionFragment;
     "name()": FunctionFragment;
     "nfts(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "removeFromBlockChain(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
@@ -77,10 +78,6 @@ export interface GMKeysInterface extends utils.Interface {
     "transferOwnership(address)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "addToBlockChain",
-    values: [string, string]
-  ): string;
   encodeFunctionData(functionFragment: "addresses", values: [string]): string;
   encodeFunctionData(
     functionFragment: "approve",
@@ -88,6 +85,10 @@ export interface GMKeysInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "burnKeys",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "getAllNft", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getApproved",
@@ -110,8 +111,13 @@ export interface GMKeysInterface extends utils.Interface {
     functionFragment: "getOneNft",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "getPrice", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintKeys",
     values: [string, string]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
@@ -119,10 +125,6 @@ export interface GMKeysInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "removeFromBlockChain",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -155,14 +157,11 @@ export interface GMKeysInterface extends utils.Interface {
     values: [string]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "addToBlockChain",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "addresses", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "burnKeys", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getAllNft", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
@@ -179,18 +178,16 @@ export interface GMKeysInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getOneNft", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "mintKeys", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nfts", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "removeFromBlockChain",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -288,12 +285,6 @@ export interface GMKeys extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    addToBlockChain(
-      _receiver: string,
-      _epoch: string,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     addresses(
       arg0: string,
       overrides?: CallOverrides
@@ -315,6 +306,11 @@ export interface GMKeys extends BaseContract {
 
     burn(
       tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    burnKeys(
+      _tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -346,11 +342,19 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[GMKeys.NftStructStructOutput]>;
 
+    getPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     isApprovedForAll(
       owner: string,
       operator: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    mintKeys(
+      _receiver: string,
+      _epoch: string,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
@@ -372,11 +376,6 @@ export interface GMKeys extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    removeFromBlockChain(
-      _tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -428,12 +427,6 @@ export interface GMKeys extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  addToBlockChain(
-    _receiver: string,
-    _epoch: string,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   addresses(
     arg0: string,
     overrides?: CallOverrides
@@ -455,6 +448,11 @@ export interface GMKeys extends BaseContract {
 
   burn(
     tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  burnKeys(
+    _tokenId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -484,11 +482,19 @@ export interface GMKeys extends BaseContract {
     overrides?: CallOverrides
   ): Promise<GMKeys.NftStructStructOutput>;
 
+  getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
   isApprovedForAll(
     owner: string,
     operator: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  mintKeys(
+    _receiver: string,
+    _epoch: string,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
@@ -507,11 +513,6 @@ export interface GMKeys extends BaseContract {
   owner(overrides?: CallOverrides): Promise<string>;
 
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-  removeFromBlockChain(
-    _tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -560,12 +561,6 @@ export interface GMKeys extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    addToBlockChain(
-      _receiver: string,
-      _epoch: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     addresses(
       arg0: string,
       overrides?: CallOverrides
@@ -586,6 +581,8 @@ export interface GMKeys extends BaseContract {
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     burn(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    burnKeys(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     getAllNft(
       overrides?: CallOverrides
@@ -615,11 +612,19 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<GMKeys.NftStructStructOutput>;
 
+    getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
     isApprovedForAll(
       owner: string,
       operator: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    mintKeys(
+      _receiver: string,
+      _epoch: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -638,11 +643,6 @@ export interface GMKeys extends BaseContract {
     owner(overrides?: CallOverrides): Promise<string>;
 
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    removeFromBlockChain(
-      _tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
@@ -734,12 +734,6 @@ export interface GMKeys extends BaseContract {
   };
 
   estimateGas: {
-    addToBlockChain(
-      _receiver: string,
-      _epoch: string,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     addresses(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     approve(
@@ -752,6 +746,11 @@ export interface GMKeys extends BaseContract {
 
     burn(
       tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    burnKeys(
+      _tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -778,10 +777,18 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
     isApprovedForAll(
       owner: string,
       operator: string,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    mintKeys(
+      _receiver: string,
+      _epoch: string,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
@@ -793,11 +800,6 @@ export interface GMKeys extends BaseContract {
     ownerOf(
       tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    removeFromBlockChain(
-      _tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     renounceOwnership(
@@ -851,12 +853,6 @@ export interface GMKeys extends BaseContract {
   };
 
   populateTransaction: {
-    addToBlockChain(
-      _receiver: string,
-      _epoch: string,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     addresses(
       arg0: string,
       overrides?: CallOverrides
@@ -875,6 +871,11 @@ export interface GMKeys extends BaseContract {
 
     burn(
       tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    burnKeys(
+      _tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -904,10 +905,18 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     isApprovedForAll(
       owner: string,
       operator: string,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    mintKeys(
+      _receiver: string,
+      _epoch: string,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -922,11 +931,6 @@ export interface GMKeys extends BaseContract {
     ownerOf(
       tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    removeFromBlockChain(
-      _tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
