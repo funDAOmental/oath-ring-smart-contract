@@ -8,9 +8,9 @@
 	"author": "john paul onte <jnpl.onte@gmail.com>",
 	"license": "MIT",
 	"scripts": {
+		"deploy:gmkeys:rinkeby": "npx hardhat run scripts/deploy-gmkeys.ts --network rinkeby",
 		"deploy:randomness:rinkeby": "npx hardhat run scripts/deploy-randomness.ts --network rinkeby",
-		"test": "npx hardhat test",
-		"test:gmkey": "npx hardhat test test/gmkey",
+		"test:gmkeys": "npx hardhat test test/gmkeys",
 		"test:randomness": "npx hardhat test test/randomness",
 		"lint": "tslint -c ./tslint.json './scripts/**/*.ts'",
 		"sollint": "solhint './contracts/**/*.sol'",
