@@ -75,7 +75,6 @@ export interface GMKeysInterface extends utils.Interface {
     "isApprovedForAll(address,address)": FunctionFragment;
     "isMintingStart()": FunctionFragment;
     "mintKeys(address,string,address,uint8)": FunctionFragment;
-    "mintTestKeys(address,string,address,uint8)": FunctionFragment;
     "name()": FunctionFragment;
     "nfts(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
@@ -147,10 +146,6 @@ export interface GMKeysInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "mintKeys",
-    values: [string, string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "mintTestKeys",
     values: [string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
@@ -240,10 +235,6 @@ export interface GMKeysInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mintKeys", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "mintTestKeys",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nfts", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
@@ -433,14 +424,6 @@ export interface GMKeys extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    mintTestKeys(
-      _receiver: string,
-      _identifier: string,
-      _randomnessAddress: string,
-      _count: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     name(overrides?: CallOverrides): Promise<[string]>;
 
     nfts(
@@ -600,14 +583,6 @@ export interface GMKeys extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  mintTestKeys(
-    _receiver: string,
-    _identifier: string,
-    _randomnessAddress: string,
-    _count: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   name(overrides?: CallOverrides): Promise<string>;
 
   nfts(
@@ -750,14 +725,6 @@ export interface GMKeys extends BaseContract {
     isMintingStart(overrides?: CallOverrides): Promise<boolean>;
 
     mintKeys(
-      _receiver: string,
-      _identifier: string,
-      _randomnessAddress: string,
-      _count: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    mintTestKeys(
       _receiver: string,
       _identifier: string,
       _randomnessAddress: string,
@@ -950,14 +917,6 @@ export interface GMKeys extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    mintTestKeys(
-      _receiver: string,
-      _identifier: string,
-      _randomnessAddress: string,
-      _count: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     nfts(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -1097,14 +1056,6 @@ export interface GMKeys extends BaseContract {
     isMintingStart(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     mintKeys(
-      _receiver: string,
-      _identifier: string,
-      _randomnessAddress: string,
-      _count: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    mintTestKeys(
       _receiver: string,
       _identifier: string,
       _randomnessAddress: string,
