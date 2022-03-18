@@ -6,11 +6,12 @@ describe.only('randomness', async () => {
 	let Randomness: any;
 	let randomness: any;
 
-	const ownerAddress: string = '0x924634D6964E171498f2a292185b1554893D95E5';
+	// const ownerAddress: string = '0x924634D6964E171498f2a292185b1554893D95E5';
 
-	const user1: string = ethers.utils.formatBytes32String('USERA-1');
-	const user2: string = ethers.utils.formatBytes32String('USERA-2');
-	const user3: string = ethers.utils.formatBytes32String('USERB-1');
+	const epoch: string = 'EP001';
+	const user1: string = 'EP001-USERA-1';
+	const user2: string = 'EP001-USERA-2';
+	const user3: string = 'EP001-USERB-1';
 
 	// reference https://docs.chain.link/docs/vrf-contracts/
 	const vrfCoordinator: string = '0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B';
@@ -18,7 +19,7 @@ describe.only('randomness', async () => {
 	const keyHash: string = '0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311';
 	const fee: BigNumber = ethers.utils.parseEther('0.1');
 
-	console.log('user:', user1, user2, user3);
+	// console.log('user:', user1, user2, user3);
 	console.log('fee:', fee);
 
 	before(async () => {
@@ -66,12 +67,12 @@ describe.only('randomness', async () => {
 	});
 
 	it('should reject unlock nft (minting phase stop)', async () => {
-		await expect(randomness.unlockTestNft(user1)).to.be.revertedWith('MPS');
+		await expect(randomness.unlockTestNft(user1, epoch)).to.be.revertedWith('MPS');
 	});
 
 	it('should unlock nft', async () => {
 		await randomness.startMintPhase(70, 1111, 2222);
-		await randomness.unlockTestNft(user1);
+		await randomness.unlockTestNft(user1, epoch);
 
 		const getnftcount = await randomness.getNftCount();
 		expect(getnftcount).to.equal(1);
@@ -84,19 +85,23 @@ describe.only('randomness', async () => {
 		const user1Data = await randomness.getOneNft(user1);
 		// console.log('user1', user1Data);
 		expect(user1Data['status']).to.be.a('number');
+
+		const user1Ticket = await randomness.getOneTicket(user1);
+		// console.log('user1', user1Ticket);
+		expect(user1Ticket[0]).to.equal(epoch);
 	});
 
 	it('should reject unlock nft (key identifier already exists)', async () => {
-		await expect(randomness.unlockTestNft(user1)).to.be.revertedWith('KAE');
+		await expect(randomness.unlockTestNft(user1, epoch)).to.be.revertedWith('KAE');
 	});
 
 	it('should unlock more nft', async () => {
-		await randomness.unlockTestNft(user2);
+		await randomness.unlockTestNft(user2, epoch);
 
 		const getnftcount1 = await randomness.getNftCount();
 		expect(getnftcount1).to.equal(2);
 
-		await randomness.unlockTestNft(user3);
+		await randomness.unlockTestNft(user3, epoch);
 
 		const getnftcount2 = await randomness.getNftCount();
 		expect(getnftcount2).to.equal(3);
@@ -110,8 +115,16 @@ describe.only('randomness', async () => {
 		// console.log('user2', user2Data);
 		expect(user2Data['status']).to.be.a('number');
 
+		const user2Ticket = await randomness.getOneTicket(user2);
+		// console.log('user2', user2Ticket);
+		expect(user2Ticket[0]).to.equal(epoch);
+
 		const user3Data = await randomness.getOneNft(user3);
 		// console.log('user3', user3Data);
 		expect(user3Data['status']).to.be.a('number');
+
+		const user3Ticket = await randomness.getOneTicket(user3);
+		// console.log('user3', user3Ticket);
+		expect(user3Ticket[0]).to.equal(epoch);
 	});
 });

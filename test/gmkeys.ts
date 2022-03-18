@@ -5,11 +5,15 @@ describe.only('gmkeys', async () => {
 	let GMKeys: any;
 	let gmkeys: any;
 
+	const randomessContract: string = '0xaE0A647EBa5a817f1b183303305b715E22391d1e';
+
 	const ownerAddress: string = '0x924634D6964E171498f2a292185b1554893D95E5';
 	const baseTokenURI: string = 'https://www.jnpl.me/metadata?id=';
 
-	const receiver1: string = '0x30eDEc1C25218F5a748cccc54C562d7879e47CaA'; // can mint max 20 nft
-	const receiver2: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0'; // can mint max 20 nft
+	const receiver1: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0';
+	const identifier1: string = 'EPN001-0x58933D8678b574349bE3CdDd3de115468e8cb3f0-A';
+	const receiver2: string = '0x30eDEc1C25218F5a748cccc54C562d7879e47CaA';
+	const identifier2: string = 'EPN001-0x30eDEc1C25218F5a748cccc54C562d7879e47CaA-B';
 
 	before(async () => {
 		GMKeys = await ethers.getContractFactory('GMKeys');
@@ -18,7 +22,7 @@ describe.only('gmkeys', async () => {
 	});
 
 	it('should initialize gmkey contract', async () => {
-		const address1 = await gmkeys.getOneAddress('0x9A32c490883adb80BDf05355D7D3FFBd283ddc67');
+		const address1 = await gmkeys.getOneAddress('EP001-0x9A32c490883adb80BDf05355D7D3FFBd283ddc67');
 		expect(address1['exists']).to.equal(false); // sample invalid address
 
 		expect(await gmkeys.getPrice()).to.equal(ethers.utils.parseEther('0.1'));
@@ -26,8 +30,36 @@ describe.only('gmkeys', async () => {
 		expect(await gmkeys.getBaseURI()).to.equal('https://www.jnpl.me/metadata?id=');
 	});
 
-	it('should generate gmkeys', async () => {
-		const blockChain = await gmkeys.mintKeys(receiver1, 'EP1', {
+	it('should start/stop minting', async () => {
+		const mintStatus1 = await gmkeys.isMintingStart();
+		expect(mintStatus1).to.equal(false);
+
+		await gmkeys.startMintPhase(1111);
+
+		const gettotalkeys = await gmkeys.getTotalKeys();
+		expect(gettotalkeys).to.equal(1111);
+
+		const mintStatus2 = await gmkeys.isMintingStart();
+		expect(mintStatus2).to.equal(true);
+
+		await gmkeys.stopMintPhase();
+
+		const mintStatus3 = await gmkeys.isMintingStart();
+		expect(mintStatus3).to.equal(false);
+	});
+
+	it('should reject generate gmkeys (minting phase stop)', async () => {
+		await expect(
+			gmkeys.mintTestKeys(receiver1, identifier1, randomessContract, 1, {
+				value: ethers.utils.parseEther('0.1'),
+			})
+		).to.be.revertedWith('MPS');
+	});
+
+	it('should generate gmkeys (1)', async () => {
+		await gmkeys.startMintPhase(1111);
+
+		const blockChain = await gmkeys.mintTestKeys(receiver1, identifier1, randomessContract, 1, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		const blockChainWait = await blockChain.wait();
@@ -43,7 +75,7 @@ describe.only('gmkeys', async () => {
 
 	it('should reject the gmkeys (not enough coins)', async () => {
 		await expect(
-			gmkeys.mintKeys(receiver1, 'EP1', {
+			gmkeys.mintTestKeys(receiver1, identifier1, randomessContract, 1, {
 				value: ethers.utils.parseEther('0.01'),
 			})
 		).to.be.revertedWith('NEC');
@@ -59,56 +91,58 @@ describe.only('gmkeys', async () => {
 		const blockChain = await gmkeys.getOneNft(0);
 		// console.log(blockChain1);
 		expect(blockChain['receiver']).to.equal(receiver1);
-		expect(blockChain['epoch']).to.equal('EP1');
 	});
 
 	it('should reject get blockchain (token id dosent exists)', async () => {
 		await expect(gmkeys.getOneNft(10)).to.be.revertedWith('TID');
 	});
 
-	it('should add to blockchain new reciever1', async () => {
-		const blockChain = await gmkeys.mintKeys(receiver1, 'EP1', {
+	it('should generate gmkeys new reciever1 (4)', async () => {
+		const blockChain = await gmkeys.mintTestKeys(receiver1, identifier1, randomessContract, 4, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain.wait();
-		expect(await gmkeys.getNftCount()).to.equal(2);
+		expect(await gmkeys.getNftCount()).to.equal(5);
 	});
 
-	it('should add to blockchain new reciever2', async () => {
-		const blockChain = await gmkeys.mintKeys(receiver2, 'EP1', {
+	it('should reject get gmkeys (max user/address max gmkeys has been mint)', async () => {
+		await expect(
+			gmkeys.mintTestKeys(receiver1, identifier1, randomessContract, 1, {
+				value: ethers.utils.parseEther('0.1'),
+			})
+		).to.be.revertedWith('AMM');
+	});
+
+	it('should generate gmkeys new reciever2 (3)', async () => {
+		const blockChain = await gmkeys.mintTestKeys(receiver2, identifier2, randomessContract, 3, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		await blockChain.wait();
-		expect(await gmkeys.getNftCount()).to.equal(3);
+		expect(await gmkeys.getNftCount()).to.equal(8);
 	});
 
 	it('should check address of recievers', async () => {
-		const address1 = await gmkeys.getOneAddress(receiver1);
+		const address1 = await gmkeys.getOneAddress(identifier1);
 		// console.log(address1);
-		expect(address1['maxUnit']).to.equal(20);
-		expect(address1['currentUnit']).to.equal(2);
+		expect(address1['currentAddress']).to.equal(receiver1);
+		expect(address1['currentUnit']).to.equal(5);
 		expect(address1['exists']).to.equal(true);
 
-		const address2 = await gmkeys.getOneAddress(receiver2);
+		const address2 = await gmkeys.getOneAddress(identifier2);
 		// console.log(address2);
-		expect(address2['maxUnit']).to.equal(20);
-		expect(address2['currentUnit']).to.equal(1);
+		expect(address2['currentAddress']).to.equal(receiver2);
+		expect(address2['currentUnit']).to.equal(3);
 		expect(address2['exists']).to.equal(true);
 	});
 
-	it('should get all gmkeys data (result 3)', async () => {
+	it('should get all gmkeys data (result 8)', async () => {
 		const blockChainAll = await gmkeys.getAllNft();
 		// console.log(blockChainAll);
-		expect(blockChainAll.length).to.equal(3);
+		expect(blockChainAll.length).to.equal(8);
 	});
 
-	it('should get my gmkeys', async () => {
-		const [blockChainFiltered1, len1] = await gmkeys.getMyNft(receiver1);
-		// console.log(blockChainFiltered1);
-		expect(len1).to.equal(2);
-
-		const [blockChainFiltered2, len2] = await gmkeys.getMyNft(receiver2);
-		// console.log(blockChainFiltered2);
-		expect(len2).to.equal(1);
+	it('should get all gmkeys data by epoch (result 8)', async () => {
+		const getmintedkeys = await gmkeys.getMintedKeys();
+		expect(getmintedkeys).to.equal(8);
 	});
 });

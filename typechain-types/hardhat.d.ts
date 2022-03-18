@@ -57,6 +57,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.GMKeys__factory>;
     getContractFactory(
+      name: "IRandomness",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IRandomness__factory>;
+    getContractFactory(
       name: "Randomness",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Randomness__factory>;
@@ -116,6 +120,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.GMKeys>;
+    getContractAt(
+      name: "IRandomness",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IRandomness>;
     getContractAt(
       name: "Randomness",
       address: string,

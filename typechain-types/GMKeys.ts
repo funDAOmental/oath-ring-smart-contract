@@ -23,24 +23,32 @@ export declare namespace GMKeys {
     receiver: string;
     number: BigNumberish;
     epoch: string;
+    randomNumber: BigNumberish;
     timestamp: BigNumberish;
   };
 
-  export type NftStructStructOutput = [string, BigNumber, string, BigNumber] & {
+  export type NftStructStructOutput = [
+    string,
+    BigNumber,
+    string,
+    BigNumber,
+    BigNumber
+  ] & {
     receiver: string;
     number: BigNumber;
     epoch: string;
+    randomNumber: BigNumber;
     timestamp: BigNumber;
   };
 
   export type AddressStructStruct = {
-    maxUnit: BigNumberish;
+    currentAddress: string;
     currentUnit: BigNumberish;
     exists: boolean;
   };
 
-  export type AddressStructStructOutput = [BigNumber, BigNumber, boolean] & {
-    maxUnit: BigNumber;
+  export type AddressStructStructOutput = [string, BigNumber, boolean] & {
+    currentAddress: string;
     currentUnit: BigNumber;
     exists: boolean;
   };
@@ -49,7 +57,7 @@ export declare namespace GMKeys {
 export interface GMKeysInterface extends utils.Interface {
   contractName: "GMKeys";
   functions: {
-    "addresses(address)": FunctionFragment;
+    "addresses(string)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
@@ -57,13 +65,17 @@ export interface GMKeysInterface extends utils.Interface {
     "getAllNft()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getBaseURI()": FunctionFragment;
-    "getMyNft(address)": FunctionFragment;
+    "getMintedKeys()": FunctionFragment;
     "getNftCount()": FunctionFragment;
-    "getOneAddress(address)": FunctionFragment;
+    "getOneAddress(string)": FunctionFragment;
     "getOneNft(uint256)": FunctionFragment;
+    "getOneTicket(address,string)": FunctionFragment;
     "getPrice()": FunctionFragment;
+    "getTotalKeys()": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "mintKeys(address,string)": FunctionFragment;
+    "isMintingStart()": FunctionFragment;
+    "mintKeys(address,string,address,uint8)": FunctionFragment;
+    "mintTestKeys(address,string,address,uint8)": FunctionFragment;
     "name()": FunctionFragment;
     "nfts(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
@@ -71,6 +83,8 @@ export interface GMKeysInterface extends utils.Interface {
     "renounceOwnership()": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "startMintPhase(uint256)": FunctionFragment;
+    "stopMintPhase()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
@@ -98,7 +112,10 @@ export interface GMKeysInterface extends utils.Interface {
     functionFragment: "getBaseURI",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "getMyNft", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "getMintedKeys",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "getNftCount",
     values?: undefined
@@ -111,14 +128,30 @@ export interface GMKeysInterface extends utils.Interface {
     functionFragment: "getOneNft",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "getOneTicket",
+    values: [string, string]
+  ): string;
   encodeFunctionData(functionFragment: "getPrice", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getTotalKeys",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "isMintingStart",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "mintKeys",
-    values: [string, string]
+    values: [string, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintTestKeys",
+    values: [string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "nfts", values: [BigNumberish]): string;
@@ -138,6 +171,14 @@ export interface GMKeysInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "setApprovalForAll",
     values: [string, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "startMintPhase",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "stopMintPhase",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -168,7 +209,10 @@ export interface GMKeysInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getBaseURI", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getMyNft", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getMintedKeys",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getNftCount",
     data: BytesLike
@@ -178,12 +222,28 @@ export interface GMKeysInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getOneNft", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getOneTicket",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getPrice", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getTotalKeys",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "isMintingStart",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "mintKeys", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "mintTestKeys",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nfts", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
@@ -198,6 +258,14 @@ export interface GMKeysInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setApprovalForAll",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "startMintPhase",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "stopMintPhase",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -289,8 +357,8 @@ export interface GMKeys extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, boolean] & {
-        maxUnit: BigNumber;
+      [string, BigNumber, boolean] & {
+        currentAddress: string;
         currentUnit: BigNumber;
         exists: boolean;
       }
@@ -325,15 +393,12 @@ export interface GMKeys extends BaseContract {
 
     getBaseURI(overrides?: CallOverrides): Promise<[string]>;
 
-    getMyNft(
-      _address: string,
-      overrides?: CallOverrides
-    ): Promise<[GMKeys.NftStructStructOutput[], BigNumber]>;
+    getMintedKeys(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getNftCount(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getOneAddress(
-      _address: string,
+      _identifier: string,
       overrides?: CallOverrides
     ): Promise<[GMKeys.AddressStructStructOutput]>;
 
@@ -342,7 +407,15 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[GMKeys.NftStructStructOutput]>;
 
+    getOneTicket(
+      _randomnessAddress: string,
+      _identifier: string,
+      overrides?: CallOverrides
+    ): Promise<[string, number, BigNumber]>;
+
     getPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getTotalKeys(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     isApprovedForAll(
       owner: string,
@@ -350,9 +423,21 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    isMintingStart(overrides?: CallOverrides): Promise<[boolean]>;
+
     mintKeys(
       _receiver: string,
-      _epoch: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    mintTestKeys(
+      _receiver: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -362,10 +447,11 @@ export interface GMKeys extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, string, BigNumber] & {
+      [string, BigNumber, string, BigNumber, BigNumber] & {
         receiver: string;
         number: BigNumber;
         epoch: string;
+        randomNumber: BigNumber;
         timestamp: BigNumber;
       }
     >;
@@ -402,6 +488,15 @@ export interface GMKeys extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    startMintPhase(
+      _totalKeys: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    stopMintPhase(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -431,8 +526,8 @@ export interface GMKeys extends BaseContract {
     arg0: string,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, boolean] & {
-      maxUnit: BigNumber;
+    [string, BigNumber, boolean] & {
+      currentAddress: string;
       currentUnit: BigNumber;
       exists: boolean;
     }
@@ -465,15 +560,12 @@ export interface GMKeys extends BaseContract {
 
   getBaseURI(overrides?: CallOverrides): Promise<string>;
 
-  getMyNft(
-    _address: string,
-    overrides?: CallOverrides
-  ): Promise<[GMKeys.NftStructStructOutput[], BigNumber]>;
+  getMintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
   getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
 
   getOneAddress(
-    _address: string,
+    _identifier: string,
     overrides?: CallOverrides
   ): Promise<GMKeys.AddressStructStructOutput>;
 
@@ -482,7 +574,15 @@ export interface GMKeys extends BaseContract {
     overrides?: CallOverrides
   ): Promise<GMKeys.NftStructStructOutput>;
 
+  getOneTicket(
+    _randomnessAddress: string,
+    _identifier: string,
+    overrides?: CallOverrides
+  ): Promise<[string, number, BigNumber]>;
+
   getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getTotalKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
   isApprovedForAll(
     owner: string,
@@ -490,9 +590,21 @@ export interface GMKeys extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  isMintingStart(overrides?: CallOverrides): Promise<boolean>;
+
   mintKeys(
     _receiver: string,
-    _epoch: string,
+    _identifier: string,
+    _randomnessAddress: string,
+    _count: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  mintTestKeys(
+    _receiver: string,
+    _identifier: string,
+    _randomnessAddress: string,
+    _count: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -502,10 +614,11 @@ export interface GMKeys extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [string, BigNumber, string, BigNumber] & {
+    [string, BigNumber, string, BigNumber, BigNumber] & {
       receiver: string;
       number: BigNumber;
       epoch: string;
+      randomNumber: BigNumber;
       timestamp: BigNumber;
     }
   >;
@@ -539,6 +652,15 @@ export interface GMKeys extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  startMintPhase(
+    _totalKeys: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  stopMintPhase(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   supportsInterface(
     interfaceId: BytesLike,
     overrides?: CallOverrides
@@ -565,8 +687,8 @@ export interface GMKeys extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, boolean] & {
-        maxUnit: BigNumber;
+      [string, BigNumber, boolean] & {
+        currentAddress: string;
         currentUnit: BigNumber;
         exists: boolean;
       }
@@ -595,15 +717,12 @@ export interface GMKeys extends BaseContract {
 
     getBaseURI(overrides?: CallOverrides): Promise<string>;
 
-    getMyNft(
-      _address: string,
-      overrides?: CallOverrides
-    ): Promise<[GMKeys.NftStructStructOutput[], BigNumber]>;
+    getMintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
     getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
 
     getOneAddress(
-      _address: string,
+      _identifier: string,
       overrides?: CallOverrides
     ): Promise<GMKeys.AddressStructStructOutput>;
 
@@ -612,7 +731,15 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<GMKeys.NftStructStructOutput>;
 
+    getOneTicket(
+      _randomnessAddress: string,
+      _identifier: string,
+      overrides?: CallOverrides
+    ): Promise<[string, number, BigNumber]>;
+
     getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getTotalKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
     isApprovedForAll(
       owner: string,
@@ -620,9 +747,21 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    isMintingStart(overrides?: CallOverrides): Promise<boolean>;
+
     mintKeys(
       _receiver: string,
-      _epoch: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    mintTestKeys(
+      _receiver: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -632,10 +771,11 @@ export interface GMKeys extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, string, BigNumber] & {
+      [string, BigNumber, string, BigNumber, BigNumber] & {
         receiver: string;
         number: BigNumber;
         epoch: string;
+        randomNumber: BigNumber;
         timestamp: BigNumber;
       }
     >;
@@ -666,6 +806,13 @@ export interface GMKeys extends BaseContract {
       approved: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    startMintPhase(
+      _totalKeys: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    stopMintPhase(overrides?: CallOverrides): Promise<void>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -763,12 +910,12 @@ export interface GMKeys extends BaseContract {
 
     getBaseURI(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getMyNft(_address: string, overrides?: CallOverrides): Promise<BigNumber>;
+    getMintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
     getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
 
     getOneAddress(
-      _address: string,
+      _identifier: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -777,7 +924,15 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getOneTicket(
+      _randomnessAddress: string,
+      _identifier: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getTotalKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
     isApprovedForAll(
       owner: string,
@@ -785,9 +940,21 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    isMintingStart(overrides?: CallOverrides): Promise<BigNumber>;
+
     mintKeys(
       _receiver: string,
-      _epoch: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    mintTestKeys(
+      _receiver: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -824,6 +991,15 @@ export interface GMKeys extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    startMintPhase(
+      _totalKeys: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    stopMintPhase(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -888,15 +1064,12 @@ export interface GMKeys extends BaseContract {
 
     getBaseURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getMyNft(
-      _address: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getMintedKeys(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getNftCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getOneAddress(
-      _address: string,
+      _identifier: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -905,7 +1078,15 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getOneTicket(
+      _randomnessAddress: string,
+      _identifier: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getTotalKeys(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     isApprovedForAll(
       owner: string,
@@ -913,9 +1094,21 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    isMintingStart(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     mintKeys(
       _receiver: string,
-      _epoch: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mintTestKeys(
+      _receiver: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -955,6 +1148,15 @@ export interface GMKeys extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    startMintPhase(
+      _totalKeys: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    stopMintPhase(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

@@ -20,13 +20,21 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export declare namespace Randomness {
   export type NftStructStruct = {
     status: BigNumberish;
+    epoch: string;
     tickets: BigNumberish;
     randomNumber: BigNumberish;
     timestamp: BigNumberish;
   };
 
-  export type NftStructStructOutput = [number, number, BigNumber, BigNumber] & {
+  export type NftStructStructOutput = [
+    number,
+    string,
+    number,
+    BigNumber,
+    BigNumber
+  ] & {
     status: number;
+    epoch: string;
     tickets: number;
     randomNumber: BigNumber;
     timestamp: BigNumber;
@@ -41,7 +49,8 @@ export interface RandomnessInterface extends utils.Interface {
     "getLinkBalance()": FunctionFragment;
     "getMintedTickets()": FunctionFragment;
     "getNftCount()": FunctionFragment;
-    "getOneNft(bytes32)": FunctionFragment;
+    "getOneNft(string)": FunctionFragment;
+    "getOneTicket(string)": FunctionFragment;
     "getRegisteredUser()": FunctionFragment;
     "getTotalTickets()": FunctionFragment;
     "getWinningPercentage()": FunctionFragment;
@@ -52,7 +61,8 @@ export interface RandomnessInterface extends utils.Interface {
     "startMintPhase(uint8,uint256,uint256)": FunctionFragment;
     "stopMintPhase()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "unlockNft(bytes32)": FunctionFragment;
+    "unlockNft(string,string)": FunctionFragment;
+    "unlockTestNft(string,string)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "getFee", values?: undefined): string;
@@ -72,9 +82,10 @@ export interface RandomnessInterface extends utils.Interface {
     functionFragment: "getNftCount",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "getOneNft", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "getOneNft",
-    values: [BytesLike]
+    functionFragment: "getOneTicket",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "getRegisteredUser",
@@ -115,7 +126,11 @@ export interface RandomnessInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "unlockNft",
-    values: [BytesLike]
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "unlockTestNft",
+    values: [string, string]
   ): string;
 
   decodeFunctionResult(functionFragment: "getFee", data: BytesLike): Result;
@@ -133,6 +148,10 @@ export interface RandomnessInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getOneNft", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getOneTicket",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getRegisteredUser",
     data: BytesLike
@@ -171,6 +190,10 @@ export interface RandomnessInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unlockNft", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "unlockTestNft",
+    data: BytesLike
+  ): Result;
 
   events: {
     "OwnershipTransferred(address,address)": EventFragment;
@@ -226,9 +249,14 @@ export interface Randomness extends BaseContract {
     getNftCount(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getOneNft(
-      _identifier: BytesLike,
+      _identifier: string,
       overrides?: CallOverrides
     ): Promise<[Randomness.NftStructStructOutput]>;
+
+    getOneTicket(
+      _identifier: string,
+      overrides?: CallOverrides
+    ): Promise<[string, number, BigNumber]>;
 
     getRegisteredUser(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -267,7 +295,14 @@ export interface Randomness extends BaseContract {
     ): Promise<ContractTransaction>;
 
     unlockNft(
-      _identifier: BytesLike,
+      _identifier: string,
+      _epoch: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    unlockTestNft(
+      _identifier: string,
+      _epoch: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -283,9 +318,14 @@ export interface Randomness extends BaseContract {
   getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
 
   getOneNft(
-    _identifier: BytesLike,
+    _identifier: string,
     overrides?: CallOverrides
   ): Promise<Randomness.NftStructStructOutput>;
+
+  getOneTicket(
+    _identifier: string,
+    overrides?: CallOverrides
+  ): Promise<[string, number, BigNumber]>;
 
   getRegisteredUser(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -324,7 +364,14 @@ export interface Randomness extends BaseContract {
   ): Promise<ContractTransaction>;
 
   unlockNft(
-    _identifier: BytesLike,
+    _identifier: string,
+    _epoch: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  unlockTestNft(
+    _identifier: string,
+    _epoch: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -340,9 +387,14 @@ export interface Randomness extends BaseContract {
     getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
 
     getOneNft(
-      _identifier: BytesLike,
+      _identifier: string,
       overrides?: CallOverrides
     ): Promise<Randomness.NftStructStructOutput>;
+
+    getOneTicket(
+      _identifier: string,
+      overrides?: CallOverrides
+    ): Promise<[string, number, BigNumber]>;
 
     getRegisteredUser(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -376,7 +428,17 @@ export interface Randomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    unlockNft(_identifier: BytesLike, overrides?: CallOverrides): Promise<void>;
+    unlockNft(
+      _identifier: string,
+      _epoch: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    unlockTestNft(
+      _identifier: string,
+      _epoch: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
@@ -402,7 +464,12 @@ export interface Randomness extends BaseContract {
     getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
 
     getOneNft(
-      _identifier: BytesLike,
+      _identifier: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getOneTicket(
+      _identifier: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -443,7 +510,14 @@ export interface Randomness extends BaseContract {
     ): Promise<BigNumber>;
 
     unlockNft(
-      _identifier: BytesLike,
+      _identifier: string,
+      _epoch: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    unlockTestNft(
+      _identifier: string,
+      _epoch: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -460,7 +534,12 @@ export interface Randomness extends BaseContract {
     getNftCount(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getOneNft(
-      _identifier: BytesLike,
+      _identifier: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getOneTicket(
+      _identifier: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -503,7 +582,14 @@ export interface Randomness extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     unlockNft(
-      _identifier: BytesLike,
+      _identifier: string,
+      _epoch: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    unlockTestNft(
+      _identifier: string,
+      _epoch: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
