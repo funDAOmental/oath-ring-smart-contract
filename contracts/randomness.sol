@@ -61,32 +61,32 @@ contract Randomness is VRFConsumerBase, Ownable {
 		fee = _fee;
 	}
 
-	function getTestRandomNumber(string memory _identifier, string memory _epoch) internal {
-		bytes32 requestIdTest = '0x5553455231';
-		uint256 randomnessTest = 67868570531905125450905257968959569476979017743827885017162909765141947220651; // should mock chain.link data
+	// function getTestRandomNumber(string memory _identifier, string memory _epoch) internal {
+	// 	bytes32 requestIdTest = '0x5553455231';
+	// 	uint256 randomnessTest = 67868570531905125450905257968959569476979017743827885017162909765141947220651; // should mock chain.link data
 
-		nftKeys[requestIdTest] = _identifier;
-		KeyStruct storage uniqkey = uniqKeys[_identifier];
-		uniqkey.epoch = _epoch;
-		uniqkey.exists = true;
+	// 	nftKeys[requestIdTest] = _identifier;
+	// 	KeyStruct storage uniqkey = uniqKeys[_identifier];
+	// 	uniqkey.epoch = _epoch;
+	// 	uniqkey.exists = true;
 
-		uint256 chance = (randomnessTest % 100) + 1;
-		uint256 ticketChance = (randomnessTest % 10) + 1;
+	// 	uint256 chance = (randomnessTest % 100) + 1;
+	// 	uint256 ticketChance = (randomnessTest % 10) + 1;
 
-		STATUS status = getStatus(chanceOfWinningPercentage >= chance);
-		uint8 tickets = getTickets(status, ticketChance);
+	// 	STATUS status = getStatus(chanceOfWinningPercentage >= chance);
+	// 	uint8 tickets = getTickets(status, ticketChance);
 
-		mintedTickets = mintedTickets + tickets;
+	// 	mintedTickets = mintedTickets + tickets;
 
-		NftStruct storage nft = nfts[nftKeys[requestIdTest]];
-		nft.status = status;
-		nft.epoch = uniqKeys[nftKeys[requestIdTest]].epoch;
-		nft.tickets = tickets;
-		nft.randomNumber = randomnessTest;
-		nft.timestamp = block.timestamp;
+	// 	NftStruct storage nft = nfts[nftKeys[requestIdTest]];
+	// 	nft.status = status;
+	// 	nft.epoch = uniqKeys[nftKeys[requestIdTest]].epoch;
+	// 	nft.tickets = tickets;
+	// 	nft.randomNumber = randomnessTest;
+	// 	nft.timestamp = block.timestamp;
 
-		nftCount.increment();
-	}
+	// 	nftCount.increment();
+	// }
 
 	function getRandomNumber(string memory _identifier, string memory _epoch) internal {
 		bytes32 requestId = requestRandomness(keyHash, fee);
@@ -262,12 +262,12 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName unlockTestNft
 	 * @functionDescription run the test random number generator
 	 */
-	function unlockTestNft(string memory _identifier, string memory _epoch) public {
-		require(mintPhase == 1, 'MPS');
-		require(!uniqKeys[_identifier].exists, 'KAE');
+	// function unlockTestNft(string memory _identifier, string memory _epoch) public {
+	// 	require(mintPhase == 1, 'MPS');
+	// 	require(!uniqKeys[_identifier].exists, 'KAE');
 
-		getTestRandomNumber(_identifier, _epoch);
-	}
+	// 	getTestRandomNumber(_identifier, _epoch);
+	// }
 
 	/*
 	 * @functionName getNftCount
