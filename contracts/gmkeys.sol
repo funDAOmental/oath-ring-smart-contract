@@ -175,11 +175,12 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// BLOCKCHAIN FUNCTION ==========================================================================================
 	// blockchain mint and burn
 	// 	// ERROR MSG:
-	// MPS: minting phase stop
+	//  // MPS: minting phase stop
 	// 	// NEC: not enough coins
 	// 	// ADE: address dosent exists
 	// 	// TID: token id dosent exists
 	// 	// AMM: max user/address max gmkeys has been mint
+	//  // NYR: user/address not yet registered
 
 	// function mintTestKeys(
 	// 	address _receiver, // user/wallet address to recieve NFT
@@ -232,6 +233,8 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		uint8 ticket;
 		uint256 randomNumber;
 		(epoch, ticket, randomNumber) = getOneTicket(_randomnessAddress, _identifier);
+
+		require(ticket >= 1, 'NYR');
 
 		AddressStruct storage address1 = addresses[_identifier];
 		if (address1.exists) {
