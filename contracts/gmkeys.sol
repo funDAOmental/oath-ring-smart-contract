@@ -93,7 +93,11 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 			uint256
 		)
 	{
-		return IRandomness(_randomnessAddress).getOneTicket(_identifier);
+		string memory epoch;
+		uint8 ticket;
+		uint256 randomNumber;
+		(epoch, ticket, randomNumber) = IRandomness(_randomnessAddress).getOneTicket(_identifier);
+		return (epoch, ticket, randomNumber);
 	}
 
 	// CORE FUNCTION ===========================================================================================
@@ -189,7 +193,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// 	uint8 _count // number of keys to mint
 	// ) public payable {
 	// 	require(mintPhase == 1, 'MPS');
-	// 	require(msg.value >= price, 'NEC');
+	// 	require(msg.value >= price * _count, 'NEC');
 
 	// 	console.log(_randomnessAddress, '<RANDOM ADDRESS');
 	// 	string memory epochTest = 'EPN001';
@@ -205,15 +209,15 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// 		addAddress(_receiver, _identifier, _count);
 	// 	}
 
-	// 	mintedKeys = mintedKeys + _count;
-
 	// 	uint8 j = 1;
 	// 	for (j; j <= _count; j++) {
-	// 		nfts.push(NftStruct(payable(_receiver), nftCount.current(), epochTest, randomNumberTest, block.timestamp));
+	// 		nfts.push(NftStruct(payable(_receiver), nftCount.current(), epochTest, randomNumberTest + j, block.timestamp));
 	// 		_safeMint(payable(_receiver), nftCount.current());
 
 	// 		nftCount.increment();
 	// 	}
+
+	// 	mintedKeys = mintedKeys + _count;
 	// }
 
 	/*
@@ -227,7 +231,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		uint8 _count // number of keys to mint
 	) public payable {
 		require(mintPhase == 1, 'MPS');
-		require(msg.value >= price, 'NEC');
+		require(msg.value >= price * _count, 'NEC');
 
 		string memory epoch;
 		uint8 ticket;
@@ -245,15 +249,15 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 			addAddress(_receiver, _identifier, _count);
 		}
 
-		mintedKeys = mintedKeys + _count;
-
 		uint8 j = 1;
 		for (j; j <= _count; j++) {
-			nfts.push(NftStruct(payable(_receiver), nftCount.current(), epoch, randomNumber, block.timestamp));
+			nfts.push(NftStruct(payable(_receiver), nftCount.current(), epoch, randomNumber + j, block.timestamp));
 			_safeMint(payable(_receiver), nftCount.current());
 
 			nftCount.increment();
 		}
+
+		mintedKeys = mintedKeys + _count;
 	}
 
 	/*

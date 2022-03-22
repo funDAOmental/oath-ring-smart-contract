@@ -71,6 +71,9 @@ describe.only('gmkeys', async () => {
 
 		const tokenURI = await gmkeys.tokenURI(newTokenId);
 		expect(tokenURI).to.equal(`${baseTokenURI}${newTokenId}`);
+
+		// const blockChainAll = await gmkeys.getAllNft();
+		// console.log(blockChainAll);
 	});
 
 	it('should reject the gmkeys (not enough coins)', async () => {
@@ -99,7 +102,7 @@ describe.only('gmkeys', async () => {
 
 	it('should generate gmkeys new reciever1 (4)', async () => {
 		const blockChain = await gmkeys.mintTestKeys(receiver1, identifier1, randomessContract, 4, {
-			value: ethers.utils.parseEther('0.1'),
+			value: ethers.utils.parseEther('0.4'),
 		});
 		await blockChain.wait();
 		expect(await gmkeys.getNftCount()).to.equal(5);
@@ -115,7 +118,7 @@ describe.only('gmkeys', async () => {
 
 	it('should generate gmkeys new reciever2 (3)', async () => {
 		const blockChain = await gmkeys.mintTestKeys(receiver2, identifier2, randomessContract, 3, {
-			value: ethers.utils.parseEther('0.1'),
+			value: ethers.utils.parseEther('0.3'),
 		});
 		await blockChain.wait();
 		expect(await gmkeys.getNftCount()).to.equal(8);
