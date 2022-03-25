@@ -23,6 +23,8 @@ interface IRandomness {
 contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	using Counters for Counters.Counter;
 
+	event MintKeys(address indexed _receiver, uint256 _count, uint256 totalCount);
+
 	string private baseTokenURI;
 	uint256 private price;
 
@@ -197,6 +199,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// 	// AMM: max user/address max gmkeys has been mint
 	//  // NYR: user/address not yet registered
 	//  // MSR: max supply of gmkeys reach
+	//  // IGO: invalid gmkey owner
 
 	// function mintTestKeys(
 	// 	address _receiver, // user/wallet address to recieve NFT
@@ -231,6 +234,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// 	}
 
 	// 	mintedKeys = mintedKeys + _count;
+	// 	emit MintKeys(_receiver, _count, mintedKeys);
 	// }
 
 	/*
@@ -272,29 +276,35 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		}
 
 		mintedKeys = mintedKeys + _count;
+		emit MintKeys(_receiver, _count, mintedKeys);
 	}
 
 	/*
 	 * @functionName burnKeys
 	 * @functionDescription burn gmkeys and remove it to the blockchain
 	 */
-	function burnKeys(uint256 _tokenId) public {
+	function burnKeys(uint256 _tokenId) public onlyOwner {
 		require(_exists(_tokenId), 'TID');
 
 		delete nfts[_tokenId];
 		_burn(_tokenId);
 	}
 
+	// TODO: WIP
 	/*
 	 * @functionName transferKeys
 	 * @functionDescription transfer gmkeys and transfer it to the blockchain
 	 */
-	function transferKeys(uint256 _tokenId) public {
-		require(_exists(_tokenId), 'TID');
+	// function transferKeys(
+	// 	address _owner, // user/wallet address of NFT owner
+	// 	address _receiver, // user/wallet address to recieve NFT
+	// 	uint256 _tokenId
+	// ) public {
+	// 	require(_exists(_tokenId), 'TID');
+	// 	require(_owner == ownerOf(_tokenId), 'IGO');
 
-		delete nfts[_tokenId];
-		_burn(_tokenId);
-	}
+	// 	safeTransferFrom(_owner, _receiver, _tokenId);
+	// }
 
 	/*
 	 * @functionName getNftCount

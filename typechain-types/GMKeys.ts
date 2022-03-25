@@ -88,7 +88,6 @@ export interface GMKeysInterface extends utils.Interface {
     "symbol()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
-    "transferKeys(uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "withdraw()": FunctionFragment;
   };
@@ -191,10 +190,6 @@ export interface GMKeysInterface extends utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferKeys",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
@@ -277,10 +272,6 @@ export interface GMKeysInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "transferKeys",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
@@ -289,12 +280,14 @@ export interface GMKeysInterface extends utils.Interface {
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
+    "MintKeys(address,uint256,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MintKeys"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
@@ -312,6 +305,13 @@ export type ApprovalForAllEvent = TypedEvent<
 >;
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
+
+export type MintKeysEvent = TypedEvent<
+  [string, BigNumber, BigNumber],
+  { _receiver: string; _count: BigNumber; totalCount: BigNumber }
+>;
+
+export type MintKeysEventFilter = TypedEventFilter<MintKeysEvent>;
 
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string],
@@ -511,11 +511,6 @@ export interface GMKeys extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    transferKeys(
-      _tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -673,11 +668,6 @@ export interface GMKeys extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  transferKeys(
-    _tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   transferOwnership(
     newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -827,11 +817,6 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    transferKeys(
-      _tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     transferOwnership(
       newOwner: string,
       overrides?: CallOverrides
@@ -862,6 +847,17 @@ export interface GMKeys extends BaseContract {
       operator?: string | null,
       approved?: null
     ): ApprovalForAllEventFilter;
+
+    "MintKeys(address,uint256,uint256)"(
+      _receiver?: string | null,
+      _count?: null,
+      totalCount?: null
+    ): MintKeysEventFilter;
+    MintKeys(
+      _receiver?: string | null,
+      _count?: null,
+      totalCount?: null
+    ): MintKeysEventFilter;
 
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
@@ -1018,11 +1014,6 @@ export interface GMKeys extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    transferKeys(
-      _tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1173,11 +1164,6 @@ export interface GMKeys extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    transferKeys(
-      _tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

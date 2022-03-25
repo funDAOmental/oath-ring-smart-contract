@@ -92,7 +92,7 @@ describe.only('gmkeys', async () => {
 
 	it('should get gmkeys data 0', async () => {
 		const blockChain = await gmkeys.getOneNft(0);
-		// console.log(blockChain1);
+		// console.log(blockChain);
 		expect(blockChain['receiver']).to.equal(receiver1);
 	});
 
@@ -138,16 +138,29 @@ describe.only('gmkeys', async () => {
 		expect(address2['exists']).to.equal(true);
 	});
 
+	it('should get all gmkeys data by epoch (result 8)', async () => {
+		const getmintedkeys = await gmkeys.getMintedKeys();
+		expect(getmintedkeys).to.equal(8);
+	});
+
 	it('should get all gmkeys data (result 8)', async () => {
 		const blockChainAll = await gmkeys.getAllNft();
 		// console.log(blockChainAll);
 		expect(blockChainAll.length).to.equal(8);
 	});
 
-	it('should get all gmkeys data by epoch (result 8)', async () => {
-		const getmintedkeys = await gmkeys.getMintedKeys();
-		expect(getmintedkeys).to.equal(8);
+	it('should burn gmkeys', async () => {
+		await gmkeys.burnKeys(0);
+
+		await expect(gmkeys.getOneNft(0)).to.be.revertedWith('TID');
 	});
+
+	// TODO: WIP
+	// it('should transfer gmkeys', async () => {
+	// 	await gmkeys.transferKeys(receiver1, receiver2, 1);
+	// 	// const blockChain = await gmkeys.getOneNft(1);
+	// 	// expect(blockChain['receiver']).to.equal(receiver1);
+	// });
 
 	it('should withdraw contract balance', async () => {
 		const withdraw = await gmkeys.withdraw();
