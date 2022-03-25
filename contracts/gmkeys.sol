@@ -40,6 +40,8 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		bool exists;
 	}
 
+	uint256 private vMAXSUPPLY = 10000; // max gmkey supply
+
 	uint256 private totalKeys = 0; // total number of keys available
 	uint256 private mintedKeys = 0; // total number of minted keys
 
@@ -102,6 +104,15 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 
 	// CORE FUNCTION ===========================================================================================
 	// core owner functionality
+
+	/*
+	 * @functionName withdraw
+	 * @functionDescription withdraw contract balance
+	 */
+	function withdraw() public payable onlyOwner {
+		uint256 amount = address(this).balance;
+		payable(msg.sender).transfer(amount);
+	}
 
 	/*
 	 * @functionName startMintPhase
@@ -185,6 +196,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// 	// TID: token id dosent exists
 	// 	// AMM: max user/address max gmkeys has been mint
 	//  // NYR: user/address not yet registered
+	//  // MSR: max supply of gmkeys reach
 
 	// function mintTestKeys(
 	// 	address _receiver, // user/wallet address to recieve NFT
@@ -194,6 +206,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// ) public payable {
 	// 	require(mintPhase == 1, 'MPS');
 	// 	require(msg.value >= price * _count, 'NEC');
+	// 	require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
 	// 	console.log(_randomnessAddress, '<RANDOM ADDRESS');
 	// 	string memory epochTest = 'EPN001';
@@ -232,6 +245,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	) public payable {
 		require(mintPhase == 1, 'MPS');
 		require(msg.value >= price * _count, 'NEC');
+		require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
 		string memory epoch;
 		uint8 ticket;
@@ -265,7 +279,18 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	 * @functionDescription burn gmkeys and remove it to the blockchain
 	 */
 	function burnKeys(uint256 _tokenId) public {
-		require(nfts.length > _tokenId, 'TID');
+		require(_exists(_tokenId), 'TID');
+
+		delete nfts[_tokenId];
+		_burn(_tokenId);
+	}
+
+	/*
+	 * @functionName transferKeys
+	 * @functionDescription transfer gmkeys and transfer it to the blockchain
+	 */
+	function transferKeys(uint256 _tokenId) public {
+		require(_exists(_tokenId), 'TID');
 
 		delete nfts[_tokenId];
 		_burn(_tokenId);
@@ -292,7 +317,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	 * @functionDescription get gmkeys information
 	 */
 	function getOneNft(uint256 _tokenId) public view returns (NftStruct memory) {
-		require(nfts.length > _tokenId, 'TID');
+		require(_exists(_tokenId), 'TID');
 
 		return nfts[_tokenId];
 	}

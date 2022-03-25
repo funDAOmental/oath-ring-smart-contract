@@ -148,4 +148,11 @@ describe.only('gmkeys', async () => {
 		const getmintedkeys = await gmkeys.getMintedKeys();
 		expect(getmintedkeys).to.equal(8);
 	});
+
+	it('should withdraw contract balance', async () => {
+		const withdraw = await gmkeys.withdraw();
+
+		const blockChainWait = await withdraw.wait();
+		expect(blockChainWait.status).to.equal(1);
+	});
 });
