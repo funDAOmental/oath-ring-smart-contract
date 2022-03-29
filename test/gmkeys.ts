@@ -155,12 +155,11 @@ describe.only('gmkeys', async () => {
 		await expect(gmkeys.getOneNft(0)).to.be.revertedWith('TID');
 	});
 
-	// TODO: WIP
-	// it('should transfer gmkeys', async () => {
-	// 	await gmkeys.transferKeys(receiver1, receiver2, 1);
-	// 	// const blockChain = await gmkeys.getOneNft(1);
-	// 	// expect(blockChain['receiver']).to.equal(receiver1);
-	// });
+	it('should transfer gmkeys', async () => {
+		await gmkeys.transferKeys(receiver1, receiver2, 1);
+		const blockChain = await gmkeys.getOneNft(1);
+		expect(blockChain['receiver']).to.equal(receiver2);
+	});
 
 	it('should withdraw contract balance', async () => {
 		const withdraw = await gmkeys.withdraw();

@@ -290,21 +290,20 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		_burn(_tokenId);
 	}
 
-	// TODO: WIP
 	/*
 	 * @functionName transferKeys
 	 * @functionDescription transfer gmkeys and transfer it to the blockchain
 	 */
-	// function transferKeys(
-	// 	address _owner, // user/wallet address of NFT owner
-	// 	address _receiver, // user/wallet address to recieve NFT
-	// 	uint256 _tokenId
-	// ) public {
-	// 	require(_exists(_tokenId), 'TID');
-	// 	require(_owner == ownerOf(_tokenId), 'IGO');
+	function transferKeys(
+		address _owner, // user/wallet address of NFT owner
+		address _receiver, // user/wallet address to recieve NFT
+		uint256 _tokenId
+	) public {
+		require(_exists(_tokenId), 'TID');
+		require(_owner == ownerOf(_tokenId), 'IGO');
 
-	// 	safeTransferFrom(_owner, _receiver, _tokenId);
-	// }
+		safeTransferFrom(_owner, _receiver, _tokenId);
+	}
 
 	/*
 	 * @functionName getNftCount
