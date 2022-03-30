@@ -31,6 +31,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	struct NftStruct {
 		address receiver;
 		uint256 number;
+		uint128 seed;
 		string epoch;
 		uint256 randomNumber;
 		uint256 timestamp;
@@ -201,6 +202,12 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	//  // MSR: max supply of gmkeys reach
 	//  // IGO: invalid gmkey owner
 
+	function getSeed(uint256 _randomNumber) internal pure returns (uint128) {
+		uint256 hashModulus = 10**16;
+		uint256 random = uint256(keccak256(abi.encodePacked(_randomNumber)));
+		return uint128(random % hashModulus);
+	}
+
 	// function mintTestKeys(
 	// 	address _receiver, // user/wallet address to recieve NFT
 	// 	string memory _identifier, // user identifier
@@ -227,7 +234,16 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 
 	// 	uint8 j = 1;
 	// 	for (j; j <= _count; j++) {
-	// 		nfts.push(NftStruct(payable(_receiver), nftCount.current(), epochTest, randomNumberTest + j, block.timestamp));
+	// 		nfts.push(
+	// 			NftStruct(
+	// 				payable(_receiver),
+	// 				nftCount.current(),
+	// 				getSeed(randomNumberTest),
+	// 				epochTest,
+	// 				randomNumberTest + j,
+	// 				block.timestamp
+	// 			)
+	// 		);
 	// 		_safeMint(payable(_receiver), nftCount.current());
 
 	// 		nftCount.increment();
@@ -269,7 +285,16 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 
 		uint8 j = 1;
 		for (j; j <= _count; j++) {
-			nfts.push(NftStruct(payable(_receiver), nftCount.current(), epoch, randomNumber + j, block.timestamp));
+			nfts.push(
+				NftStruct(
+					payable(_receiver),
+					nftCount.current(),
+					getSeed(randomNumber),
+					epoch,
+					randomNumber + j,
+					block.timestamp
+				)
+			);
 			_safeMint(payable(_receiver), nftCount.current());
 
 			nftCount.increment();

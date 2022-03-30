@@ -22,6 +22,7 @@ export declare namespace GMKeys {
   export type NftStructStruct = {
     receiver: string;
     number: BigNumberish;
+    seed: BigNumberish;
     epoch: string;
     randomNumber: BigNumberish;
     timestamp: BigNumberish;
@@ -30,12 +31,14 @@ export declare namespace GMKeys {
   export type NftStructStructOutput = [
     string,
     BigNumber,
+    BigNumber,
     string,
     BigNumber,
     BigNumber
   ] & {
     receiver: string;
     number: BigNumber;
+    seed: BigNumber;
     epoch: string;
     randomNumber: BigNumber;
     timestamp: BigNumber;
@@ -451,9 +454,10 @@ export interface GMKeys extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, string, BigNumber, BigNumber] & {
+      [string, BigNumber, BigNumber, string, BigNumber, BigNumber] & {
         receiver: string;
         number: BigNumber;
+        seed: BigNumber;
         epoch: string;
         randomNumber: BigNumber;
         timestamp: BigNumber;
@@ -621,9 +625,10 @@ export interface GMKeys extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [string, BigNumber, string, BigNumber, BigNumber] & {
+    [string, BigNumber, BigNumber, string, BigNumber, BigNumber] & {
       receiver: string;
       number: BigNumber;
+      seed: BigNumber;
       epoch: string;
       randomNumber: BigNumber;
       timestamp: BigNumber;
@@ -781,9 +786,10 @@ export interface GMKeys extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, string, BigNumber, BigNumber] & {
+      [string, BigNumber, BigNumber, string, BigNumber, BigNumber] & {
         receiver: string;
         number: BigNumber;
+        seed: BigNumber;
         epoch: string;
         randomNumber: BigNumber;
         timestamp: BigNumber;
