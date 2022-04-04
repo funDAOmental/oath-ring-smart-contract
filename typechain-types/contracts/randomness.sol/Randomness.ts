@@ -28,21 +28,13 @@ import type {
 
 export declare namespace Randomness {
   export type NftStructStruct = {
-    status: BigNumberish;
     epoch: string;
     tickets: BigNumberish;
     randomNumber: BigNumberish;
     timestamp: BigNumberish;
   };
 
-  export type NftStructStructOutput = [
-    number,
-    string,
-    number,
-    BigNumber,
-    BigNumber
-  ] & {
-    status: number;
+  export type NftStructStructOutput = [string, number, BigNumber, BigNumber] & {
     epoch: string;
     tickets: number;
     randomNumber: BigNumber;
@@ -59,14 +51,13 @@ export interface RandomnessInterface extends utils.Interface {
     "getNftCount()": FunctionFragment;
     "getOneNft(string)": FunctionFragment;
     "getOneTicket(string)": FunctionFragment;
-    "getRegisteredUser()": FunctionFragment;
     "getTotalTickets()": FunctionFragment;
     "getWinningPercentage()": FunctionFragment;
     "isMintingStart()": FunctionFragment;
     "owner()": FunctionFragment;
     "rawFulfillRandomness(bytes32,uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "startMintPhase(uint8,uint256,uint256)": FunctionFragment;
+    "startMintPhase(uint8,uint256,uint8)": FunctionFragment;
     "stopMintPhase()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "unlockNft(string,string)": FunctionFragment;
@@ -81,7 +72,6 @@ export interface RandomnessInterface extends utils.Interface {
       | "getNftCount"
       | "getOneNft"
       | "getOneTicket"
-      | "getRegisteredUser"
       | "getTotalTickets"
       | "getWinningPercentage"
       | "isMintingStart"
@@ -115,10 +105,6 @@ export interface RandomnessInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getOneTicket",
     values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getRegisteredUser",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getTotalTickets",
@@ -175,10 +161,6 @@ export interface RandomnessInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "getOneNft", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getOneTicket",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getRegisteredUser",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -282,8 +264,6 @@ export interface Randomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string, number, BigNumber]>;
 
-    getRegisteredUser(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     getTotalTickets(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getWinningPercentage(overrides?: CallOverrides): Promise<[number]>;
@@ -305,7 +285,7 @@ export interface Randomness extends BaseContract {
     startMintPhase(
       _chanceOfWinningPercentage: BigNumberish,
       _totalTickets: BigNumberish,
-      _totalRegisteredUser: BigNumberish,
+      _epoch: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -345,8 +325,6 @@ export interface Randomness extends BaseContract {
     overrides?: CallOverrides
   ): Promise<[string, number, BigNumber]>;
 
-  getRegisteredUser(overrides?: CallOverrides): Promise<BigNumber>;
-
   getTotalTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
   getWinningPercentage(overrides?: CallOverrides): Promise<number>;
@@ -368,7 +346,7 @@ export interface Randomness extends BaseContract {
   startMintPhase(
     _chanceOfWinningPercentage: BigNumberish,
     _totalTickets: BigNumberish,
-    _totalRegisteredUser: BigNumberish,
+    _epoch: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -408,8 +386,6 @@ export interface Randomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string, number, BigNumber]>;
 
-    getRegisteredUser(overrides?: CallOverrides): Promise<BigNumber>;
-
     getTotalTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
     getWinningPercentage(overrides?: CallOverrides): Promise<number>;
@@ -429,7 +405,7 @@ export interface Randomness extends BaseContract {
     startMintPhase(
       _chanceOfWinningPercentage: BigNumberish,
       _totalTickets: BigNumberish,
-      _totalRegisteredUser: BigNumberish,
+      _epoch: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -479,8 +455,6 @@ export interface Randomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getRegisteredUser(overrides?: CallOverrides): Promise<BigNumber>;
-
     getTotalTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
     getWinningPercentage(overrides?: CallOverrides): Promise<BigNumber>;
@@ -502,7 +476,7 @@ export interface Randomness extends BaseContract {
     startMintPhase(
       _chanceOfWinningPercentage: BigNumberish,
       _totalTickets: BigNumberish,
-      _totalRegisteredUser: BigNumberish,
+      _epoch: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -543,8 +517,6 @@ export interface Randomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getRegisteredUser(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     getTotalTickets(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getWinningPercentage(
@@ -568,7 +540,7 @@ export interface Randomness extends BaseContract {
     startMintPhase(
       _chanceOfWinningPercentage: BigNumberish,
       _totalTickets: BigNumberish,
-      _totalRegisteredUser: BigNumberish,
+      _epoch: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

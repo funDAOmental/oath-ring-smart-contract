@@ -43,16 +43,13 @@ describe.only('randomness', async () => {
 		const mintStatus1 = await randomness.isMintingStart();
 		expect(mintStatus1).to.equal(false);
 
-		await randomness.startMintPhase(70, 1111, 2222);
+		await randomness.startMintPhase(70, 3000, 1);
 
 		const getwinningpercentahe = await randomness.getWinningPercentage();
 		expect(getwinningpercentahe).to.equal(70);
 
 		const gettotaltickets = await randomness.getTotalTickets();
-		expect(gettotaltickets).to.equal(1111);
-
-		const getregistereduser = await randomness.getRegisteredUser();
-		expect(getregistereduser).to.equal(2222);
+		expect(gettotaltickets).to.equal(3000);
 
 		const getmintedtickets = await randomness.getMintedTickets();
 		expect(getmintedtickets).to.equal(0);
@@ -71,20 +68,20 @@ describe.only('randomness', async () => {
 	});
 
 	it('should unlock nft', async () => {
-		await randomness.startMintPhase(70, 1111, 2222);
+		await randomness.startMintPhase(70, 3000, 1);
 		await randomness.unlockTestNft(user1, epoch);
 
 		const getnftcount = await randomness.getNftCount();
 		expect(getnftcount).to.equal(1);
 
 		const getmintedticket = await randomness.getMintedTickets();
-		expect(getmintedticket).to.equal(2);
+		expect(getmintedticket).to.equal(3);
 	});
 
 	it('should show user1 nft data', async () => {
 		const user1Data = await randomness.getOneNft(user1);
 		// console.log('user1', user1Data);
-		expect(user1Data['status']).to.be.a('number');
+		expect(user1Data['tickets']).to.be.a('number');
 
 		const user1Ticket = await randomness.getOneTicket(user1);
 		// console.log('user1', user1Ticket);
@@ -107,13 +104,13 @@ describe.only('randomness', async () => {
 		expect(getnftcount2).to.equal(3);
 
 		const getmintedticket = await randomness.getMintedTickets();
-		expect(getmintedticket).to.equal(6);
+		expect(getmintedticket).to.equal(9);
 	});
 
 	it('should show user2, user3 nft data', async () => {
 		const user2Data = await randomness.getOneNft(user2);
 		// console.log('user2', user2Data);
-		expect(user2Data['status']).to.be.a('number');
+		expect(user2Data['tickets']).to.be.a('number');
 
 		const user2Ticket = await randomness.getOneTicket(user2);
 		// console.log('user2', user2Ticket);
@@ -121,7 +118,7 @@ describe.only('randomness', async () => {
 
 		const user3Data = await randomness.getOneNft(user3);
 		// console.log('user3', user3Data);
-		expect(user3Data['status']).to.be.a('number');
+		expect(user3Data['tickets']).to.be.a('number');
 
 		const user3Ticket = await randomness.getOneTicket(user3);
 		// console.log('user3', user3Ticket);

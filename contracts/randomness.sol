@@ -10,29 +10,25 @@ import 'hardhat/console.sol';
 contract Randomness is VRFConsumerBase, Ownable {
 	using Counters for Counters.Counter;
 
-	enum STATUS {
-		LOSE,
-		WIN
-	}
-
 	struct KeyStruct {
 		string epoch;
 		bool exists;
 	}
 
 	struct NftStruct {
-		STATUS status; // 0 lose, 1 win
 		string epoch;
 		uint8 tickets;
 		uint256 randomNumber;
 		uint256 timestamp;
 	}
 
-	uint256 private vEPOCHENDTIME = 268560; // 4476 min
+	uint256 private vEPOCHENDTIME = 240660; // 4011 min
+	uint256 private vLASTEPOCHENDTIME = 356040; // 5934 min
+	uint256 private vEPOCHTICKET = 4011;
+	uint256 private vLASTEPOCHTICKET = 5934;
 
 	uint8 private chanceOfWinningPercentage = 100; // chance of winning percentage
 	uint256 private totalTickets = 0; // total number of tickets available
-	uint256 private totalRegisteredUser = 0; // total registered user
 	uint256 private mintedTickets = 0; // total number of minted tickets
 
 	uint8 private mintPhase = 0; // minting phase 0 stop, 1 start
@@ -70,16 +66,19 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// 	uniqkey.epoch = _epoch;
 	// 	uniqkey.exists = true;
 
-	// 	uint256 chance = (randomnessTest % 100) + 1;
-	// 	uint256 ticketChance = (randomnessTest % 10) + 1;
+	// 	uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
+	// 	uint256 probability = uint256(((totalTickets - mintedTickets) * 100) / (timeRemaining / 60));
 
-	// 	STATUS status = getStatus(chanceOfWinningPercentage >= chance);
-	// 	uint8 tickets = getTickets(status, ticketChance);
+	// 	uint256 chance = (randomnessTest % 100) + 1;
+
+	// 	uint8 tickets = getTickets(probability, chance);
+	// 	if (keccak256(abi.encodePacked(_epoch)) == keccak256(abi.encodePacked('EP007')) && tickets == 0) {
+	// 		tickets = 1;
+	// 	}
 
 	// 	mintedTickets = mintedTickets + tickets;
 
 	// 	NftStruct storage nft = nfts[nftKeys[requestIdTest]];
-	// 	nft.status = status;
 	// 	nft.epoch = uniqKeys[nftKeys[requestIdTest]].epoch;
 	// 	nft.tickets = tickets;
 	// 	nft.randomNumber = randomnessTest;
@@ -98,16 +97,21 @@ contract Randomness is VRFConsumerBase, Ownable {
 	}
 
 	function fulfillRandomness(bytes32 _requestId, uint256 _randomness) internal override {
-		uint256 chance = (_randomness % 100) + 1;
-		uint256 ticketChance = (_randomness % 10) + 1;
+		uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
+		uint256 probability = uint256(((totalTickets - mintedTickets) * 100) / (timeRemaining / 60));
 
-		STATUS status = getStatus(chanceOfWinningPercentage >= chance);
-		uint8 tickets = getTickets(status, ticketChance);
+		uint256 chance = (_randomness % 100) + 1;
+		uint8 tickets = getTickets(probability, chance);
+		if (
+			keccak256(abi.encodePacked(uniqKeys[nftKeys[_requestId]].epoch)) == keccak256(abi.encodePacked('EP007')) &&
+			tickets == 0
+		) {
+			tickets = 1;
+		}
 
 		mintedTickets = mintedTickets + tickets;
 
 		NftStruct storage nft = nfts[nftKeys[_requestId]];
-		nft.status = status;
 		nft.epoch = uniqKeys[nftKeys[_requestId]].epoch;
 		nft.tickets = tickets;
 		nft.randomNumber = _randomness;
@@ -117,27 +121,11 @@ contract Randomness is VRFConsumerBase, Ownable {
 	}
 
 	/*
-	 * @functionName getStatus
-	 * @functionDescription get status value
-	 */
-	function getStatus(bool _status) internal pure returns (STATUS) {
-		if (_status) {
-			return STATUS.WIN;
-		}
-
-		return STATUS.LOSE;
-	}
-
-	/*
 	 * @functionName getTickets
 	 * @functionDescription get status value
 	 */
-	function getTickets(STATUS _status, uint256 _ticket) internal pure returns (uint8) {
-		if (_status == STATUS.LOSE) {
-			return 0;
-		} else {
-			return uint8(_ticket);
-		}
+	function getTickets(uint256 _probability, uint256 _chance) internal pure returns (uint8) {
+		return uint8((_probability * _chance) / 1000);
 	}
 
 	/*
@@ -166,16 +154,20 @@ contract Randomness is VRFConsumerBase, Ownable {
 	function startMintPhase(
 		uint8 _chanceOfWinningPercentage,
 		uint256 _totalTickets,
-		uint256 _totalRegisteredUser
+		uint8 _epoch
 	) public onlyOwner {
 		mintPhase = 1;
 
 		chanceOfWinningPercentage = _chanceOfWinningPercentage;
 		totalTickets = _totalTickets;
-		totalRegisteredUser = _totalRegisteredUser;
 
 		mintedTickets = 0;
-		mintStartTime = block.timestamp + vEPOCHENDTIME;
+
+		if (_epoch == 7) {
+			mintStartTime = block.timestamp + vLASTEPOCHENDTIME;
+		} else {
+			mintStartTime = block.timestamp + vEPOCHENDTIME;
+		}
 	}
 
 	/*
@@ -200,14 +192,6 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 */
 	function getTotalTickets() public view returns (uint256) {
 		return totalTickets;
-	}
-
-	/*
-	 * @functionName getRegisteredUser
-	 * @functionDescription get total registered user
-	 */
-	function getRegisteredUser() public view returns (uint256) {
-		return totalRegisteredUser;
 	}
 
 	/*
@@ -241,6 +225,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// KAE: key identifier already exists
 	// MPS: minting phase stop
 	// MPE: minting phase expired
+	// MTU: max ticket unlock
 
 	/*
 	 * @functionName unlockNft
@@ -249,13 +234,15 @@ contract Randomness is VRFConsumerBase, Ownable {
 	function unlockNft(string memory _identifier, string memory _epoch) public {
 		require(mintPhase == 1, 'MPS');
 		require(!uniqKeys[_identifier].exists, 'KAE');
-
-		if (mintStartTime >= block.timestamp) {
-			require(LINK.balanceOf(address(this)) >= fee, 'NEC');
-			getRandomNumber(_identifier, _epoch);
+		require(mintStartTime >= block.timestamp, 'MPE');
+		if (keccak256(abi.encodePacked(_epoch)) == keccak256(abi.encodePacked('EP007'))) {
+			require(vLASTEPOCHTICKET >= mintedTickets, 'MTU');
 		} else {
-			require(false, 'MPE');
+			require(vEPOCHTICKET >= mintedTickets, 'MTU');
 		}
+
+		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
+		getRandomNumber(_identifier, _epoch);
 	}
 
 	/*
@@ -265,6 +252,12 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// function unlockTestNft(string memory _identifier, string memory _epoch) public {
 	// 	require(mintPhase == 1, 'MPS');
 	// 	require(!uniqKeys[_identifier].exists, 'KAE');
+	// 	require(mintStartTime >= block.timestamp, 'MPE');
+	// 	if (keccak256(abi.encodePacked(_epoch)) == keccak256(abi.encodePacked('EP007'))) {
+	// 		require(vLASTEPOCHTICKET >= mintedTickets, 'MTU');
+	// 	} else {
+	// 		require(vEPOCHTICKET >= mintedTickets, 'MTU');
+	// 	}
 
 	// 	getTestRandomNumber(_identifier, _epoch);
 	// }
