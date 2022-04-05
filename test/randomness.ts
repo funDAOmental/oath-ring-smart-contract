@@ -8,10 +8,12 @@ describe.only('randomness', async () => {
 
 	// const ownerAddress: string = '0x924634D6964E171498f2a292185b1554893D95E5';
 
-	const epoch: string = 'EP001';
+	const epoch: number = 1;
+	const lastEpoch: number = 7;
 	const user1: string = 'EP001-USERA-1';
 	const user2: string = 'EP001-USERA-2';
 	const user3: string = 'EP001-USERB-1';
+	const user4: string = 'EP001-USERB-LASTEPOCH';
 
 	// reference https://docs.chain.link/docs/vrf-contracts/
 	const vrfCoordinator: string = '0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B';
@@ -43,16 +45,19 @@ describe.only('randomness', async () => {
 		const mintStatus1 = await randomness.isMintingStart();
 		expect(mintStatus1).to.equal(false);
 
-		await randomness.startMintPhase(70, 3000, 1);
+		await randomness.startMintPhase(3000, epoch);
 
-		const getwinningpercentahe = await randomness.getWinningPercentage();
-		expect(getwinningpercentahe).to.equal(70);
+		const getmintedtickets = await randomness.getMintedTickets();
+		expect(getmintedtickets).to.equal(0);
 
 		const gettotaltickets = await randomness.getTotalTickets();
 		expect(gettotaltickets).to.equal(3000);
 
-		const getmintedtickets = await randomness.getMintedTickets();
-		expect(getmintedtickets).to.equal(0);
+		const getremainingtickets = await randomness.getRemainingTickets();
+		expect(getremainingtickets).to.equal(3000);
+
+		const getwinningpercentage = await randomness.getWinningPercentage(epoch);
+		expect(getwinningpercentage).to.equal(74);
 
 		const mintStatus2 = await randomness.isMintingStart();
 		expect(mintStatus2).to.equal(true);
@@ -67,15 +72,30 @@ describe.only('randomness', async () => {
 		await expect(randomness.unlockTestNft(user1, epoch)).to.be.revertedWith('MPS');
 	});
 
+	it('should start first epoch', async () => {
+		await randomness.startMintPhase(4011, epoch);
+
+		const getmintedtickets = await randomness.getMintedTickets();
+		expect(getmintedtickets).to.equal(0);
+
+		const gettotaltickets = await randomness.getTotalTickets();
+		expect(gettotaltickets).to.equal(4011);
+
+		const getremainingtickets = await randomness.getRemainingTickets();
+		expect(getremainingtickets).to.equal(4011);
+
+		const getwinningpercentage = await randomness.getWinningPercentage(epoch);
+		expect(getwinningpercentage).to.equal(100);
+	});
+
 	it('should unlock nft', async () => {
-		await randomness.startMintPhase(70, 3000, 1);
 		await randomness.unlockTestNft(user1, epoch);
 
 		const getnftcount = await randomness.getNftCount();
 		expect(getnftcount).to.equal(1);
 
 		const getmintedticket = await randomness.getMintedTickets();
-		expect(getmintedticket).to.equal(3);
+		expect(getmintedticket).to.equal(5);
 	});
 
 	it('should show user1 nft data', async () => {
@@ -104,7 +124,7 @@ describe.only('randomness', async () => {
 		expect(getnftcount2).to.equal(3);
 
 		const getmintedticket = await randomness.getMintedTickets();
-		expect(getmintedticket).to.equal(9);
+		expect(getmintedticket).to.equal(15);
 	});
 
 	it('should show user2, user3 nft data', async () => {
@@ -123,5 +143,42 @@ describe.only('randomness', async () => {
 		const user3Ticket = await randomness.getOneTicket(user3);
 		// console.log('user3', user3Ticket);
 		expect(user3Ticket[0]).to.equal(epoch);
+	});
+
+	it('should start last epoch', async () => {
+		await randomness.stopMintPhase();
+		await randomness.startMintPhase(1000, lastEpoch);
+
+		const getmintedtickets = await randomness.getMintedTickets();
+		expect(getmintedtickets).to.equal(0);
+
+		const gettotaltickets = await randomness.getTotalTickets();
+		expect(gettotaltickets).to.equal(1000);
+
+		const getremainingtickets = await randomness.getRemainingTickets();
+		expect(getremainingtickets).to.equal(1000);
+
+		const getwinningpercentage = await randomness.getWinningPercentage(lastEpoch);
+		expect(getwinningpercentage).to.equal(101);
+	});
+
+	it('should unlock more nft', async () => {
+		await randomness.unlockTestNft(user4, lastEpoch);
+
+		const getnftcount = await randomness.getNftCount();
+		expect(getnftcount).to.equal(4);
+
+		const getmintedticket = await randomness.getMintedTickets();
+		expect(getmintedticket).to.equal(5);
+	});
+
+	it('should show user4 nft data', async () => {
+		const user4Data = await randomness.getOneNft(user4);
+		// console.log('user4', user4Data);
+		expect(user4Data['tickets']).to.be.a('number');
+
+		const user4Ticket = await randomness.getOneTicket(user4);
+		// console.log('user4', user4Ticket);
+		expect(user4Ticket[0]).to.equal(lastEpoch);
 	});
 });

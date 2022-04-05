@@ -11,12 +11,12 @@ contract Randomness is VRFConsumerBase, Ownable {
 	using Counters for Counters.Counter;
 
 	struct KeyStruct {
-		string epoch;
+		uint8 epoch;
 		bool exists;
 	}
 
 	struct NftStruct {
-		string epoch;
+		uint8 epoch;
 		uint8 tickets;
 		uint256 randomNumber;
 		uint256 timestamp;
@@ -24,11 +24,10 @@ contract Randomness is VRFConsumerBase, Ownable {
 
 	uint256 private vEPOCHENDTIME = 240660; // 4011 min
 	uint256 private vLASTEPOCHENDTIME = 356040; // 5934 min
-	uint256 private vEPOCHTICKET = 4011;
-	uint256 private vLASTEPOCHTICKET = 5934;
+	// uint256 private vEPOCHTICKET = 4011; // max 24066
+	// uint256 private vLASTEPOCHTICKET = 5934; // max 30000
 
-	uint8 private chanceOfWinningPercentage = 100; // chance of winning percentage
-	uint256 private totalTickets = 0; // total number of tickets available
+	uint256 private totalTickets = 4011; // updated tickets on epoch
 	uint256 private mintedTickets = 0; // total number of minted tickets
 
 	uint8 private mintPhase = 0; // minting phase 0 stop, 1 start
@@ -57,7 +56,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 		fee = _fee;
 	}
 
-	// function getTestRandomNumber(string memory _identifier, string memory _epoch) internal {
+	// function getTestRandomNumber(string memory _identifier, uint8 _epoch) internal {
 	// 	bytes32 requestIdTest = '0x5553455231';
 	// 	uint256 randomnessTest = 67868570531905125450905257968959569476979017743827885017162909765141947220651; // should mock chain.link data
 
@@ -66,13 +65,16 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// 	uniqkey.epoch = _epoch;
 	// 	uniqkey.exists = true;
 
-	// 	uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
-	// 	uint256 probability = uint256(((totalTickets - mintedTickets) * 100) / (timeRemaining / 60));
-
 	// 	uint256 chance = (randomnessTest % 100) + 1;
 
+	// 	uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
+	// 	uint128 probability = uint128(((totalTickets - mintedTickets) * 100) / (timeRemaining / 60));
+	// 	if (_epoch == 7) {
+	// 		probability = 101;
+	// 	}
+
 	// 	uint8 tickets = getTickets(probability, chance);
-	// 	if (keccak256(abi.encodePacked(_epoch)) == keccak256(abi.encodePacked('EP007')) && tickets == 0) {
+	// 	if (_epoch == 7 && tickets == 0) {
 	// 		tickets = 1;
 	// 	}
 
@@ -87,7 +89,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// 	nftCount.increment();
 	// }
 
-	function getRandomNumber(string memory _identifier, string memory _epoch) internal {
+	function getRandomNumber(string memory _identifier, uint8 _epoch) internal {
 		bytes32 requestId = requestRandomness(keyHash, fee);
 
 		nftKeys[requestId] = _identifier;
@@ -97,15 +99,16 @@ contract Randomness is VRFConsumerBase, Ownable {
 	}
 
 	function fulfillRandomness(bytes32 _requestId, uint256 _randomness) internal override {
-		uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
-		uint256 probability = uint256(((totalTickets - mintedTickets) * 100) / (timeRemaining / 60));
-
 		uint256 chance = (_randomness % 100) + 1;
+
+		uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
+		uint128 probability = uint128(((totalTickets - mintedTickets) * 100) / (timeRemaining / 60));
+		if (uniqKeys[nftKeys[_requestId]].epoch == 7) {
+			probability = 101;
+		}
+
 		uint8 tickets = getTickets(probability, chance);
-		if (
-			keccak256(abi.encodePacked(uniqKeys[nftKeys[_requestId]].epoch)) == keccak256(abi.encodePacked('EP007')) &&
-			tickets == 0
-		) {
+		if (uniqKeys[nftKeys[_requestId]].epoch == 7 && tickets == 0) {
 			tickets = 1;
 		}
 
@@ -124,8 +127,14 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName getTickets
 	 * @functionDescription get status value
 	 */
-	function getTickets(uint256 _probability, uint256 _chance) internal pure returns (uint8) {
-		return uint8((_probability * _chance) / 1000);
+	function getTickets(uint128 _probability, uint256 _chance) internal pure returns (uint8) {
+		uint8 ticketValue = uint8((_probability * _chance) / 1000);
+
+		if (ticketValue > 10) {
+			ticketValue = 10;
+		}
+
+		return ticketValue;
 	}
 
 	/*
@@ -151,18 +160,11 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName startMintPhase
 	 * @functionDescription start minting phase
 	 */
-	function startMintPhase(
-		uint8 _chanceOfWinningPercentage,
-		uint256 _totalTickets,
-		uint8 _epoch
-	) public onlyOwner {
+	function startMintPhase(uint256 _totalTickets, uint8 _epoch) public onlyOwner {
 		mintPhase = 1;
 
-		chanceOfWinningPercentage = _chanceOfWinningPercentage;
 		totalTickets = _totalTickets;
-
 		mintedTickets = 0;
-
 		if (_epoch == 7) {
 			mintStartTime = block.timestamp + vLASTEPOCHENDTIME;
 		} else {
@@ -187,14 +189,6 @@ contract Randomness is VRFConsumerBase, Ownable {
 	}
 
 	/*
-	 * @functionName getTotalTickets
-	 * @functionDescription get total tickets available
-	 */
-	function getTotalTickets() public view returns (uint256) {
-		return totalTickets;
-	}
-
-	/*
 	 * @functionName getMintedTickets
 	 * @functionDescription get total tickets minted
 	 */
@@ -203,11 +197,33 @@ contract Randomness is VRFConsumerBase, Ownable {
 	}
 
 	/*
+	 * @functionName getTotalTickets
+	 * @functionDescription get total tickets available
+	 */
+	function getTotalTickets() public view returns (uint256) {
+		return totalTickets;
+	}
+
+	/*
+	 * @functionName getRemainingTickets
+	 * @functionDescription get remaining tickets available
+	 */
+	function getRemainingTickets() public view returns (uint256) {
+		return uint256(totalTickets - mintedTickets);
+	}
+
+	/*
 	 * @functionName getWinningPercentage
 	 * @functionDescription get winning percentage
 	 */
-	function getWinningPercentage() public view returns (uint8) {
-		return chanceOfWinningPercentage;
+	function getWinningPercentage(uint8 _epoch) public view returns (uint128) {
+		uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
+		uint128 probability = uint128(((totalTickets - mintedTickets) * 100) / (timeRemaining / 60));
+		if (_epoch == 7) {
+			probability = 101;
+		}
+
+		return probability;
 	}
 
 	/*
@@ -231,15 +247,11 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName unlockNft
 	 * @functionDescription run the random number generator
 	 */
-	function unlockNft(string memory _identifier, string memory _epoch) public {
+	function unlockNft(string memory _identifier, uint8 _epoch) public {
 		require(mintPhase == 1, 'MPS');
 		require(!uniqKeys[_identifier].exists, 'KAE');
 		require(mintStartTime >= block.timestamp, 'MPE');
-		if (keccak256(abi.encodePacked(_epoch)) == keccak256(abi.encodePacked('EP007'))) {
-			require(vLASTEPOCHTICKET >= mintedTickets, 'MTU');
-		} else {
-			require(vEPOCHTICKET >= mintedTickets, 'MTU');
-		}
+		require(totalTickets >= mintedTickets, 'MTU');
 
 		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
 		getRandomNumber(_identifier, _epoch);
@@ -249,15 +261,11 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName unlockTestNft
 	 * @functionDescription run the test random number generator
 	 */
-	// function unlockTestNft(string memory _identifier, string memory _epoch) public {
+	// function unlockTestNft(string memory _identifier, uint8 _epoch) public {
 	// 	require(mintPhase == 1, 'MPS');
 	// 	require(!uniqKeys[_identifier].exists, 'KAE');
 	// 	require(mintStartTime >= block.timestamp, 'MPE');
-	// 	if (keccak256(abi.encodePacked(_epoch)) == keccak256(abi.encodePacked('EP007'))) {
-	// 		require(vLASTEPOCHTICKET >= mintedTickets, 'MTU');
-	// 	} else {
-	// 		require(vEPOCHTICKET >= mintedTickets, 'MTU');
-	// 	}
+	// 	require(totalTickets >= mintedTickets, 'MTU');
 
 	// 	getTestRandomNumber(_identifier, _epoch);
 	// }
@@ -286,7 +294,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 		public
 		view
 		returns (
-			string memory,
+			uint8,
 			uint8,
 			uint256
 		)
