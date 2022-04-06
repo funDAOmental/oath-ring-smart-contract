@@ -21,9 +21,9 @@ const _abi = [
     name: "getOneTicket",
     outputs: [
       {
-        internalType: "string",
+        internalType: "uint8",
         name: "",
-        type: "string",
+        type: "uint8",
       },
       {
         internalType: "uint8",

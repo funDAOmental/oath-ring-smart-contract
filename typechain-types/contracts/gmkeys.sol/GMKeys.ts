@@ -32,7 +32,7 @@ export declare namespace GMKeys {
     receiver: string;
     number: BigNumberish;
     seed: BigNumberish;
-    epoch: string;
+    epoch: BigNumberish;
     randomNumber: BigNumberish;
     timestamp: BigNumberish;
   };
@@ -41,14 +41,14 @@ export declare namespace GMKeys {
     string,
     BigNumber,
     BigNumber,
-    string,
+    number,
     BigNumber,
     BigNumber
   ] & {
     receiver: string;
     number: BigNumber;
     seed: BigNumber;
-    epoch: string;
+    epoch: number;
     randomNumber: BigNumber;
     timestamp: BigNumber;
   };
@@ -505,7 +505,7 @@ export interface GMKeys extends BaseContract {
       _randomnessAddress: string,
       _identifier: string,
       overrides?: CallOverrides
-    ): Promise<[string, number, BigNumber]>;
+    ): Promise<[number, number, BigNumber]>;
 
     getPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -533,11 +533,11 @@ export interface GMKeys extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, BigNumber, string, BigNumber, BigNumber] & {
+      [string, BigNumber, BigNumber, number, BigNumber, BigNumber] & {
         receiver: string;
         number: BigNumber;
         seed: BigNumber;
-        epoch: string;
+        epoch: number;
         randomNumber: BigNumber;
         timestamp: BigNumber;
       }
@@ -676,7 +676,7 @@ export interface GMKeys extends BaseContract {
     _randomnessAddress: string,
     _identifier: string,
     overrides?: CallOverrides
-  ): Promise<[string, number, BigNumber]>;
+  ): Promise<[number, number, BigNumber]>;
 
   getPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -704,11 +704,11 @@ export interface GMKeys extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [string, BigNumber, BigNumber, string, BigNumber, BigNumber] & {
+    [string, BigNumber, BigNumber, number, BigNumber, BigNumber] & {
       receiver: string;
       number: BigNumber;
       seed: BigNumber;
-      epoch: string;
+      epoch: number;
       randomNumber: BigNumber;
       timestamp: BigNumber;
     }
@@ -837,7 +837,7 @@ export interface GMKeys extends BaseContract {
       _randomnessAddress: string,
       _identifier: string,
       overrides?: CallOverrides
-    ): Promise<[string, number, BigNumber]>;
+    ): Promise<[number, number, BigNumber]>;
 
     getPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -865,11 +865,11 @@ export interface GMKeys extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, BigNumber, string, BigNumber, BigNumber] & {
+      [string, BigNumber, BigNumber, number, BigNumber, BigNumber] & {
         receiver: string;
         number: BigNumber;
         seed: BigNumber;
-        epoch: string;
+        epoch: number;
         randomNumber: BigNumber;
         timestamp: BigNumber;
       }

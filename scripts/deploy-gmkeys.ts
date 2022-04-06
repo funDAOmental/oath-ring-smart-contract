@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
 
 async function main() {
@@ -13,7 +12,6 @@ async function main() {
 	console.log('deploying gmkeys contract with the account:', deployer.address);
 	console.log('account balance:', (await deployer.getBalance()).toString());
 
-	const ownerAddress: string = '0x924634D6964E171498f2a292185b1554893D95E5';
 	const baseTokenURI: string = 'https://www.nftxt.xyz/metadata?id=';
 
 	const GMKeys = await ethers.getContractFactory('GMKeys');

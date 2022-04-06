@@ -157,8 +157,8 @@ describe.only('gmkeys', async () => {
 
 	it('should transfer gmkeys', async () => {
 		await gmkeys.transferKeys(receiver1, receiver2, 1);
-		const blockChain = await gmkeys.getOneNft(1);
-		expect(blockChain['receiver']).to.equal(receiver2);
+		const blockChainOwner = await gmkeys.ownerOf(1);
+		expect(blockChainOwner).to.equal(receiver2);
 	});
 
 	it('should withdraw contract balance', async () => {

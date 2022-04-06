@@ -69,19 +69,19 @@ export interface IRandomness extends BaseContract {
     getOneTicket(
       _identifier: string,
       overrides?: CallOverrides
-    ): Promise<[string, number, BigNumber]>;
+    ): Promise<[number, number, BigNumber]>;
   };
 
   getOneTicket(
     _identifier: string,
     overrides?: CallOverrides
-  ): Promise<[string, number, BigNumber]>;
+  ): Promise<[number, number, BigNumber]>;
 
   callStatic: {
     getOneTicket(
       _identifier: string,
       overrides?: CallOverrides
-    ): Promise<[string, number, BigNumber]>;
+    ): Promise<[number, number, BigNumber]>;
   };
 
   filters: {};

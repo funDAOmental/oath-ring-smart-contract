@@ -14,7 +14,7 @@ interface IRandomness {
 		external
 		view
 		returns (
-			string memory,
+			uint8,
 			uint8,
 			uint256
 		);
@@ -32,7 +32,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		address receiver;
 		uint256 number;
 		uint128 seed;
-		string epoch;
+		uint8 epoch;
 		uint256 randomNumber;
 		uint256 timestamp;
 	}
@@ -43,7 +43,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		bool exists;
 	}
 
-	uint256 private vMAXSUPPLY = 10000; // max gmkey supply
+	uint256 private vMAXSUPPLY = 30000; // max gmkey supply
 
 	uint256 private totalKeys = 0; // total number of keys available
 	uint256 private mintedKeys = 0; // total number of minted keys
@@ -93,12 +93,12 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		public
 		view
 		returns (
-			string memory,
+			uint8,
 			uint8,
 			uint256
 		)
 	{
-		string memory epoch;
+		uint8 epoch;
 		uint8 ticket;
 		uint256 randomNumber;
 		(epoch, ticket, randomNumber) = IRandomness(_randomnessAddress).getOneTicket(_identifier);
@@ -219,7 +219,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// 	require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
 	// 	console.log(_randomnessAddress, '<RANDOM ADDRESS');
-	// 	string memory epochTest = 'EPN001';
+	// 	uint8 epochTest = 1;
 	// 	uint8 ticketTest = 5;
 	// 	uint256 randomNumberTest = 67868570531905125450905257968959569476979017743827885017162909765141947220651; // should mock chain.link data
 
@@ -267,7 +267,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		require(msg.value >= price * _count, 'NEC');
 		require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
-		string memory epoch;
+		uint8 epoch;
 		uint8 ticket;
 		uint256 randomNumber;
 		(epoch, ticket, randomNumber) = getOneTicket(_randomnessAddress, _identifier);
@@ -327,7 +327,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		require(_exists(_tokenId), 'TID');
 		require(_owner == ownerOf(_tokenId), 'IGO');
 
-		safeTransferFrom(_owner, _receiver, _tokenId);
+		transferFrom(_owner, _receiver, _tokenId);
 	}
 
 	/*
