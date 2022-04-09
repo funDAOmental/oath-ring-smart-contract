@@ -56,7 +56,7 @@ describe.only('randomness', async () => {
 		const getremainingtickets = await randomness.getRemainingTickets();
 		expect(getremainingtickets).to.equal(3000);
 
-		const getwinningpercentage = await randomness.getWinningPercentage(epoch);
+		const getwinningpercentage = await randomness.getWinningPercentage();
 		expect(getwinningpercentage).to.equal(74);
 
 		const mintStatus2 = await randomness.isMintingStart();
@@ -84,7 +84,7 @@ describe.only('randomness', async () => {
 		const getremainingtickets = await randomness.getRemainingTickets();
 		expect(getremainingtickets).to.equal(4011);
 
-		const getwinningpercentage = await randomness.getWinningPercentage(epoch);
+		const getwinningpercentage = await randomness.getWinningPercentage();
 		expect(getwinningpercentage).to.equal(100);
 	});
 
@@ -106,6 +106,10 @@ describe.only('randomness', async () => {
 		const user1Ticket = await randomness.getOneTicket(user1);
 		// console.log('user1', user1Ticket);
 		expect(user1Ticket[0]).to.equal(epoch);
+	});
+
+	it('should reject unlock nft (invalid active epoch)', async () => {
+		await expect(randomness.unlockTestNft(user2, 2)).to.be.revertedWith('IAE');
 	});
 
 	it('should reject unlock nft (key identifier already exists)', async () => {
@@ -158,7 +162,7 @@ describe.only('randomness', async () => {
 		const getremainingtickets = await randomness.getRemainingTickets();
 		expect(getremainingtickets).to.equal(1000);
 
-		const getwinningpercentage = await randomness.getWinningPercentage(lastEpoch);
+		const getwinningpercentage = await randomness.getWinningPercentage();
 		expect(getwinningpercentage).to.equal(101);
 	});
 

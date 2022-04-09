@@ -30,13 +30,21 @@ export declare namespace Randomness {
   export type NftStructStruct = {
     epoch: BigNumberish;
     tickets: BigNumberish;
+    ticketType: BigNumberish;
     randomNumber: BigNumberish;
     timestamp: BigNumberish;
   };
 
-  export type NftStructStructOutput = [number, number, BigNumber, BigNumber] & {
+  export type NftStructStructOutput = [
+    number,
+    number,
+    number,
+    BigNumber,
+    BigNumber
+  ] & {
     epoch: number;
     tickets: number;
+    ticketType: number;
     randomNumber: BigNumber;
     timestamp: BigNumber;
   };
@@ -53,7 +61,7 @@ export interface RandomnessInterface extends utils.Interface {
     "getOneTicket(string)": FunctionFragment;
     "getRemainingTickets()": FunctionFragment;
     "getTotalTickets()": FunctionFragment;
-    "getWinningPercentage(uint8)": FunctionFragment;
+    "getWinningPercentage()": FunctionFragment;
     "isMintingStart()": FunctionFragment;
     "owner()": FunctionFragment;
     "rawFulfillRandomness(bytes32,uint256)": FunctionFragment;
@@ -118,7 +126,7 @@ export interface RandomnessInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getWinningPercentage",
-    values: [BigNumberish]
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "isMintingStart",
@@ -278,10 +286,7 @@ export interface Randomness extends BaseContract {
 
     getTotalTickets(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    getWinningPercentage(
-      _epoch: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    getWinningPercentage(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     isMintingStart(overrides?: CallOverrides): Promise<[boolean]>;
 
@@ -343,10 +348,7 @@ export interface Randomness extends BaseContract {
 
   getTotalTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
-  getWinningPercentage(
-    _epoch: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  getWinningPercentage(overrides?: CallOverrides): Promise<BigNumber>;
 
   isMintingStart(overrides?: CallOverrides): Promise<boolean>;
 
@@ -408,10 +410,7 @@ export interface Randomness extends BaseContract {
 
     getTotalTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getWinningPercentage(
-      _epoch: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    getWinningPercentage(overrides?: CallOverrides): Promise<BigNumber>;
 
     isMintingStart(overrides?: CallOverrides): Promise<boolean>;
 
@@ -481,10 +480,7 @@ export interface Randomness extends BaseContract {
 
     getTotalTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getWinningPercentage(
-      _epoch: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    getWinningPercentage(overrides?: CallOverrides): Promise<BigNumber>;
 
     isMintingStart(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -550,7 +546,6 @@ export interface Randomness extends BaseContract {
     getTotalTickets(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getWinningPercentage(
-      _epoch: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

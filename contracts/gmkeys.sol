@@ -238,9 +238,9 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// 			NftStruct(
 	// 				payable(_receiver),
 	// 				nftCount.current(),
-	// 				getSeed(randomNumberTest),
+	// 				getSeed(randomNumberTest + nftCount.current()),
 	// 				epochTest,
-	// 				randomNumberTest + j,
+	// 				randomNumberTest + nftCount.current(),
 	// 				block.timestamp
 	// 			)
 	// 		);
@@ -289,9 +289,9 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 				NftStruct(
 					payable(_receiver),
 					nftCount.current(),
-					getSeed(randomNumber),
+					getSeed(randomNumber + nftCount.current()),
 					epoch,
-					randomNumber + j,
+					randomNumber + nftCount.current(),
 					block.timestamp
 				)
 			);

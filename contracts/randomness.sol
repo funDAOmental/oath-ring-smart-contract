@@ -18,6 +18,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	struct NftStruct {
 		uint8 epoch;
 		uint8 tickets;
+		uint8 ticketType; // last digit of random number
 		uint256 randomNumber;
 		uint256 timestamp;
 	}
@@ -27,6 +28,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// uint256 private vEPOCHTICKET = 4011; // max 24066
 	// uint256 private vLASTEPOCHTICKET = 5934; // max 30000
 
+	uint8 private activeEpoch = 0; // active epoch
 	uint256 private totalTickets = 4011; // updated tickets on epoch
 	uint256 private mintedTickets = 0; // total number of minted tickets
 
@@ -83,6 +85,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// 	NftStruct storage nft = nfts[nftKeys[requestIdTest]];
 	// 	nft.epoch = uniqKeys[nftKeys[requestIdTest]].epoch;
 	// 	nft.tickets = tickets;
+	// 	nft.ticketType = uint8(randomnessTest % 10);
 	// 	nft.randomNumber = randomnessTest;
 	// 	nft.timestamp = block.timestamp;
 
@@ -117,6 +120,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 		NftStruct storage nft = nfts[nftKeys[_requestId]];
 		nft.epoch = uniqKeys[nftKeys[_requestId]].epoch;
 		nft.tickets = tickets;
+		nft.ticketType = uint8(_randomness % 10);
 		nft.randomNumber = _randomness;
 		nft.timestamp = block.timestamp;
 
@@ -163,6 +167,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	function startMintPhase(uint256 _totalTickets, uint8 _epoch) public onlyOwner {
 		mintPhase = 1;
 
+		activeEpoch = _epoch;
 		totalTickets = _totalTickets;
 		mintedTickets = 0;
 		if (_epoch == 7) {
@@ -216,10 +221,10 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 * @functionName getWinningPercentage
 	 * @functionDescription get winning percentage
 	 */
-	function getWinningPercentage(uint8 _epoch) public view returns (uint128) {
+	function getWinningPercentage() public view returns (uint128) {
 		uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
 		uint128 probability = uint128(((totalTickets - mintedTickets) * 100) / (timeRemaining / 60));
-		if (_epoch == 7) {
+		if (activeEpoch == 7) {
 			probability = 101;
 		}
 
@@ -242,6 +247,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// MPS: minting phase stop
 	// MPE: minting phase expired
 	// MTU: max ticket unlock
+	// IAE: invalid active epoch
 
 	/*
 	 * @functionName unlockNft
@@ -252,6 +258,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 		require(!uniqKeys[_identifier].exists, 'KAE');
 		require(mintStartTime >= block.timestamp, 'MPE');
 		require(totalTickets >= mintedTickets, 'MTU');
+		require(activeEpoch >= _epoch, 'IAE');
 
 		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
 		getRandomNumber(_identifier, _epoch);
@@ -266,6 +273,7 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// 	require(!uniqKeys[_identifier].exists, 'KAE');
 	// 	require(mintStartTime >= block.timestamp, 'MPE');
 	// 	require(totalTickets >= mintedTickets, 'MTU');
+	// 	require(activeEpoch >= _epoch, 'IAE');
 
 	// 	getTestRandomNumber(_identifier, _epoch);
 	// }
