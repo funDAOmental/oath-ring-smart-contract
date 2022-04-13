@@ -33,6 +33,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		uint256 number;
 		uint128 seed;
 		uint8 epoch;
+		uint8 epochType; // 1, 2, 3, 4, 5, 6, 7
 		uint256 randomNumber;
 		uint256 timestamp;
 	}
@@ -55,7 +56,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	Counters.Counter private nftCount;
 	NftStruct[] public nfts;
 
-	constructor(string memory _baseTokenURI, uint256 _price) ERC721('GMKeys by NFTxT', 'GMKEYS') {
+	constructor(string memory _baseTokenURI, uint256 _price) ERC721('GMKeys by funDAOmental', 'GMKEYS') {
 		baseTokenURI = _baseTokenURI;
 		price = _price;
 	}
@@ -192,20 +193,30 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 
 	// BLOCKCHAIN FUNCTION ==========================================================================================
 	// blockchain mint and burn
-	// 	// ERROR MSG:
-	//  // MPS: minting phase stop
-	// 	// NEC: not enough coins
-	// 	// ADE: address dosent exists
-	// 	// TID: token id dosent exists
-	// 	// AMM: max user/address max gmkeys has been mint
-	//  // NYR: user/address not yet registered
-	//  // MSR: max supply of gmkeys reach
-	//  // IGO: invalid gmkey owner
+	// ERROR MSG:
+	// MPS: minting phase stop
+	// NEC: not enough coins
+	// ADE: address dosent exists
+	// TID: token id dosent exists
+	// AMM: max user/address max gmkeys has been mint
+	// NYR: user/address not yet registered
+	// MSR: max supply of gmkeys reach
+	// IGO: invalid gmkey owner
 
 	function getSeed(uint256 _randomNumber) internal pure returns (uint128) {
 		uint256 hashModulus = 10**16;
 		uint256 random = uint256(keccak256(abi.encodePacked(_randomNumber)));
 		return uint128(random % hashModulus);
+	}
+
+	function getEpochType(uint128 _seed, uint8 _epoch) internal pure returns (uint8) {
+		uint8 epochType = uint8((_seed % 10) + 1);
+
+		if (epochType <= 7) {
+			return epochType;
+		} else {
+			return _epoch;
+		}
 	}
 
 	// function mintTestKeys(
@@ -234,13 +245,15 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 
 	// 	uint8 j = 1;
 	// 	for (j; j <= _count; j++) {
+	// 		uint128 runningSeed = getSeed(randomNumberTest + nftCount.current());
 	// 		nfts.push(
 	// 			NftStruct(
 	// 				payable(_receiver),
 	// 				nftCount.current(),
-	// 				getSeed(randomNumberTest + nftCount.current()),
+	// 				runningSeed,
 	// 				epochTest,
-	// 				randomNumberTest + nftCount.current(),
+	// 				getEpochType(runningSeed, epochTest),
+	// 				randomNumberTest,
 	// 				block.timestamp
 	// 			)
 	// 		);
@@ -285,13 +298,15 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 
 		uint8 j = 1;
 		for (j; j <= _count; j++) {
+			uint128 runningSeed = getSeed(randomNumber + nftCount.current());
 			nfts.push(
 				NftStruct(
 					payable(_receiver),
 					nftCount.current(),
-					getSeed(randomNumber + nftCount.current()),
+					runningSeed,
 					epoch,
-					randomNumber + nftCount.current(),
+					getEpochType(runningSeed, epoch),
+					randomNumber,
 					block.timestamp
 				)
 			);

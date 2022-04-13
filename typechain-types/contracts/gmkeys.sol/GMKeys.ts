@@ -33,6 +33,7 @@ export declare namespace GMKeys {
     number: BigNumberish;
     seed: BigNumberish;
     epoch: BigNumberish;
+    epochType: BigNumberish;
     randomNumber: BigNumberish;
     timestamp: BigNumberish;
   };
@@ -42,6 +43,7 @@ export declare namespace GMKeys {
     BigNumber,
     BigNumber,
     number,
+    number,
     BigNumber,
     BigNumber
   ] & {
@@ -49,6 +51,7 @@ export declare namespace GMKeys {
     number: BigNumber;
     seed: BigNumber;
     epoch: number;
+    epochType: number;
     randomNumber: BigNumber;
     timestamp: BigNumber;
   };
@@ -533,11 +536,12 @@ export interface GMKeys extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, BigNumber, number, BigNumber, BigNumber] & {
+      [string, BigNumber, BigNumber, number, number, BigNumber, BigNumber] & {
         receiver: string;
         number: BigNumber;
         seed: BigNumber;
         epoch: number;
+        epochType: number;
         randomNumber: BigNumber;
         timestamp: BigNumber;
       }
@@ -704,11 +708,12 @@ export interface GMKeys extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [string, BigNumber, BigNumber, number, BigNumber, BigNumber] & {
+    [string, BigNumber, BigNumber, number, number, BigNumber, BigNumber] & {
       receiver: string;
       number: BigNumber;
       seed: BigNumber;
       epoch: number;
+      epochType: number;
       randomNumber: BigNumber;
       timestamp: BigNumber;
     }
@@ -865,11 +870,12 @@ export interface GMKeys extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, BigNumber, number, BigNumber, BigNumber] & {
+      [string, BigNumber, BigNumber, number, number, BigNumber, BigNumber] & {
         receiver: string;
         number: BigNumber;
         seed: BigNumber;
         epoch: number;
+        epochType: number;
         randomNumber: BigNumber;
         timestamp: BigNumber;
       }
