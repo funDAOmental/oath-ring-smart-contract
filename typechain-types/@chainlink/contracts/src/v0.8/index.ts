@@ -3,4 +3,7 @@
 /* eslint-disable */
 import type * as interfaces from "./interfaces";
 export type { interfaces };
+import type * as vendor from "./vendor";
+export type { vendor };
+export type { ChainlinkClient } from "./ChainlinkClient";
 export type { VRFConsumerBase } from "./VRFConsumerBase";

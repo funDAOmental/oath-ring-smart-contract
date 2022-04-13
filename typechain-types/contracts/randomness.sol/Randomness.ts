@@ -30,21 +30,13 @@ export declare namespace Randomness {
   export type NftStructStruct = {
     epoch: BigNumberish;
     tickets: BigNumberish;
-    ticketType: BigNumberish;
     randomNumber: BigNumberish;
     timestamp: BigNumberish;
   };
 
-  export type NftStructStructOutput = [
-    number,
-    number,
-    number,
-    BigNumber,
-    BigNumber
-  ] & {
+  export type NftStructStructOutput = [number, number, BigNumber, BigNumber] & {
     epoch: number;
     tickets: number;
-    ticketType: number;
     randomNumber: BigNumber;
     timestamp: BigNumber;
   };
@@ -55,6 +47,7 @@ export interface RandomnessInterface extends utils.Interface {
     "getFee()": FunctionFragment;
     "getKeyHash()": FunctionFragment;
     "getLinkBalance()": FunctionFragment;
+    "getLinkToken()": FunctionFragment;
     "getMintedTickets()": FunctionFragment;
     "getNftCount()": FunctionFragment;
     "getOneNft(string)": FunctionFragment;
@@ -70,6 +63,7 @@ export interface RandomnessInterface extends utils.Interface {
     "stopMintPhase()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "unlockNft(string,uint8)": FunctionFragment;
+    "withdrawLinkBalance()": FunctionFragment;
   };
 
   getFunction(
@@ -77,6 +71,7 @@ export interface RandomnessInterface extends utils.Interface {
       | "getFee"
       | "getKeyHash"
       | "getLinkBalance"
+      | "getLinkToken"
       | "getMintedTickets"
       | "getNftCount"
       | "getOneNft"
@@ -92,6 +87,7 @@ export interface RandomnessInterface extends utils.Interface {
       | "stopMintPhase"
       | "transferOwnership"
       | "unlockNft"
+      | "withdrawLinkBalance"
   ): FunctionFragment;
 
   encodeFunctionData(functionFragment: "getFee", values?: undefined): string;
@@ -101,6 +97,10 @@ export interface RandomnessInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getLinkBalance",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getLinkToken",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -157,11 +157,19 @@ export interface RandomnessInterface extends utils.Interface {
     functionFragment: "unlockNft",
     values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "withdrawLinkBalance",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(functionFragment: "getFee", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getKeyHash", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getLinkBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getLinkToken",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -215,13 +223,56 @@ export interface RandomnessInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unlockNft", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawLinkBalance",
+    data: BytesLike
+  ): Result;
 
   events: {
+    "ChainlinkCancelled(bytes32)": EventFragment;
+    "ChainlinkFulfilled(bytes32)": EventFragment;
+    "ChainlinkRequested(bytes32)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "ChainlinkCancelled"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ChainlinkFulfilled"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ChainlinkRequested"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
+
+export interface ChainlinkCancelledEventObject {
+  id: string;
+}
+export type ChainlinkCancelledEvent = TypedEvent<
+  [string],
+  ChainlinkCancelledEventObject
+>;
+
+export type ChainlinkCancelledEventFilter =
+  TypedEventFilter<ChainlinkCancelledEvent>;
+
+export interface ChainlinkFulfilledEventObject {
+  id: string;
+}
+export type ChainlinkFulfilledEvent = TypedEvent<
+  [string],
+  ChainlinkFulfilledEventObject
+>;
+
+export type ChainlinkFulfilledEventFilter =
+  TypedEventFilter<ChainlinkFulfilledEvent>;
+
+export interface ChainlinkRequestedEventObject {
+  id: string;
+}
+export type ChainlinkRequestedEvent = TypedEvent<
+  [string],
+  ChainlinkRequestedEventObject
+>;
+
+export type ChainlinkRequestedEventFilter =
+  TypedEventFilter<ChainlinkRequestedEvent>;
 
 export interface OwnershipTransferredEventObject {
   previousOwner: string;
@@ -267,6 +318,8 @@ export interface Randomness extends BaseContract {
     getKeyHash(overrides?: CallOverrides): Promise<[string]>;
 
     getLinkBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getLinkToken(overrides?: CallOverrides): Promise<[string]>;
 
     getMintedTickets(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -322,6 +375,10 @@ export interface Randomness extends BaseContract {
       _epoch: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    withdrawLinkBalance(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   getFee(overrides?: CallOverrides): Promise<BigNumber>;
@@ -329,6 +386,8 @@ export interface Randomness extends BaseContract {
   getKeyHash(overrides?: CallOverrides): Promise<string>;
 
   getLinkBalance(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getLinkToken(overrides?: CallOverrides): Promise<string>;
 
   getMintedTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -385,12 +444,18 @@ export interface Randomness extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  withdrawLinkBalance(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     getFee(overrides?: CallOverrides): Promise<BigNumber>;
 
     getKeyHash(overrides?: CallOverrides): Promise<string>;
 
     getLinkBalance(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getLinkToken(overrides?: CallOverrides): Promise<string>;
 
     getMintedTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -442,9 +507,26 @@ export interface Randomness extends BaseContract {
       _epoch: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    withdrawLinkBalance(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
+    "ChainlinkCancelled(bytes32)"(
+      id?: BytesLike | null
+    ): ChainlinkCancelledEventFilter;
+    ChainlinkCancelled(id?: BytesLike | null): ChainlinkCancelledEventFilter;
+
+    "ChainlinkFulfilled(bytes32)"(
+      id?: BytesLike | null
+    ): ChainlinkFulfilledEventFilter;
+    ChainlinkFulfilled(id?: BytesLike | null): ChainlinkFulfilledEventFilter;
+
+    "ChainlinkRequested(bytes32)"(
+      id?: BytesLike | null
+    ): ChainlinkRequestedEventFilter;
+    ChainlinkRequested(id?: BytesLike | null): ChainlinkRequestedEventFilter;
+
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
@@ -461,6 +543,8 @@ export interface Randomness extends BaseContract {
     getKeyHash(overrides?: CallOverrides): Promise<BigNumber>;
 
     getLinkBalance(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getLinkToken(overrides?: CallOverrides): Promise<BigNumber>;
 
     getMintedTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -516,6 +600,10 @@ export interface Randomness extends BaseContract {
       _epoch: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    withdrawLinkBalance(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -524,6 +612,8 @@ export interface Randomness extends BaseContract {
     getKeyHash(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getLinkBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getLinkToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getMintedTickets(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -581,6 +671,10 @@ export interface Randomness extends BaseContract {
     unlockNft(
       _identifier: string,
       _epoch: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdrawLinkBalance(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

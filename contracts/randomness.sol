@@ -2,12 +2,13 @@
 
 pragma solidity ^0.8.11;
 
+import '@chainlink/contracts/src/v0.8/ChainlinkClient.sol';
 import '@chainlink/contracts/src/v0.8/VRFConsumerBase.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 import 'hardhat/console.sol';
 
-contract Randomness is VRFConsumerBase, Ownable {
+contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 	using Counters for Counters.Counter;
 
 	struct KeyStruct {
@@ -18,7 +19,6 @@ contract Randomness is VRFConsumerBase, Ownable {
 	struct NftStruct {
 		uint8 epoch;
 		uint8 tickets;
-		uint8 ticketType; // last digit of random number
 		uint256 randomNumber;
 		uint256 timestamp;
 	}
@@ -85,7 +85,6 @@ contract Randomness is VRFConsumerBase, Ownable {
 	// 	NftStruct storage nft = nfts[nftKeys[requestIdTest]];
 	// 	nft.epoch = uniqKeys[nftKeys[requestIdTest]].epoch;
 	// 	nft.tickets = tickets;
-	// 	nft.ticketType = uint8(randomnessTest % 10);
 	// 	nft.randomNumber = randomnessTest;
 	// 	nft.timestamp = block.timestamp;
 
@@ -120,7 +119,6 @@ contract Randomness is VRFConsumerBase, Ownable {
 		NftStruct storage nft = nfts[nftKeys[_requestId]];
 		nft.epoch = uniqKeys[nftKeys[_requestId]].epoch;
 		nft.tickets = tickets;
-		nft.ticketType = uint8(_randomness % 10);
 		nft.randomNumber = _randomness;
 		nft.timestamp = block.timestamp;
 
@@ -159,6 +157,8 @@ contract Randomness is VRFConsumerBase, Ownable {
 
 	// CORE FUNCTION ===========================================================================================
 	// core owner functionality
+	// ERROR MSG:
+	// WLF: withdraw link token failed
 
 	/*
 	 * @functionName startMintPhase
@@ -237,6 +237,23 @@ contract Randomness is VRFConsumerBase, Ownable {
 	 */
 	function getLinkBalance() public view returns (uint256) {
 		return LINK.balanceOf(address(this));
+	}
+
+	/*
+	 * @functionName getLinkToken
+	 * @functionDescription get link token
+	 */
+	function getLinkToken() public view returns (address) {
+		return chainlinkTokenAddress();
+	}
+
+	/*
+	 * @functionName withdrawLinkBalance
+	 * @functionDescription withdraw link token balance
+	 */
+	function withdrawLinkBalance() public onlyOwner {
+		LinkTokenInterface link = LinkTokenInterface(chainlinkTokenAddress());
+		require(link.transfer(msg.sender, link.balanceOf(address(this))), 'WLF');
 	}
 
 	// UNLOCK FUNCTION ===========================================================================================
