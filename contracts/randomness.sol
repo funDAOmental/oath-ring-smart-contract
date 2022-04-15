@@ -54,6 +54,9 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 			_linkToken // LINK Token
 		)
 	{
+		setChainlinkOracle(_vrfCoordinator);
+		setChainlinkToken(_linkToken);
+
 		keyHash = _keyHash;
 		fee = _fee;
 	}

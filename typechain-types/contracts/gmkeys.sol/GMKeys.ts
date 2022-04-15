@@ -79,6 +79,7 @@ export interface GMKeysInterface extends utils.Interface {
     "getAllNft()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getBaseURI()": FunctionFragment;
+    "getEthBalance()": FunctionFragment;
     "getMintedKeys()": FunctionFragment;
     "getNftCount()": FunctionFragment;
     "getOneAddress(string)": FunctionFragment;
@@ -105,7 +106,7 @@ export interface GMKeysInterface extends utils.Interface {
     "transferFrom(address,address,uint256)": FunctionFragment;
     "transferKeys(address,address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "withdraw()": FunctionFragment;
+    "withdrawEthBalance()": FunctionFragment;
   };
 
   getFunction(
@@ -118,6 +119,7 @@ export interface GMKeysInterface extends utils.Interface {
       | "getAllNft"
       | "getApproved"
       | "getBaseURI"
+      | "getEthBalance"
       | "getMintedKeys"
       | "getNftCount"
       | "getOneAddress"
@@ -144,7 +146,7 @@ export interface GMKeysInterface extends utils.Interface {
       | "transferFrom"
       | "transferKeys"
       | "transferOwnership"
-      | "withdraw"
+      | "withdrawEthBalance"
   ): FunctionFragment;
 
   encodeFunctionData(functionFragment: "addresses", values: [string]): string;
@@ -165,6 +167,10 @@ export interface GMKeysInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getBaseURI",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getEthBalance",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -256,7 +262,10 @@ export interface GMKeysInterface extends utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "withdrawEthBalance",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(functionFragment: "addresses", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
@@ -269,6 +278,10 @@ export interface GMKeysInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getBaseURI", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getEthBalance",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getMintedKeys",
     data: BytesLike
@@ -346,7 +359,10 @@ export interface GMKeysInterface extends utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "withdrawEthBalance",
+    data: BytesLike
+  ): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
@@ -490,6 +506,8 @@ export interface GMKeys extends BaseContract {
 
     getBaseURI(overrides?: CallOverrides): Promise<[string]>;
 
+    getEthBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getMintedKeys(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getNftCount(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -619,7 +637,7 @@ export interface GMKeys extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    withdraw(
+    withdrawEthBalance(
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -661,6 +679,8 @@ export interface GMKeys extends BaseContract {
   ): Promise<string>;
 
   getBaseURI(overrides?: CallOverrides): Promise<string>;
+
+  getEthBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
   getMintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -785,7 +805,7 @@ export interface GMKeys extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  withdraw(
+  withdrawEthBalance(
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -823,6 +843,8 @@ export interface GMKeys extends BaseContract {
     ): Promise<string>;
 
     getBaseURI(overrides?: CallOverrides): Promise<string>;
+
+    getEthBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     getMintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -943,7 +965,7 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    withdraw(overrides?: CallOverrides): Promise<void>;
+    withdrawEthBalance(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -1030,6 +1052,8 @@ export interface GMKeys extends BaseContract {
     ): Promise<BigNumber>;
 
     getBaseURI(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getEthBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     getMintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1147,7 +1171,7 @@ export interface GMKeys extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    withdraw(
+    withdrawEthBalance(
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -1187,6 +1211,8 @@ export interface GMKeys extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     getBaseURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getEthBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getMintedKeys(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1307,7 +1333,7 @@ export interface GMKeys extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    withdraw(
+    withdrawEthBalance(
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

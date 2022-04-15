@@ -110,10 +110,18 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// core owner functionality
 
 	/*
-	 * @functionName withdraw
-	 * @functionDescription withdraw contract balance
+	 * @functionName getEthBalance
+	 * @functionDescription get eth token balance
 	 */
-	function withdraw() public payable onlyOwner {
+	function getEthBalance() public view returns (uint256) {
+		return address(this).balance;
+	}
+
+	/*
+	 * @functionName withdrawEthBalance
+	 * @functionDescription withdraw eth token balance
+	 */
+	function withdrawEthBalance() public payable onlyOwner {
 		uint256 amount = address(this).balance;
 		payable(msg.sender).transfer(amount);
 	}
