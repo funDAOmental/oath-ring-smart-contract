@@ -21,9 +21,10 @@ interface IRandomness {
 }
 
 contract GMKeys is ERC721, ERC721Burnable, Ownable {
-	using Counters for Counters.Counter;
+	event MintKeys(address indexed _receiver, uint256 _count);
+	event TransferKeys(address indexed _receiver, uint256 _count);
 
-	event MintKeys(address indexed _receiver, uint256 _count, uint256 totalCount);
+	using Counters for Counters.Counter;
 
 	string private baseTokenURI;
 	uint256 private price;
@@ -220,7 +221,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	function getEpochType(uint128 _seed, uint8 _epoch) internal pure returns (uint8) {
 		uint8 epochType = uint8((_seed % 10) + 1);
 
-		if (epochType <= 7) {
+		if (epochType <= _epoch) {
 			return epochType;
 		} else {
 			return _epoch;
@@ -271,7 +272,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// 	}
 
 	// 	mintedKeys = mintedKeys + _count;
-	// 	emit MintKeys(_receiver, _count, mintedKeys);
+	// 	emit MintKeys(_receiver, _count);
 	// }
 
 	/*
@@ -324,7 +325,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		}
 
 		mintedKeys = mintedKeys + _count;
-		emit MintKeys(_receiver, _count, mintedKeys);
+		emit MintKeys(_receiver, _count);
 	}
 
 	/*
@@ -351,6 +352,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		require(_owner == ownerOf(_tokenId), 'IGO');
 
 		transferFrom(_owner, _receiver, _tokenId);
+		emit TransferKeys(_receiver, _tokenId);
 	}
 
 	/*

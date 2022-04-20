@@ -367,9 +367,10 @@ export interface GMKeysInterface extends utils.Interface {
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "MintKeys(address,uint256,uint256)": EventFragment;
+    "MintKeys(address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
+    "TransferKeys(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
@@ -377,6 +378,7 @@ export interface GMKeysInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "MintKeys"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "TransferKeys"): EventFragment;
 }
 
 export interface ApprovalEventObject {
@@ -406,10 +408,9 @@ export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 export interface MintKeysEventObject {
   _receiver: string;
   _count: BigNumber;
-  totalCount: BigNumber;
 }
 export type MintKeysEvent = TypedEvent<
-  [string, BigNumber, BigNumber],
+  [string, BigNumber],
   MintKeysEventObject
 >;
 
@@ -438,6 +439,17 @@ export type TransferEvent = TypedEvent<
 >;
 
 export type TransferEventFilter = TypedEventFilter<TransferEvent>;
+
+export interface TransferKeysEventObject {
+  _receiver: string;
+  _count: BigNumber;
+}
+export type TransferKeysEvent = TypedEvent<
+  [string, BigNumber],
+  TransferKeysEventObject
+>;
+
+export type TransferKeysEventFilter = TypedEventFilter<TransferKeysEvent>;
 
 export interface GMKeys extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -991,16 +1003,11 @@ export interface GMKeys extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "MintKeys(address,uint256,uint256)"(
+    "MintKeys(address,uint256)"(
       _receiver?: string | null,
-      _count?: null,
-      totalCount?: null
+      _count?: null
     ): MintKeysEventFilter;
-    MintKeys(
-      _receiver?: string | null,
-      _count?: null,
-      totalCount?: null
-    ): MintKeysEventFilter;
+    MintKeys(_receiver?: string | null, _count?: null): MintKeysEventFilter;
 
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
@@ -1021,6 +1028,15 @@ export interface GMKeys extends BaseContract {
       to?: string | null,
       tokenId?: BigNumberish | null
     ): TransferEventFilter;
+
+    "TransferKeys(address,uint256)"(
+      _receiver?: string | null,
+      _count?: null
+    ): TransferKeysEventFilter;
+    TransferKeys(
+      _receiver?: string | null,
+      _count?: null
+    ): TransferKeysEventFilter;
   };
 
   estimateGas: {

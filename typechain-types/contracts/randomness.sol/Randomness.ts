@@ -232,12 +232,14 @@ export interface RandomnessInterface extends utils.Interface {
     "ChainlinkCancelled(bytes32)": EventFragment;
     "ChainlinkFulfilled(bytes32)": EventFragment;
     "ChainlinkRequested(bytes32)": EventFragment;
+    "GenerateRndomNumber(uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ChainlinkCancelled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ChainlinkFulfilled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ChainlinkRequested"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "GenerateRndomNumber"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
 
@@ -273,6 +275,17 @@ export type ChainlinkRequestedEvent = TypedEvent<
 
 export type ChainlinkRequestedEventFilter =
   TypedEventFilter<ChainlinkRequestedEvent>;
+
+export interface GenerateRndomNumberEventObject {
+  _randomNumber: BigNumber;
+}
+export type GenerateRndomNumberEvent = TypedEvent<
+  [BigNumber],
+  GenerateRndomNumberEventObject
+>;
+
+export type GenerateRndomNumberEventFilter =
+  TypedEventFilter<GenerateRndomNumberEvent>;
 
 export interface OwnershipTransferredEventObject {
   previousOwner: string;
@@ -526,6 +539,13 @@ export interface Randomness extends BaseContract {
       id?: BytesLike | null
     ): ChainlinkRequestedEventFilter;
     ChainlinkRequested(id?: BytesLike | null): ChainlinkRequestedEventFilter;
+
+    "GenerateRndomNumber(uint256)"(
+      _randomNumber?: BigNumberish | null
+    ): GenerateRndomNumberEventFilter;
+    GenerateRndomNumber(
+      _randomNumber?: BigNumberish | null
+    ): GenerateRndomNumberEventFilter;
 
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,

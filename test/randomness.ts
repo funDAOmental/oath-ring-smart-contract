@@ -22,7 +22,7 @@ describe.only('randomness', async () => {
 	const fee: BigNumber = ethers.utils.parseEther('0.1');
 
 	// console.log('user:', user1, user2, user3);
-	console.log('fee:', fee);
+	// console.log('fee:', fee);
 
 	before(async () => {
 		Randomness = await ethers.getContractFactory('Randomness');

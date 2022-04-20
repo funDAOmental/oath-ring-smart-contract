@@ -9,6 +9,8 @@ import '@openzeppelin/contracts/utils/Counters.sol';
 import 'hardhat/console.sol';
 
 contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
+	event GenerateRndomNumber(uint256 indexed _randomNumber);
+
 	using Counters for Counters.Counter;
 
 	struct KeyStruct {
@@ -92,6 +94,7 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 	// 	nft.timestamp = block.timestamp;
 
 	// 	nftCount.increment();
+	// 	emit GenerateRndomNumber(randomnessTest);
 	// }
 
 	function getRandomNumber(string memory _identifier, uint8 _epoch) internal {
@@ -126,6 +129,7 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 		nft.timestamp = block.timestamp;
 
 		nftCount.increment();
+		emit GenerateRndomNumber(_randomness);
 	}
 
 	/*
