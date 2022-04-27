@@ -158,7 +158,6 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	// ERROR MSG:
 	// MPS: minting phase stop
 	// NEC: not enough coins
-	// ADE: address dosent exists
 	// TID: token id dosent exists
 	// AMM: max user/address max gmkeys has been mint
 	// NYR: user/address not yet registered
