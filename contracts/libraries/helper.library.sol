@@ -3,6 +3,15 @@
 pragma solidity ^0.8.11;
 
 library HelperLibrary {
+	function getTickets(uint128 _probability, uint256 _chance) internal pure returns (uint8) {
+		uint8 ticketValue = uint8((_probability * _chance) / 1000);
+		if (ticketValue > 10) {
+			ticketValue = 10;
+		}
+
+		return ticketValue;
+	}
+
 	function getSeed(uint256 _randomNumber) internal pure returns (uint128) {
 		uint256 hashModulus = 10**16;
 		uint256 random = uint256(keccak256(abi.encodePacked(_randomNumber)));

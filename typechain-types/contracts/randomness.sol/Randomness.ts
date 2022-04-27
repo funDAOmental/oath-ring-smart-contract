@@ -48,6 +48,7 @@ export interface RandomnessInterface extends utils.Interface {
     "getKeyHash()": FunctionFragment;
     "getLinkBalance()": FunctionFragment;
     "getLinkToken()": FunctionFragment;
+    "getMintedKeys()": FunctionFragment;
     "getMintedTickets()": FunctionFragment;
     "getNftCount()": FunctionFragment;
     "getOneNft(string)": FunctionFragment;
@@ -56,13 +57,19 @@ export interface RandomnessInterface extends utils.Interface {
     "getTotalTickets()": FunctionFragment;
     "getWinningPercentage()": FunctionFragment;
     "isMintingStart()": FunctionFragment;
+    "mintPhase()": FunctionFragment;
+    "mintedKeys()": FunctionFragment;
     "owner()": FunctionFragment;
     "rawFulfillRandomness(bytes32,uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "startMintPhase(uint256,uint8)": FunctionFragment;
+    "startMinting()": FunctionFragment;
     "stopMintPhase()": FunctionFragment;
+    "stopMinting()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "unlockNft(string,uint8)": FunctionFragment;
+    "unlockTestNft(string,uint8)": FunctionFragment;
+    "updateMintedKeys(uint8)": FunctionFragment;
     "withdrawLinkBalance()": FunctionFragment;
   };
 
@@ -72,6 +79,7 @@ export interface RandomnessInterface extends utils.Interface {
       | "getKeyHash"
       | "getLinkBalance"
       | "getLinkToken"
+      | "getMintedKeys"
       | "getMintedTickets"
       | "getNftCount"
       | "getOneNft"
@@ -80,13 +88,19 @@ export interface RandomnessInterface extends utils.Interface {
       | "getTotalTickets"
       | "getWinningPercentage"
       | "isMintingStart"
+      | "mintPhase"
+      | "mintedKeys"
       | "owner"
       | "rawFulfillRandomness"
       | "renounceOwnership"
       | "startMintPhase"
+      | "startMinting"
       | "stopMintPhase"
+      | "stopMinting"
       | "transferOwnership"
       | "unlockNft"
+      | "unlockTestNft"
+      | "updateMintedKeys"
       | "withdrawLinkBalance"
   ): FunctionFragment;
 
@@ -101,6 +115,10 @@ export interface RandomnessInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getLinkToken",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMintedKeys",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -132,6 +150,11 @@ export interface RandomnessInterface extends utils.Interface {
     functionFragment: "isMintingStart",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "mintPhase", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "mintedKeys",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "rawFulfillRandomness",
@@ -146,7 +169,15 @@ export interface RandomnessInterface extends utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "startMinting",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "stopMintPhase",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "stopMinting",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -156,6 +187,14 @@ export interface RandomnessInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "unlockNft",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "unlockTestNft",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateMintedKeys",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "withdrawLinkBalance",
@@ -170,6 +209,10 @@ export interface RandomnessInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getLinkToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getMintedKeys",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -201,6 +244,8 @@ export interface RandomnessInterface extends utils.Interface {
     functionFragment: "isMintingStart",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "mintPhase", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintedKeys", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "rawFulfillRandomness",
@@ -215,7 +260,15 @@ export interface RandomnessInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "startMinting",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "stopMintPhase",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "stopMinting",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -223,6 +276,14 @@ export interface RandomnessInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unlockNft", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "unlockTestNft",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateMintedKeys",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "withdrawLinkBalance",
     data: BytesLike
@@ -334,6 +395,8 @@ export interface Randomness extends BaseContract {
 
     getLinkToken(overrides?: CallOverrides): Promise<[string]>;
 
+    getMintedKeys(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     getMintedTickets(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getNftCount(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -356,6 +419,10 @@ export interface Randomness extends BaseContract {
 
     isMintingStart(overrides?: CallOverrides): Promise<[boolean]>;
 
+    mintPhase(overrides?: CallOverrides): Promise<[number]>;
+
+    mintedKeys(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     rawFulfillRandomness(
@@ -374,7 +441,15 @@ export interface Randomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    startMinting(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     stopMintPhase(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    stopMinting(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -386,6 +461,17 @@ export interface Randomness extends BaseContract {
     unlockNft(
       _identifier: string,
       _epoch: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    unlockTestNft(
+      _identifier: string,
+      _epoch: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateMintedKeys(
+      _count: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -401,6 +487,8 @@ export interface Randomness extends BaseContract {
   getLinkBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
   getLinkToken(overrides?: CallOverrides): Promise<string>;
+
+  getMintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
   getMintedTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -424,6 +512,10 @@ export interface Randomness extends BaseContract {
 
   isMintingStart(overrides?: CallOverrides): Promise<boolean>;
 
+  mintPhase(overrides?: CallOverrides): Promise<number>;
+
+  mintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
+
   owner(overrides?: CallOverrides): Promise<string>;
 
   rawFulfillRandomness(
@@ -442,7 +534,15 @@ export interface Randomness extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  startMinting(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   stopMintPhase(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  stopMinting(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -454,6 +554,17 @@ export interface Randomness extends BaseContract {
   unlockNft(
     _identifier: string,
     _epoch: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  unlockTestNft(
+    _identifier: string,
+    _epoch: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updateMintedKeys(
+    _count: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -469,6 +580,8 @@ export interface Randomness extends BaseContract {
     getLinkBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     getLinkToken(overrides?: CallOverrides): Promise<string>;
+
+    getMintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
     getMintedTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -492,6 +605,10 @@ export interface Randomness extends BaseContract {
 
     isMintingStart(overrides?: CallOverrides): Promise<boolean>;
 
+    mintPhase(overrides?: CallOverrides): Promise<number>;
+
+    mintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
+
     owner(overrides?: CallOverrides): Promise<string>;
 
     rawFulfillRandomness(
@@ -508,7 +625,11 @@ export interface Randomness extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    startMinting(overrides?: CallOverrides): Promise<void>;
+
     stopMintPhase(overrides?: CallOverrides): Promise<void>;
+
+    stopMinting(overrides?: CallOverrides): Promise<void>;
 
     transferOwnership(
       newOwner: string,
@@ -518,6 +639,17 @@ export interface Randomness extends BaseContract {
     unlockNft(
       _identifier: string,
       _epoch: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    unlockTestNft(
+      _identifier: string,
+      _epoch: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateMintedKeys(
+      _count: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -566,6 +698,8 @@ export interface Randomness extends BaseContract {
 
     getLinkToken(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getMintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
+
     getMintedTickets(overrides?: CallOverrides): Promise<BigNumber>;
 
     getNftCount(overrides?: CallOverrides): Promise<BigNumber>;
@@ -588,6 +722,10 @@ export interface Randomness extends BaseContract {
 
     isMintingStart(overrides?: CallOverrides): Promise<BigNumber>;
 
+    mintPhase(overrides?: CallOverrides): Promise<BigNumber>;
+
+    mintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
+
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     rawFulfillRandomness(
@@ -606,7 +744,15 @@ export interface Randomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    startMinting(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     stopMintPhase(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    stopMinting(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -618,6 +764,17 @@ export interface Randomness extends BaseContract {
     unlockNft(
       _identifier: string,
       _epoch: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    unlockTestNft(
+      _identifier: string,
+      _epoch: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateMintedKeys(
+      _count: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -634,6 +791,8 @@ export interface Randomness extends BaseContract {
     getLinkBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getLinkToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getMintedKeys(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getMintedTickets(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -661,6 +820,10 @@ export interface Randomness extends BaseContract {
 
     isMintingStart(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    mintPhase(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    mintedKeys(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     rawFulfillRandomness(
@@ -679,7 +842,15 @@ export interface Randomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    startMinting(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     stopMintPhase(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    stopMinting(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -691,6 +862,17 @@ export interface Randomness extends BaseContract {
     unlockNft(
       _identifier: string,
       _epoch: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    unlockTestNft(
+      _identifier: string,
+      _epoch: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateMintedKeys(
+      _count: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

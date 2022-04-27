@@ -91,7 +91,6 @@ export interface GMKeysInterface extends utils.Interface {
     "isMintingStart()": FunctionFragment;
     "mintKeys(address,string,address,uint8)": FunctionFragment;
     "mintPhase()": FunctionFragment;
-    "mintTestKeys(address,string,address,uint8)": FunctionFragment;
     "mintedKeys()": FunctionFragment;
     "name()": FunctionFragment;
     "nfts(uint256)": FunctionFragment;
@@ -137,7 +136,6 @@ export interface GMKeysInterface extends utils.Interface {
       | "isMintingStart"
       | "mintKeys"
       | "mintPhase"
-      | "mintTestKeys"
       | "mintedKeys"
       | "name"
       | "nfts"
@@ -223,10 +221,6 @@ export interface GMKeysInterface extends utils.Interface {
     values: [string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "mintPhase", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "mintTestKeys",
-    values: [string, string, string, BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "mintedKeys",
     values?: undefined
@@ -347,10 +341,6 @@ export interface GMKeysInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "mintKeys", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mintPhase", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "mintTestKeys",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "mintedKeys", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nfts", data: BytesLike): Result;
@@ -613,14 +603,6 @@ export interface GMKeys extends BaseContract {
 
     mintPhase(overrides?: CallOverrides): Promise<[number]>;
 
-    mintTestKeys(
-      _receiver: string,
-      _identifier: string,
-      _randomnessAddress: string,
-      _count: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     mintedKeys(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
@@ -812,14 +794,6 @@ export interface GMKeys extends BaseContract {
 
   mintPhase(overrides?: CallOverrides): Promise<number>;
 
-  mintTestKeys(
-    _receiver: string,
-    _identifier: string,
-    _randomnessAddress: string,
-    _count: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   mintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
   name(overrides?: CallOverrides): Promise<string>;
@@ -1000,14 +974,6 @@ export interface GMKeys extends BaseContract {
     ): Promise<void>;
 
     mintPhase(overrides?: CallOverrides): Promise<number>;
-
-    mintTestKeys(
-      _receiver: string,
-      _identifier: string,
-      _randomnessAddress: string,
-      _count: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     mintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1235,14 +1201,6 @@ export interface GMKeys extends BaseContract {
 
     mintPhase(overrides?: CallOverrides): Promise<BigNumber>;
 
-    mintTestKeys(
-      _receiver: string,
-      _identifier: string,
-      _randomnessAddress: string,
-      _count: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     mintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1418,14 +1376,6 @@ export interface GMKeys extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     mintPhase(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    mintTestKeys(
-      _receiver: string,
-      _identifier: string,
-      _randomnessAddress: string,
-      _count: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     mintedKeys(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

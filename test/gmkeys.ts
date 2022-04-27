@@ -156,8 +156,10 @@ describe.only('gmkeys', async () => {
 	});
 
 	it('should withdraw contract balance', async () => {
-		const withdraw = await gmkeys.withdrawEthBalance();
+		const ethBalance = await gmkeys.getEthBalance();
+		expect(Number(ethBalance)).to.equal(800000000000000000);
 
+		const withdraw = await gmkeys.withdrawEthBalance();
 		const blockChainWait = await withdraw.wait();
 		expect(blockChainWait.status).to.equal(1);
 	});

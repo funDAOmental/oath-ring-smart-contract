@@ -8,7 +8,11 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 import 'hardhat/console.sol';
 
-contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
+import './services/mint.service.sol';
+
+import './libraries/helper.library.sol';
+
+contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable, MintService {
 	event GenerateRndomNumber(uint256 indexed _randomNumber);
 
 	using Counters for Counters.Counter;
@@ -32,9 +36,7 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 
 	uint8 private activeEpoch = 0; // active epoch
 	uint256 private totalTickets = 4011; // updated tickets on epoch
-	uint256 private mintedTickets = 0; // total number of minted tickets
 
-	uint8 private mintPhase = 0; // minting phase 0 stop, 1 start
 	uint256 private mintStartTime = 0; // minting start time based on block.timestamp
 
 	mapping(bytes32 => string) private nftKeys;
@@ -75,17 +77,17 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 	// 	uint256 chance = (randomnessTest % 100) + 1;
 
 	// 	uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
-	// 	uint128 probability = uint128(((totalTickets - mintedTickets) * 100) / (timeRemaining / 60));
+	// 	uint128 probability = uint128(((totalTickets - super.getMintedKeys()) * 100) / (timeRemaining / 60));
 	// 	if (_epoch == 7) {
 	// 		probability = 101;
 	// 	}
 
-	// 	uint8 tickets = getTickets(probability, chance);
+	// 	uint8 tickets = HelperLibrary.getTickets(probability, chance);
 	// 	if (_epoch == 7 && tickets == 0) {
 	// 		tickets = 1;
 	// 	}
 
-	// 	mintedTickets = mintedTickets + tickets;
+	// 	super.updateMintedKeys(tickets);
 
 	// 	NftStruct storage nft = nfts[nftKeys[requestIdTest]];
 	// 	nft.epoch = uniqKeys[nftKeys[requestIdTest]].epoch;
@@ -110,17 +112,17 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 		uint256 chance = (_randomness % 100) + 1;
 
 		uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
-		uint128 probability = uint128(((totalTickets - mintedTickets) * 100) / (timeRemaining / 60));
+		uint128 probability = uint128(((totalTickets - super.getMintedKeys()) * 100) / (timeRemaining / 60));
 		if (uniqKeys[nftKeys[_requestId]].epoch == 7) {
 			probability = 101;
 		}
 
-		uint8 tickets = getTickets(probability, chance);
+		uint8 tickets = HelperLibrary.getTickets(probability, chance);
 		if (uniqKeys[nftKeys[_requestId]].epoch == 7 && tickets == 0) {
 			tickets = 1;
 		}
 
-		mintedTickets = mintedTickets + tickets;
+		super.updateMintedKeys(tickets);
 
 		NftStruct storage nft = nfts[nftKeys[_requestId]];
 		nft.epoch = uniqKeys[nftKeys[_requestId]].epoch;
@@ -130,20 +132,6 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 
 		nftCount.increment();
 		emit GenerateRndomNumber(_randomness);
-	}
-
-	/*
-	 * @functionName getTickets
-	 * @functionDescription get status value
-	 */
-	function getTickets(uint128 _probability, uint256 _chance) internal pure returns (uint8) {
-		uint8 ticketValue = uint8((_probability * _chance) / 1000);
-
-		if (ticketValue > 10) {
-			ticketValue = 10;
-		}
-
-		return ticketValue;
 	}
 
 	/*
@@ -172,11 +160,10 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 	 * @functionDescription start minting phase
 	 */
 	function startMintPhase(uint256 _totalTickets, uint8 _epoch) public onlyOwner {
-		mintPhase = 1;
+		super.startMinting();
 
 		activeEpoch = _epoch;
 		totalTickets = _totalTickets;
-		mintedTickets = 0;
 		if (_epoch == 7) {
 			mintStartTime = block.timestamp + vLASTEPOCHENDTIME;
 		} else {
@@ -189,15 +176,7 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 	 * @functionDescription stop minting phase
 	 */
 	function stopMintPhase() public onlyOwner {
-		mintPhase = 0;
-	}
-
-	/*
-	 * @functionName isMintingStart
-	 * @functionDescription check if minting started
-	 */
-	function isMintingStart() public view returns (bool) {
-		return mintPhase == 1;
+		super.stopMinting();
 	}
 
 	/*
@@ -205,7 +184,7 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 	 * @functionDescription get total tickets minted
 	 */
 	function getMintedTickets() public view returns (uint256) {
-		return mintedTickets;
+		return super.getMintedKeys();
 	}
 
 	/*
@@ -221,7 +200,7 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 	 * @functionDescription get remaining tickets available
 	 */
 	function getRemainingTickets() public view returns (uint256) {
-		return uint256(totalTickets - mintedTickets);
+		return uint256(totalTickets - super.getMintedKeys());
 	}
 
 	/*
@@ -230,7 +209,7 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 	 */
 	function getWinningPercentage() public view returns (uint128) {
 		uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
-		uint128 probability = uint128(((totalTickets - mintedTickets) * 100) / (timeRemaining / 60));
+		uint128 probability = uint128(((totalTickets - super.getMintedKeys()) * 100) / (timeRemaining / 60));
 		if (activeEpoch == 7) {
 			probability = 101;
 		}
@@ -281,7 +260,7 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 		require(mintPhase == 1, 'MPS');
 		require(!uniqKeys[_identifier].exists, 'KAE');
 		require(mintStartTime >= block.timestamp, 'MPE');
-		require(totalTickets >= mintedTickets, 'MTU');
+		require(totalTickets >= super.getMintedKeys(), 'MTU');
 		require(activeEpoch >= _epoch, 'IAE');
 
 		require(LINK.balanceOf(address(this)) >= fee, 'NEC');
@@ -296,7 +275,7 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable {
 	// 	require(mintPhase == 1, 'MPS');
 	// 	require(!uniqKeys[_identifier].exists, 'KAE');
 	// 	require(mintStartTime >= block.timestamp, 'MPE');
-	// 	require(totalTickets >= mintedTickets, 'MTU');
+	// 	require(totalTickets >= super.getMintedKeys(), 'MTU');
 	// 	require(activeEpoch >= _epoch, 'IAE');
 
 	// 	getTestRandomNumber(_identifier, _epoch);
