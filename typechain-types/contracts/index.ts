@@ -3,5 +3,9 @@
 /* eslint-disable */
 import type * as gmkeysSol from "./gmkeys.sol";
 export type { gmkeysSol };
+import type * as interfaces from "./interfaces";
+export type { interfaces };
 import type * as randomnessSol from "./randomness.sol";
 export type { randomnessSol };
+import type * as services from "./services";
+export type { services };

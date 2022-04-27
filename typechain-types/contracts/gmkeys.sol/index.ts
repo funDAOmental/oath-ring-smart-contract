@@ -2,4 +2,3 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { GMKeys } from "./GMKeys";
-export type { IRandomness } from "./IRandomness";

@@ -44,7 +44,15 @@ export type { IERC165 } from "./@openzeppelin/contracts/utils/introspection/IERC
 export { IERC165__factory } from "./factories/@openzeppelin/contracts/utils/introspection/IERC165__factory";
 export type { GMKeys } from "./contracts/gmkeys.sol/GMKeys";
 export { GMKeys__factory } from "./factories/contracts/gmkeys.sol/GMKeys__factory";
-export type { IRandomness } from "./contracts/gmkeys.sol/IRandomness";
-export { IRandomness__factory } from "./factories/contracts/gmkeys.sol/IRandomness__factory";
+export type { IRandomness } from "./contracts/interfaces/randomess.inteface.sol/IRandomness";
+export { IRandomness__factory } from "./factories/contracts/interfaces/randomess.inteface.sol/IRandomness__factory";
 export type { Randomness } from "./contracts/randomness.sol/Randomness";
 export { Randomness__factory } from "./factories/contracts/randomness.sol/Randomness__factory";
+export type { EthLibrary } from "./contracts/services/eth.service.sol/EthLibrary";
+export { EthLibrary__factory } from "./factories/contracts/services/eth.service.sol/EthLibrary__factory";
+export type { EthService } from "./contracts/services/eth.service.sol/EthService";
+export { EthService__factory } from "./factories/contracts/services/eth.service.sol/EthService__factory";
+export type { MintLibrary } from "./contracts/services/mint.service.sol/MintLibrary";
+export { MintLibrary__factory } from "./factories/contracts/services/mint.service.sol/MintLibrary__factory";
+export type { MintService } from "./contracts/services/mint.service.sol/MintService";
+export { MintService__factory } from "./factories/contracts/services/mint.service.sol/MintService__factory";

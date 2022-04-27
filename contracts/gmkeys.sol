@@ -8,19 +8,13 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 import 'hardhat/console.sol';
 
-interface IRandomness {
-	// [epoch, tickets, randomNumber]
-	function getOneTicket(string memory _identifier)
-		external
-		view
-		returns (
-			uint8,
-			uint8,
-			uint256
-		);
-}
+import './interfaces/randomess.inteface.sol';
+import './services/eth.service.sol';
+import './services/mint.service.sol';
 
-contract GMKeys is ERC721, ERC721Burnable, Ownable {
+import './libraries/helper.library.sol';
+
+contract GMKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	event MintKeys(address indexed _receiver, uint256 _count);
 	event TransferKeys(address indexed _receiver, uint256 _count);
 
@@ -46,11 +40,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	}
 
 	uint256 private vMAXSUPPLY = 30000; // max gmkey supply
-
 	uint256 private totalKeys = 0; // total number of keys available
-	uint256 private mintedKeys = 0; // total number of minted keys
-
-	uint8 private mintPhase = 0; // minting phase 0 stop, 1 start
 
 	mapping(string => AddressStruct) public addresses;
 
@@ -88,6 +78,32 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	}
 
 	/*
+	 * @functionName getTotalKeys
+	 * @functionDescription get total keys available
+	 */
+	function getTotalKeys() public view returns (uint256) {
+		return totalKeys;
+	}
+
+	/*
+	 * @functionName startMintPhase
+	 * @functionDescription start minting phase
+	 */
+	function startMintPhase(uint256 _totalKeys) public onlyOwner {
+		super.startMinting();
+
+		totalKeys = _totalKeys;
+	}
+
+	/*
+	 * @functionName stopMintPhase
+	 * @functionDescription stop minting phase
+	 */
+	function stopMintPhase() public onlyOwner {
+		super.stopMinting();
+	}
+
+	/*
 	 * @functionName getOneTicket
 	 * @functionDescription get randomness ticket count
 	 */
@@ -105,69 +121,6 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		uint256 randomNumber;
 		(epoch, ticket, randomNumber) = IRandomness(_randomnessAddress).getOneTicket(_identifier);
 		return (epoch, ticket, randomNumber);
-	}
-
-	// CORE FUNCTION ===========================================================================================
-	// core owner functionality
-
-	/*
-	 * @functionName getEthBalance
-	 * @functionDescription get eth token balance
-	 */
-	function getEthBalance() public view returns (uint256) {
-		return address(this).balance;
-	}
-
-	/*
-	 * @functionName withdrawEthBalance
-	 * @functionDescription withdraw eth token balance
-	 */
-	function withdrawEthBalance() public payable onlyOwner {
-		uint256 amount = address(this).balance;
-		payable(msg.sender).transfer(amount);
-	}
-
-	/*
-	 * @functionName startMintPhase
-	 * @functionDescription start minting phase
-	 */
-	function startMintPhase(uint256 _totalKeys) public onlyOwner {
-		mintPhase = 1;
-
-		totalKeys = _totalKeys;
-		mintedKeys = 0;
-	}
-
-	/*
-	 * @functionName stopMintPhase
-	 * @functionDescription stop minting phase
-	 */
-	function stopMintPhase() public onlyOwner {
-		mintPhase = 0;
-	}
-
-	/*
-	 * @functionName isMintingStart
-	 * @functionDescription check if minting started
-	 */
-	function isMintingStart() public view returns (bool) {
-		return mintPhase == 1;
-	}
-
-	/*
-	 * @functionName getTotalKeys
-	 * @functionDescription get total keys available
-	 */
-	function getTotalKeys() public view returns (uint256) {
-		return totalKeys;
-	}
-
-	/*
-	 * @functionName getMintedKeys
-	 * @functionDescription get total tickets minted
-	 */
-	function getMintedKeys() public view returns (uint256) {
-		return mintedKeys;
 	}
 
 	// ADDRESS FUNCTION ===========================================================================================
@@ -212,29 +165,13 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// MSR: max supply of gmkeys reach
 	// IGO: invalid gmkey owner
 
-	function getSeed(uint256 _randomNumber) internal pure returns (uint128) {
-		uint256 hashModulus = 10**16;
-		uint256 random = uint256(keccak256(abi.encodePacked(_randomNumber)));
-		return uint128(random % hashModulus);
-	}
-
-	function getEpochType(uint128 _seed, uint8 _epoch) internal pure returns (uint8) {
-		uint8 epochType = uint8((_seed % 10) + 1);
-
-		if (epochType <= _epoch) {
-			return epochType;
-		} else {
-			return _epoch;
-		}
-	}
-
 	// function mintTestKeys(
 	// 	address _receiver, // user/wallet address to recieve NFT
 	// 	string memory _identifier, // user identifier
 	// 	address _randomnessAddress, // randomness contract address
 	// 	uint8 _count // number of keys to mint
 	// ) public payable {
-	// 	require(mintPhase == 1, 'MPS');
+	// 	require(super.isMintingStart(), 'MPS');
 	// 	require(msg.value >= price * _count, 'NEC');
 	// 	require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
@@ -254,14 +191,14 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 
 	// 	uint8 j = 1;
 	// 	for (j; j <= _count; j++) {
-	// 		uint128 runningSeed = getSeed(randomNumberTest + nftCount.current());
+	// 		uint128 runningSeed = HelperLibrary.getSeed(randomNumberTest + nftCount.current());
 	// 		nfts.push(
 	// 			NftStruct(
 	// 				payable(_receiver),
 	// 				nftCount.current(),
 	// 				runningSeed,
 	// 				epochTest,
-	// 				getEpochType(runningSeed, epochTest),
+	// 				HelperLibrary.getEpochType(runningSeed, epochTest),
 	// 				randomNumberTest,
 	// 				block.timestamp
 	// 			)
@@ -271,7 +208,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 	// 		nftCount.increment();
 	// 	}
 
-	// 	mintedKeys = mintedKeys + _count;
+	// 	super.updateMintedKeys(_count);
 	// 	emit MintKeys(_receiver, _count);
 	// }
 
@@ -285,7 +222,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 		address _randomnessAddress, // randomness contract address
 		uint8 _count // number of keys to mint
 	) public payable {
-		require(mintPhase == 1, 'MPS');
+		require(super.isMintingStart(), 'MPS');
 		require(msg.value >= price * _count, 'NEC');
 		require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
@@ -307,14 +244,14 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 
 		uint8 j = 1;
 		for (j; j <= _count; j++) {
-			uint128 runningSeed = getSeed(randomNumber + nftCount.current());
+			uint128 runningSeed = HelperLibrary.getSeed(randomNumber + nftCount.current());
 			nfts.push(
 				NftStruct(
 					payable(_receiver),
 					nftCount.current(),
 					runningSeed,
 					epoch,
-					getEpochType(runningSeed, epoch),
+					HelperLibrary.getEpochType(runningSeed, epoch),
 					randomNumber,
 					block.timestamp
 				)
@@ -324,7 +261,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable {
 			nftCount.increment();
 		}
 
-		mintedKeys = mintedKeys + _count;
+		super.updateMintedKeys(_count);
 		emit MintKeys(_receiver, _count);
 	}
 

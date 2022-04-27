@@ -90,6 +90,9 @@ export interface GMKeysInterface extends utils.Interface {
     "isApprovedForAll(address,address)": FunctionFragment;
     "isMintingStart()": FunctionFragment;
     "mintKeys(address,string,address,uint8)": FunctionFragment;
+    "mintPhase()": FunctionFragment;
+    "mintTestKeys(address,string,address,uint8)": FunctionFragment;
+    "mintedKeys()": FunctionFragment;
     "name()": FunctionFragment;
     "nfts(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
@@ -99,13 +102,16 @@ export interface GMKeysInterface extends utils.Interface {
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "startMintPhase(uint256)": FunctionFragment;
+    "startMinting()": FunctionFragment;
     "stopMintPhase()": FunctionFragment;
+    "stopMinting()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "transferKeys(address,address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "updateMintedKeys(uint8)": FunctionFragment;
     "withdrawEthBalance()": FunctionFragment;
   };
 
@@ -130,6 +136,9 @@ export interface GMKeysInterface extends utils.Interface {
       | "isApprovedForAll"
       | "isMintingStart"
       | "mintKeys"
+      | "mintPhase"
+      | "mintTestKeys"
+      | "mintedKeys"
       | "name"
       | "nfts"
       | "owner"
@@ -139,13 +148,16 @@ export interface GMKeysInterface extends utils.Interface {
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
       | "startMintPhase"
+      | "startMinting"
       | "stopMintPhase"
+      | "stopMinting"
       | "supportsInterface"
       | "symbol"
       | "tokenURI"
       | "transferFrom"
       | "transferKeys"
       | "transferOwnership"
+      | "updateMintedKeys"
       | "withdrawEthBalance"
   ): FunctionFragment;
 
@@ -210,6 +222,15 @@ export interface GMKeysInterface extends utils.Interface {
     functionFragment: "mintKeys",
     values: [string, string, string, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "mintPhase", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "mintTestKeys",
+    values: [string, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintedKeys",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "nfts", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
@@ -238,7 +259,15 @@ export interface GMKeysInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "startMinting",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "stopMintPhase",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "stopMinting",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -261,6 +290,10 @@ export interface GMKeysInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateMintedKeys",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "withdrawEthBalance",
@@ -313,6 +346,12 @@ export interface GMKeysInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mintKeys", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintPhase", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "mintTestKeys",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "mintedKeys", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nfts", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
@@ -338,7 +377,15 @@ export interface GMKeysInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "startMinting",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "stopMintPhase",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "stopMinting",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -357,6 +404,10 @@ export interface GMKeysInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateMintedKeys",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -560,6 +611,18 @@ export interface GMKeys extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    mintPhase(overrides?: CallOverrides): Promise<[number]>;
+
+    mintTestKeys(
+      _receiver: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    mintedKeys(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     name(overrides?: CallOverrides): Promise<[string]>;
 
     nfts(
@@ -614,7 +677,15 @@ export interface GMKeys extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    startMinting(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     stopMintPhase(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    stopMinting(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -646,6 +717,11 @@ export interface GMKeys extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    updateMintedKeys(
+      _count: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -734,6 +810,18 @@ export interface GMKeys extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  mintPhase(overrides?: CallOverrides): Promise<number>;
+
+  mintTestKeys(
+    _receiver: string,
+    _identifier: string,
+    _randomnessAddress: string,
+    _count: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  mintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
+
   name(overrides?: CallOverrides): Promise<string>;
 
   nfts(
@@ -785,7 +873,15 @@ export interface GMKeys extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  startMinting(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   stopMintPhase(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  stopMinting(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -814,6 +910,11 @@ export interface GMKeys extends BaseContract {
 
   transferOwnership(
     newOwner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  updateMintedKeys(
+    _count: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -898,6 +999,18 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    mintPhase(overrides?: CallOverrides): Promise<number>;
+
+    mintTestKeys(
+      _receiver: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    mintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
+
     name(overrides?: CallOverrides): Promise<string>;
 
     nfts(
@@ -947,7 +1060,11 @@ export interface GMKeys extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    startMinting(overrides?: CallOverrides): Promise<void>;
+
     stopMintPhase(overrides?: CallOverrides): Promise<void>;
+
+    stopMinting(overrides?: CallOverrides): Promise<void>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -974,6 +1091,11 @@ export interface GMKeys extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    updateMintedKeys(
+      _count: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1111,6 +1233,18 @@ export interface GMKeys extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    mintPhase(overrides?: CallOverrides): Promise<BigNumber>;
+
+    mintTestKeys(
+      _receiver: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    mintedKeys(overrides?: CallOverrides): Promise<BigNumber>;
+
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     nfts(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -1152,7 +1286,15 @@ export interface GMKeys extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    startMinting(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     stopMintPhase(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    stopMinting(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1184,6 +1326,11 @@ export interface GMKeys extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    updateMintedKeys(
+      _count: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1270,6 +1417,18 @@ export interface GMKeys extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    mintPhase(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    mintTestKeys(
+      _receiver: string,
+      _identifier: string,
+      _randomnessAddress: string,
+      _count: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mintedKeys(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     nfts(
@@ -1314,7 +1473,15 @@ export interface GMKeys extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    startMinting(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     stopMintPhase(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    stopMinting(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1346,6 +1513,11 @@ export interface GMKeys extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    updateMintedKeys(
+      _count: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

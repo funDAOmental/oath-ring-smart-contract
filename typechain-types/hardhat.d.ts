@@ -92,6 +92,22 @@ declare module "hardhat/types/runtime" {
       name: "Randomness",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Randomness__factory>;
+    getContractFactory(
+      name: "EthLibrary",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.EthLibrary__factory>;
+    getContractFactory(
+      name: "EthService",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.EthService__factory>;
+    getContractFactory(
+      name: "MintLibrary",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MintLibrary__factory>;
+    getContractFactory(
+      name: "MintService",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MintService__factory>;
 
     getContractAt(
       name: "ChainlinkClient",
@@ -193,6 +209,26 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Randomness>;
+    getContractAt(
+      name: "EthLibrary",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.EthLibrary>;
+    getContractAt(
+      name: "EthService",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.EthService>;
+    getContractAt(
+      name: "MintLibrary",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MintLibrary>;
+    getContractAt(
+      name: "MintService",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MintService>;
 
     // default types
     getContractFactory(
