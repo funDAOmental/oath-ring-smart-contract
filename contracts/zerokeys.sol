@@ -8,13 +8,12 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 import 'hardhat/console.sol';
 
-import './interfaces/randomess.inteface.sol';
 import './services/eth.service.sol';
 import './services/mint.service.sol';
 
 import './libraries/helper.library.sol';
 
-contract GMKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
+contract ZEROKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	event MintKeys(address indexed _receiver, uint256 _count);
 	event TransferKeys(address indexed _receiver, uint256 _count);
 
@@ -28,26 +27,18 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 		uint256 number;
 		uint128 seed;
 		uint8 epoch;
-		uint8 epochType; // 1, 2, 3, 4, 5, 6, 7
+		uint8 epochType; // 0
 		uint256 randomNumber;
 		uint256 timestamp;
-	}
-
-	struct AddressStruct {
-		address currentAddress;
-		uint128 currentUnit;
-		bool exists;
 	}
 
 	uint256 private vMAXSUPPLY = 30000; // max gmkey supply
 	uint256 private totalKeys = 0; // total number of keys available
 
-	mapping(string => AddressStruct) public addresses;
-
 	Counters.Counter private nftCount;
 	NftStruct[] public nfts;
 
-	constructor(string memory _baseTokenURI, uint256 _price) ERC721('GMKeys by funDAOmental', 'GMKEYS') {
+	constructor(string memory _baseTokenURI, uint256 _price) ERC721('ZEROKeys by funDAOmental', 'ZEROKEYS') {
 		baseTokenURI = _baseTokenURI;
 		price = _price;
 	}
@@ -103,104 +94,30 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 		super.stopMinting();
 	}
 
-	/*
-	 * @functionName getOneTicket
-	 * @functionDescription get randomness ticket count
-	 */
-	function getOneTicket(address _randomnessAddress, string memory _identifier)
-		public
-		view
-		returns (
-			uint8,
-			uint8,
-			uint256
-		)
-	{
-		uint8 epoch;
-		uint8 ticket;
-		uint256 randomNumber;
-		(epoch, ticket, randomNumber) = IRandomness(_randomnessAddress).getOneTicket(_identifier);
-		return (epoch, ticket, randomNumber);
-	}
-
-	// ADDRESS FUNCTION ===========================================================================================
-	// add validation that user/wallet address can only mint max 20 gmkeys (based on maxUnit)
-	// ERROR MSG:
-	// PAE: address already exists
-
-	/*
-	 * @functionName addAddress
-	 * @functionDescription add address of nft owner
-	 */
-	function addAddress(
-		address _receiver, // user/wallet address
-		string memory _identifier, // user identifier
-		uint8 _count // number of keys to mint
-	) internal {
-		require(!addresses[_identifier].exists, 'AAE');
-
-		AddressStruct storage address1 = addresses[_identifier];
-		address1.currentAddress = _receiver;
-		address1.currentUnit = _count;
-		address1.exists = true;
-	}
-
-	/*
-	 * @functionName getOneAddress
-	 * @functionDescription get address information
-	 */
-	function getOneAddress(string memory _identifier) public view returns (AddressStruct memory) {
-		return addresses[_identifier];
-	}
-
 	// BLOCKCHAIN FUNCTION ==========================================================================================
 	// blockchain mint and burn
 	// ERROR MSG:
 	// MPS: minting phase stop
 	// NEC: not enough coins
 	// TID: token id dosent exists
-	// AMM: max user/address max gmkeys has been mint
-	// NYR: user/address not yet registered
 	// MSR: max supply of gmkeys reach
 	// IGO: invalid gmkey owner
 
 	function mintTestKeys(
 		address _receiver, // user/wallet address to recieve NFT
-		string memory _identifier, // user identifier
-		address _randomnessAddress, // randomness contract address
 		uint8 _count // number of keys to mint
 	) public payable {
 		require(super.isMintingStart(), 'MPS');
 		require(msg.value >= price * _count, 'NEC');
 		require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
-		console.log(_randomnessAddress, '<RANDOM ADDRESS');
-		uint8 epochTest = 1;
-		uint8 ticketTest = 5;
-		uint256 randomNumberTest = 67868570531905125450905257968959569476979017743827885017162909765141947220651; // should mock chain.link data
-
-		AddressStruct storage address1 = addresses[_identifier];
-		if (address1.exists) {
-			require(ticketTest >= (address1.currentUnit + _count), 'AMM');
-			address1.currentUnit += _count;
-		} else {
-			require(ticketTest >= _count, 'AMM');
-			addAddress(_receiver, _identifier, _count);
-		}
+		uint256 randomNumberTest = HelperLibrary.getRandomNumber();
 
 		uint8 j = 1;
 		for (j; j <= _count; j++) {
 			uint128 runningSeed = HelperLibrary.getSeed(randomNumberTest + nftCount.current());
 			nfts.push(
-				NftStruct(
-					payable(_receiver),
-					nftCount.current(),
-					runningSeed,
-					epochTest,
-					HelperLibrary.getEpochType(runningSeed, epochTest),
-					randomNumberTest,
-					block.timestamp
-				)
+				NftStruct(payable(_receiver), nftCount.current(), runningSeed, 0, 0, randomNumberTest, block.timestamp)
 			);
 			_safeMint(payable(_receiver), nftCount.current());
 
@@ -217,44 +134,18 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	 */
 	function mintKeys(
 		address _receiver, // user/wallet address to recieve NFT
-		string memory _identifier, // user identifier
-		address _randomnessAddress, // randomness contract address
 		uint8 _count // number of keys to mint
 	) public payable {
 		require(super.isMintingStart(), 'MPS');
 		require(msg.value >= price * _count, 'NEC');
 		require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
-		uint8 epoch;
-		uint8 ticket;
-		uint256 randomNumber;
-		(epoch, ticket, randomNumber) = getOneTicket(_randomnessAddress, _identifier);
-
-		require(ticket >= 1, 'NYR');
-
-		AddressStruct storage address1 = addresses[_identifier];
-		if (address1.exists) {
-			require(ticket >= (address1.currentUnit + _count), 'AMM');
-			address1.currentUnit += _count;
-		} else {
-			require(ticket >= _count, 'AMM');
-			addAddress(_receiver, _identifier, _count);
-		}
+		uint256 randomNumber = HelperLibrary.getRandomNumber();
 
 		uint8 j = 1;
 		for (j; j <= _count; j++) {
 			uint128 runningSeed = HelperLibrary.getSeed(randomNumber + nftCount.current());
-			nfts.push(
-				NftStruct(
-					payable(_receiver),
-					nftCount.current(),
-					runningSeed,
-					epoch,
-					HelperLibrary.getEpochType(runningSeed, epoch),
-					randomNumber,
-					block.timestamp
-				)
-			);
+			nfts.push(NftStruct(payable(_receiver), nftCount.current(), runningSeed, 0, 0, randomNumber, block.timestamp));
 			_safeMint(payable(_receiver), nftCount.current());
 
 			nftCount.increment();

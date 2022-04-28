@@ -9,3 +9,5 @@ import type * as randomnessSol from "./randomness.sol";
 export type { randomnessSol };
 import type * as services from "./services";
 export type { services };
+import type * as zerokeysSol from "./zerokeys.sol";
+export type { zerokeysSol };

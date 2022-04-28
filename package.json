@@ -9,8 +9,11 @@
 	"license": "MIT",
 	"scripts": {
 		"deploy:gmkeys:rinkeby": "npx hardhat run scripts/deploy-gmkeys.ts --network rinkeby",
+		"deploy:zerokeys:rinkeby": "npx hardhat run scripts/deploy-zerokeys.ts --network rinkeby",
 		"deploy:randomness:rinkeby": "npx hardhat run scripts/deploy-randomness.ts --network rinkeby",
+		"test": "npx hardhat test",
 		"test:gmkeys": "npx hardhat test test/gmkeys",
+		"test:zerokeys": "npx hardhat test test/zerokeys",
 		"test:randomness": "npx hardhat test test/randomness",
 		"lint": "tslint -c ./tslint.json './scripts/**/*.ts'",
 		"sollint": "solhint './contracts/**/*.sol'",

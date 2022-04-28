@@ -52,3 +52,5 @@ export type { EthService } from "./contracts/services/eth.service.sol/EthService
 export { EthService__factory } from "./factories/contracts/services/eth.service.sol/EthService__factory";
 export type { MintService } from "./contracts/services/mint.service.sol/MintService";
 export { MintService__factory } from "./factories/contracts/services/mint.service.sol/MintService__factory";
+export type { ZEROKeys } from "./contracts/zerokeys.sol/ZEROKeys";
+export { ZEROKeys__factory } from "./factories/contracts/zerokeys.sol/ZEROKeys__factory";

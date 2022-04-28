@@ -3,6 +3,10 @@
 pragma solidity ^0.8.11;
 
 library HelperLibrary {
+	function getRandomNumber() internal view returns (uint256) {
+		return uint256(keccak256(abi.encodePacked(block.timestamp)));
+	}
+
 	function getTickets(uint128 _probability, uint256 _chance) internal pure returns (uint8) {
 		uint8 ticketValue = uint8((_probability * _chance) / 1000);
 		if (ticketValue > 10) {

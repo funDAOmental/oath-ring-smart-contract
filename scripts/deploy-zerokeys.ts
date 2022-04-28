@@ -9,22 +9,22 @@ async function main() {
 	// await hre.run('compile');
 
 	const [deployer] = await ethers.getSigners(); // get the account to deploy the contract
-	console.log('deploying gmkeys contract with the account:', deployer.address);
+	console.log('deploying zerokeys contract with the account:', deployer.address);
 	console.log('account balance:', (await deployer.getBalance()).toString());
 
 	const baseTokenURI: string = 'https://www.nftxt.xyz/metadata?id=';
 
-	const GMKeys = await ethers.getContractFactory('GMKeys');
-	const gmkeys = await GMKeys.deploy(baseTokenURI, ethers.utils.parseEther('0.1'));
+	const ZEROKeys = await ethers.getContractFactory('ZEROKeys');
+	const zerokeys = await ZEROKeys.deploy(baseTokenURI, ethers.utils.parseEther('0.1'));
 
-	await gmkeys.deployed();
+	await zerokeys.deployed();
 
-	console.log('gmkeys contract deployed to:', gmkeys.address);
+	console.log('zerokeys contract deployed to:', zerokeys.address);
 }
 
 main()
 	.then(() => process.exit(0))
 	.catch((error) => {
-		console.error('gmkeys deployment error:', error);
+		console.error('zerokeys deployment error:', error);
 		process.exit(1);
 	});

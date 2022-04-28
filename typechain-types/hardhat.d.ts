@@ -100,6 +100,10 @@ declare module "hardhat/types/runtime" {
       name: "MintService",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MintService__factory>;
+    getContractFactory(
+      name: "ZEROKeys",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ZEROKeys__factory>;
 
     getContractAt(
       name: "ChainlinkClient",
@@ -211,6 +215,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.MintService>;
+    getContractAt(
+      name: "ZEROKeys",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ZEROKeys>;
 
     // default types
     getContractFactory(
