@@ -68,7 +68,6 @@ export interface RandomnessInterface extends utils.Interface {
     "stopMinting()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "unlockNft(string,uint8)": FunctionFragment;
-    "unlockTestNft(string,uint8)": FunctionFragment;
     "updateMintedKeys(uint8)": FunctionFragment;
     "withdrawLinkBalance()": FunctionFragment;
   };
@@ -99,7 +98,6 @@ export interface RandomnessInterface extends utils.Interface {
       | "stopMinting"
       | "transferOwnership"
       | "unlockNft"
-      | "unlockTestNft"
       | "updateMintedKeys"
       | "withdrawLinkBalance"
   ): FunctionFragment;
@@ -189,10 +187,6 @@ export interface RandomnessInterface extends utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "unlockTestNft",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "updateMintedKeys",
     values: [BigNumberish]
   ): string;
@@ -276,10 +270,6 @@ export interface RandomnessInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unlockNft", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "unlockTestNft",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "updateMintedKeys",
     data: BytesLike
@@ -464,12 +454,6 @@ export interface Randomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    unlockTestNft(
-      _identifier: string,
-      _epoch: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     updateMintedKeys(
       _count: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -557,12 +541,6 @@ export interface Randomness extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  unlockTestNft(
-    _identifier: string,
-    _epoch: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   updateMintedKeys(
     _count: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -637,12 +615,6 @@ export interface Randomness extends BaseContract {
     ): Promise<void>;
 
     unlockNft(
-      _identifier: string,
-      _epoch: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    unlockTestNft(
       _identifier: string,
       _epoch: BigNumberish,
       overrides?: CallOverrides
@@ -767,12 +739,6 @@ export interface Randomness extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    unlockTestNft(
-      _identifier: string,
-      _epoch: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     updateMintedKeys(
       _count: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -860,12 +826,6 @@ export interface Randomness extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     unlockNft(
-      _identifier: string,
-      _epoch: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    unlockTestNft(
       _identifier: string,
       _epoch: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }

@@ -65,39 +65,39 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable, MintService {
 		fee = _fee;
 	}
 
-	function getTestRandomNumber(string memory _identifier, uint8 _epoch) internal {
-		bytes32 requestIdTest = '0x5553455231';
-		uint256 randomnessTest = 67868570531905125450905257968959569476979017743827885017162909765141947220651; // should mock chain.link data
+	// function getTestRandomNumber(string memory _identifier, uint8 _epoch) internal {
+	// 	bytes32 requestIdTest = '0x5553455231';
+	// 	uint256 randomnessTest = 67868570531905125450905257968959569476979017743827885017162909765141947220651; // should mock chain.link data
 
-		nftKeys[requestIdTest] = _identifier;
-		KeyStruct storage uniqkey = uniqKeys[_identifier];
-		uniqkey.epoch = _epoch;
-		uniqkey.exists = true;
+	// 	nftKeys[requestIdTest] = _identifier;
+	// 	KeyStruct storage uniqkey = uniqKeys[_identifier];
+	// 	uniqkey.epoch = _epoch;
+	// 	uniqkey.exists = true;
 
-		uint256 chance = (randomnessTest % 100) + 1;
+	// 	uint256 chance = (randomnessTest % 100) + 1;
 
-		uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
-		uint128 probability = uint128(((totalTickets - super.getMintedKeys()) * 100) / (timeRemaining / 60));
-		if (_epoch == 7) {
-			probability = 101;
-		}
+	// 	uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
+	// 	uint128 probability = uint128(((totalTickets - super.getMintedKeys()) * 100) / (timeRemaining / 60));
+	// 	if (_epoch == 7) {
+	// 		probability = 101;
+	// 	}
 
-		uint8 tickets = HelperLibrary.getTickets(probability, chance);
-		if (_epoch == 7 && tickets == 0) {
-			tickets = 1;
-		}
+	// 	uint8 tickets = HelperLibrary.getTickets(probability, chance);
+	// 	if (_epoch == 7 && tickets == 0) {
+	// 		tickets = 1;
+	// 	}
 
-		super.updateMintedKeys(tickets);
+	// 	super.updateMintedKeys(tickets);
 
-		NftStruct storage nft = nfts[nftKeys[requestIdTest]];
-		nft.epoch = uniqKeys[nftKeys[requestIdTest]].epoch;
-		nft.tickets = tickets;
-		nft.randomNumber = randomnessTest;
-		nft.timestamp = block.timestamp;
+	// 	NftStruct storage nft = nfts[nftKeys[requestIdTest]];
+	// 	nft.epoch = uniqKeys[nftKeys[requestIdTest]].epoch;
+	// 	nft.tickets = tickets;
+	// 	nft.randomNumber = randomnessTest;
+	// 	nft.timestamp = block.timestamp;
 
-		nftCount.increment();
-		emit GenerateRndomNumber(randomnessTest);
-	}
+	// 	nftCount.increment();
+	// 	emit GenerateRndomNumber(randomnessTest);
+	// }
 
 	function getRandomNumber(string memory _identifier, uint8 _epoch) internal {
 		bytes32 requestId = requestRandomness(keyHash, fee);
@@ -208,10 +208,14 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable, MintService {
 	 * @functionDescription get winning percentage
 	 */
 	function getWinningPercentage() public view returns (uint128) {
+		uint128 probability = 0;
 		uint256 timeRemaining = uint256(mintStartTime - block.timestamp);
-		uint128 probability = uint128(((totalTickets - super.getMintedKeys()) * 100) / (timeRemaining / 60));
-		if (activeEpoch == 7) {
-			probability = 101;
+
+		if (timeRemaining >= 1) {
+			probability = uint128(((totalTickets - super.getMintedKeys()) * 100) / (timeRemaining / 60));
+			if (activeEpoch == 7) {
+				probability = 101;
+			}
 		}
 
 		return probability;
@@ -271,15 +275,15 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable, MintService {
 	 * @functionName unlockTestNft
 	 * @functionDescription run the test random number generator
 	 */
-	function unlockTestNft(string memory _identifier, uint8 _epoch) public {
-		require(mintPhase == 1, 'MPS');
-		require(!uniqKeys[_identifier].exists, 'KAE');
-		require(mintStartTime >= block.timestamp, 'MPE');
-		require(totalTickets >= super.getMintedKeys(), 'MTU');
-		require(activeEpoch >= _epoch, 'IAE');
+	// function unlockTestNft(string memory _identifier, uint8 _epoch) public {
+	// 	require(mintPhase == 1, 'MPS');
+	// 	require(!uniqKeys[_identifier].exists, 'KAE');
+	// 	require(mintStartTime >= block.timestamp, 'MPE');
+	// 	require(totalTickets >= super.getMintedKeys(), 'MTU');
+	// 	require(activeEpoch >= _epoch, 'IAE');
 
-		getTestRandomNumber(_identifier, _epoch);
-	}
+	// 	getTestRandomNumber(_identifier, _epoch);
+	// }
 
 	/*
 	 * @functionName getNftCount

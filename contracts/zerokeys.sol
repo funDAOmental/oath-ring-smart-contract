@@ -46,7 +46,7 @@ contract ZEROKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	// OVERIDE FUNCTION ===========================================================================================
 	/*
 	 * @overrideName _baseURI
-	 * @overrideDescription overide base token URI format (https://www.nftxt.xyz/metadata?id=)
+	 * @overrideDescription overide base token URI format (https://www.nftxt.xyz/api/metadata?id=)
 	 */
 	function _baseURI() internal view override returns (string memory) {
 		return baseTokenURI;
@@ -103,30 +103,30 @@ contract ZEROKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	// MSR: max supply of gmkeys reach
 	// IGO: invalid gmkey owner
 
-	function mintTestKeys(
-		address _receiver, // user/wallet address to recieve NFT
-		uint8 _count // number of keys to mint
-	) public payable {
-		require(super.isMintingStart(), 'MPS');
-		require(msg.value >= price * _count, 'NEC');
-		require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
+	// function mintTestKeys(
+	// 	address _receiver, // user/wallet address to recieve NFT
+	// 	uint8 _count // number of keys to mint
+	// ) public payable {
+	// 	require(super.isMintingStart(), 'MPS');
+	// 	require(msg.value >= price * _count, 'NEC');
+	// 	require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
-		uint256 randomNumberTest = HelperLibrary.getRandomNumber();
+	// 	uint256 randomNumberTest = HelperLibrary.getRandomNumber();
 
-		uint8 j = 1;
-		for (j; j <= _count; j++) {
-			uint128 runningSeed = HelperLibrary.getSeed(randomNumberTest + nftCount.current());
-			nfts.push(
-				NftStruct(payable(_receiver), nftCount.current(), runningSeed, 0, 0, randomNumberTest, block.timestamp)
-			);
-			_safeMint(payable(_receiver), nftCount.current());
+	// 	uint8 j = 1;
+	// 	for (j; j <= _count; j++) {
+	// 		uint128 runningSeed = HelperLibrary.getSeed(randomNumberTest + nftCount.current());
+	// 		nfts.push(
+	// 			NftStruct(payable(_receiver), nftCount.current(), runningSeed, 0, 0, randomNumberTest, block.timestamp)
+	// 		);
+	// 		_safeMint(payable(_receiver), nftCount.current());
 
-			nftCount.increment();
-		}
+	// 		nftCount.increment();
+	// 	}
 
-		super.updateMintedKeys(_count);
-		emit MintKeys(_receiver, _count);
-	}
+	// 	super.updateMintedKeys(_count);
+	// 	emit MintKeys(_receiver, _count);
+	// }
 
 	/*
 	 * @functionName mintKeys

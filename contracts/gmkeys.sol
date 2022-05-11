@@ -55,7 +55,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	// OVERIDE FUNCTION ===========================================================================================
 	/*
 	 * @overrideName _baseURI
-	 * @overrideDescription overide base token URI format (https://www.nftxt.xyz/metadata?id=)
+	 * @overrideDescription overide base token URI format (https://www.nftxt.xyz/api/metadata?id=)
 	 */
 	function _baseURI() internal view override returns (string memory) {
 		return baseTokenURI;
@@ -164,52 +164,52 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	// MSR: max supply of gmkeys reach
 	// IGO: invalid gmkey owner
 
-	function mintTestKeys(
-		address _receiver, // user/wallet address to recieve NFT
-		string memory _identifier, // user identifier
-		address _randomnessAddress, // randomness contract address
-		uint8 _count // number of keys to mint
-	) public payable {
-		require(super.isMintingStart(), 'MPS');
-		require(msg.value >= price * _count, 'NEC');
-		require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
+	// function mintTestKeys(
+	// 	address _receiver, // user/wallet address to recieve NFT
+	// 	string memory _identifier, // user identifier
+	// 	address _randomnessAddress, // randomness contract address
+	// 	uint8 _count // number of keys to mint
+	// ) public payable {
+	// 	require(super.isMintingStart(), 'MPS');
+	// 	require(msg.value >= price * _count, 'NEC');
+	// 	require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
-		console.log(_randomnessAddress, '<RANDOM ADDRESS');
-		uint8 epochTest = 1;
-		uint8 ticketTest = 5;
-		uint256 randomNumberTest = 67868570531905125450905257968959569476979017743827885017162909765141947220651; // should mock chain.link data
+	// 	console.log(_randomnessAddress, '<RANDOM ADDRESS');
+	// 	uint8 epochTest = 1;
+	// 	uint8 ticketTest = 5;
+	// 	uint256 randomNumberTest = 67868570531905125450905257968959569476979017743827885017162909765141947220651; // should mock chain.link data
 
-		AddressStruct storage address1 = addresses[_identifier];
-		if (address1.exists) {
-			require(ticketTest >= (address1.currentUnit + _count), 'AMM');
-			address1.currentUnit += _count;
-		} else {
-			require(ticketTest >= _count, 'AMM');
-			addAddress(_receiver, _identifier, _count);
-		}
+	// 	AddressStruct storage address1 = addresses[_identifier];
+	// 	if (address1.exists) {
+	// 		require(ticketTest >= (address1.currentUnit + _count), 'AMM');
+	// 		address1.currentUnit += _count;
+	// 	} else {
+	// 		require(ticketTest >= _count, 'AMM');
+	// 		addAddress(_receiver, _identifier, _count);
+	// 	}
 
-		uint8 j = 1;
-		for (j; j <= _count; j++) {
-			uint128 runningSeed = HelperLibrary.getSeed(randomNumberTest + nftCount.current());
-			nfts.push(
-				NftStruct(
-					payable(_receiver),
-					nftCount.current(),
-					runningSeed,
-					epochTest,
-					HelperLibrary.getEpochType(runningSeed, epochTest),
-					randomNumberTest,
-					block.timestamp
-				)
-			);
-			_safeMint(payable(_receiver), nftCount.current());
+	// 	uint8 j = 1;
+	// 	for (j; j <= _count; j++) {
+	// 		uint128 runningSeed = HelperLibrary.getSeed(randomNumberTest + nftCount.current());
+	// 		nfts.push(
+	// 			NftStruct(
+	// 				payable(_receiver),
+	// 				nftCount.current(),
+	// 				runningSeed,
+	// 				epochTest,
+	// 				HelperLibrary.getEpochType(runningSeed, epochTest),
+	// 				randomNumberTest,
+	// 				block.timestamp
+	// 			)
+	// 		);
+	// 		_safeMint(payable(_receiver), nftCount.current());
 
-			nftCount.increment();
-		}
+	// 		nftCount.increment();
+	// 	}
 
-		super.updateMintedKeys(_count);
-		emit MintKeys(_receiver, _count);
-	}
+	// 	super.updateMintedKeys(_count);
+	// 	emit MintKeys(_receiver, _count);
+	// }
 
 	/*
 	 * @functionName mintKeys

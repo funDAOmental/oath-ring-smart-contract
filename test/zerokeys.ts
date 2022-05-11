@@ -5,7 +5,6 @@ describe.only('zerokeys', async () => {
 	let ZEROKeys: any;
 	let zerokeys: any;
 
-	const ownerAddress: string = '0x924634D6964E171498f2a292185b1554893D95E5';
 	const baseTokenURI: string = 'https://www.jnpl.me/metadata?id=';
 
 	const receiver1: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0';

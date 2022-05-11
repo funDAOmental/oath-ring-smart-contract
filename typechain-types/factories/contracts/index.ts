@@ -3,6 +3,7 @@
 /* eslint-disable */
 export * as gmkeysSol from "./gmkeys.sol";
 export * as interfaces from "./interfaces";
+export * as presaleSol from "./presale.sol";
 export * as randomnessSol from "./randomness.sol";
 export * as services from "./services";
 export * as zerokeysSol from "./zerokeys.sol";
