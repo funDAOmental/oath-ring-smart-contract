@@ -29,10 +29,10 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable, MintService {
 		uint256 timestamp;
 	}
 
-	uint256 private vEPOCHENDTIME = 240660; // 4011 min
-	uint256 private vLASTEPOCHENDTIME = 356040; // 5934 min
-	// uint256 private vEPOCHTICKET = 4011; // max 24066
-	// uint256 private vLASTEPOCHTICKET = 5934; // max 30000
+	uint256 private constant EPOCHENDTIME = 240660; // 4011 min
+	uint256 private constant LASTEPOCHENDTIME = 356040; // 5934 min
+	// uint256 private constant EPOCHTICKET = 4011; // max 24066
+	// uint256 private constant LASTEPOCHTICKET = 5934; // max 30000
 
 	uint8 private activeEpoch = 0; // active epoch
 	uint256 private totalTickets = 4011; // updated tickets on epoch
@@ -165,9 +165,9 @@ contract Randomness is ChainlinkClient, VRFConsumerBase, Ownable, MintService {
 		activeEpoch = _epoch;
 		totalTickets = _totalTickets;
 		if (_epoch == 7) {
-			mintStartTime = block.timestamp + vLASTEPOCHENDTIME;
+			mintStartTime = block.timestamp + LASTEPOCHENDTIME;
 		} else {
-			mintStartTime = block.timestamp + vEPOCHENDTIME;
+			mintStartTime = block.timestamp + EPOCHENDTIME;
 		}
 	}
 

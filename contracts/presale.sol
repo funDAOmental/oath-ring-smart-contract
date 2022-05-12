@@ -54,10 +54,10 @@ contract PreSale is ERC1155, Ownable, EthService {
 	// NEC: not enough coins
 
 	/*
-	 * @functionName mintPreSale
-	 * @functionDescription mint access pass
+	 * @functionName transferPreSale
+	 * @functionDescription transfer access pass
 	 */
-	function mintPreSale(
+	function transferPreSale(
 		address _owner, // user/wallet address of NFT owner
 		address _receiver, // user/wallet address to recieve NFT
 		uint8 _count // number of keys to mint

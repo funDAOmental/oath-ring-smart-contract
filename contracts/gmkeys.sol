@@ -39,7 +39,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 		bool exists;
 	}
 
-	uint256 private vMAXSUPPLY = 30000; // max gmkey supply
+	uint256 private constant MAXSUPPLY = 30000; // max gmkey supply
 	uint256 private totalKeys = 0; // total number of keys available
 
 	mapping(string => AddressStruct) public addresses;
@@ -172,7 +172,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	// ) public payable {
 	// 	require(super.isMintingStart(), 'MPS');
 	// 	require(msg.value >= price * _count, 'NEC');
-	// 	require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
+	// 	require(MAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
 	// 	console.log(_randomnessAddress, '<RANDOM ADDRESS');
 	// 	uint8 epochTest = 1;
@@ -223,7 +223,7 @@ contract GMKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	) public payable {
 		require(super.isMintingStart(), 'MPS');
 		require(msg.value >= price * _count, 'NEC');
-		require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
+		require(MAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
 		uint8 epoch;
 		uint8 ticket;

@@ -61,7 +61,6 @@ export interface PreSaleInterface extends utils.Interface {
     "getEthBalance()": FunctionFragment;
     "getPrice()": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "mintPreSale(address,address,uint8)": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
@@ -69,6 +68,7 @@ export interface PreSaleInterface extends utils.Interface {
     "setApprovalForAll(address,bool)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
+    "transferPreSale(address,address,uint8)": FunctionFragment;
     "uri(uint256)": FunctionFragment;
     "withdrawEthBalance()": FunctionFragment;
   };
@@ -83,7 +83,6 @@ export interface PreSaleInterface extends utils.Interface {
       | "getEthBalance"
       | "getPrice"
       | "isApprovedForAll"
-      | "mintPreSale"
       | "owner"
       | "renounceOwnership"
       | "safeBatchTransferFrom"
@@ -91,6 +90,7 @@ export interface PreSaleInterface extends utils.Interface {
       | "setApprovalForAll"
       | "supportsInterface"
       | "transferOwnership"
+      | "transferPreSale"
       | "uri"
       | "withdrawEthBalance"
   ): FunctionFragment;
@@ -124,10 +124,6 @@ export interface PreSaleInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "mintPreSale",
-    values: [string, string, BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -152,6 +148,10 @@ export interface PreSaleInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transferPreSale",
+    values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
   encodeFunctionData(
@@ -179,10 +179,6 @@ export interface PreSaleInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "mintPreSale",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
@@ -206,6 +202,10 @@ export interface PreSaleInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferPreSale",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
@@ -371,13 +371,6 @@ export interface PreSale extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    mintPreSale(
-      _owner: string,
-      _receiver: string,
-      _count: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     owner(overrides?: CallOverrides): Promise<[string]>;
 
     renounceOwnership(
@@ -416,6 +409,13 @@ export interface PreSale extends BaseContract {
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    transferPreSale(
+      _owner: string,
+      _receiver: string,
+      _count: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
@@ -467,13 +467,6 @@ export interface PreSale extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  mintPreSale(
-    _owner: string,
-    _receiver: string,
-    _count: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   owner(overrides?: CallOverrides): Promise<string>;
 
   renounceOwnership(
@@ -512,6 +505,13 @@ export interface PreSale extends BaseContract {
   transferOwnership(
     newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  transferPreSale(
+    _owner: string,
+    _receiver: string,
+    _count: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
@@ -563,13 +563,6 @@ export interface PreSale extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    mintPreSale(
-      _owner: string,
-      _receiver: string,
-      _count: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     owner(overrides?: CallOverrides): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
@@ -605,6 +598,13 @@ export interface PreSale extends BaseContract {
 
     transferOwnership(
       newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    transferPreSale(
+      _owner: string,
+      _receiver: string,
+      _count: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -715,13 +715,6 @@ export interface PreSale extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    mintPreSale(
-      _owner: string,
-      _receiver: string,
-      _count: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceOwnership(
@@ -760,6 +753,13 @@ export interface PreSale extends BaseContract {
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    transferPreSale(
+      _owner: string,
+      _receiver: string,
+      _count: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     uri(_tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
@@ -804,13 +804,6 @@ export interface PreSale extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    mintPreSale(
-      _owner: string,
-      _receiver: string,
-      _count: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     renounceOwnership(
@@ -849,6 +842,13 @@ export interface PreSale extends BaseContract {
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    transferPreSale(
+      _owner: string,
+      _receiver: string,
+      _count: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     uri(

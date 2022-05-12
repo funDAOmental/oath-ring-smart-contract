@@ -42,7 +42,7 @@ describe.only('zerokeys', async () => {
 
 	it('should reject generate zerokeys (minting phase stop)', async () => {
 		await expect(
-			zerokeys.mintTestKeys(receiver1, 1, {
+			zerokeys.mintKeys(receiver1, 1, {
 				value: ethers.utils.parseEther('0.1'),
 			})
 		).to.be.revertedWith('MPS');
@@ -51,7 +51,7 @@ describe.only('zerokeys', async () => {
 	it('should generate zerokeys (1)', async () => {
 		await zerokeys.startMintPhase(1111);
 
-		const blockChain = await zerokeys.mintTestKeys(receiver1, 1, {
+		const blockChain = await zerokeys.mintKeys(receiver1, 1, {
 			value: ethers.utils.parseEther('0.1'),
 		});
 		const blockChainWait = await blockChain.wait();
@@ -70,7 +70,7 @@ describe.only('zerokeys', async () => {
 
 	it('should reject the zerokeys (not enough coins)', async () => {
 		await expect(
-			zerokeys.mintTestKeys(receiver1, 1, {
+			zerokeys.mintKeys(receiver1, 1, {
 				value: ethers.utils.parseEther('0.01'),
 			})
 		).to.be.revertedWith('NEC');
@@ -93,7 +93,7 @@ describe.only('zerokeys', async () => {
 	});
 
 	it('should generate zerokeys new reciever1 (4)', async () => {
-		const blockChain = await zerokeys.mintTestKeys(receiver1, 4, {
+		const blockChain = await zerokeys.mintKeys(receiver1, 4, {
 			value: ethers.utils.parseEther('0.4'),
 		});
 		await blockChain.wait();
@@ -101,7 +101,7 @@ describe.only('zerokeys', async () => {
 	});
 
 	it('should generate zerokeys new reciever2 (3)', async () => {
-		const blockChain = await zerokeys.mintTestKeys(receiver2, 3, {
+		const blockChain = await zerokeys.mintKeys(receiver2, 3, {
 			value: ethers.utils.parseEther('0.3'),
 		});
 		await blockChain.wait();

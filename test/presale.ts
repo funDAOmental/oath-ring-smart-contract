@@ -29,7 +29,7 @@ describe.only('presale', async () => {
 	});
 
 	it('should generate presale (1)', async () => {
-		const blockChain = await presale.mintPreSale(owner, receiver1, 5, {
+		const blockChain = await presale.transferPreSale(owner, receiver1, 5, {
 			value: ethers.utils.parseEther('0.5'),
 		});
 		const blockChainWait = await blockChain.wait();
@@ -44,14 +44,14 @@ describe.only('presale', async () => {
 
 	it('should reject the presale (not enough coins)', async () => {
 		await expect(
-			presale.mintPreSale(owner, receiver1, 1, {
+			presale.transferPreSale(owner, receiver1, 1, {
 				value: ethers.utils.parseEther('0.01'),
 			})
 		).to.be.revertedWith('NEC');
 	});
 
 	it('should generate presale (2)', async () => {
-		const blockChain = await presale.mintPreSale(owner, receiver2, 5, {
+		const blockChain = await presale.transferPreSale(owner, receiver2, 5, {
 			value: ethers.utils.parseEther('0.5'),
 		});
 		const blockChainWait = await blockChain.wait();

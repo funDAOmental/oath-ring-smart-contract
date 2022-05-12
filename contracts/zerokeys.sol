@@ -32,7 +32,7 @@ contract ZEROKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 		uint256 timestamp;
 	}
 
-	uint256 private vMAXSUPPLY = 30000; // max gmkey supply
+	uint256 private constant MAXSUPPLY = 30000; // max zerokey supply
 	uint256 private totalKeys = 0; // total number of keys available
 
 	Counters.Counter private nftCount;
@@ -100,37 +100,12 @@ contract ZEROKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	// MPS: minting phase stop
 	// NEC: not enough coins
 	// TID: token id dosent exists
-	// MSR: max supply of gmkeys reach
-	// IGO: invalid gmkey owner
-
-	// function mintTestKeys(
-	// 	address _receiver, // user/wallet address to recieve NFT
-	// 	uint8 _count // number of keys to mint
-	// ) public payable {
-	// 	require(super.isMintingStart(), 'MPS');
-	// 	require(msg.value >= price * _count, 'NEC');
-	// 	require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
-
-	// 	uint256 randomNumberTest = HelperLibrary.getRandomNumber();
-
-	// 	uint8 j = 1;
-	// 	for (j; j <= _count; j++) {
-	// 		uint128 runningSeed = HelperLibrary.getSeed(randomNumberTest + nftCount.current());
-	// 		nfts.push(
-	// 			NftStruct(payable(_receiver), nftCount.current(), runningSeed, 0, 0, randomNumberTest, block.timestamp)
-	// 		);
-	// 		_safeMint(payable(_receiver), nftCount.current());
-
-	// 		nftCount.increment();
-	// 	}
-
-	// 	super.updateMintedKeys(_count);
-	// 	emit MintKeys(_receiver, _count);
-	// }
+	// MSR: max supply of zerokeys reach
+	// IGO: invalid zerokey owner
 
 	/*
 	 * @functionName mintKeys
-	 * @functionDescription mint gmkeys and add it to the blockchain
+	 * @functionDescription mint zerokeys and add it to the blockchain
 	 */
 	function mintKeys(
 		address _receiver, // user/wallet address to recieve NFT
@@ -138,7 +113,7 @@ contract ZEROKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 	) public payable {
 		require(super.isMintingStart(), 'MPS');
 		require(msg.value >= price * _count, 'NEC');
-		require(vMAXSUPPLY >= nftCount.current() + _count, 'MSR');
+		require(MAXSUPPLY >= nftCount.current() + _count, 'MSR');
 
 		uint256 randomNumber = HelperLibrary.getRandomNumber();
 
@@ -157,7 +132,7 @@ contract ZEROKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 
 	/*
 	 * @functionName burnKeys
-	 * @functionDescription burn gmkeys and remove it to the blockchain
+	 * @functionDescription burn zerokeys and remove it to the blockchain
 	 */
 	function burnKeys(uint256 _tokenId) public onlyOwner {
 		require(_exists(_tokenId), 'TID');
@@ -168,7 +143,7 @@ contract ZEROKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 
 	/*
 	 * @functionName transferKeys
-	 * @functionDescription transfer gmkeys and transfer it to the blockchain
+	 * @functionDescription transfer zerokeys and transfer it to the blockchain
 	 */
 	function transferKeys(
 		address _owner, // user/wallet address of NFT owner
@@ -184,7 +159,7 @@ contract ZEROKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 
 	/*
 	 * @functionName getNftCount
-	 * @functionDescription get gmkeys count
+	 * @functionDescription get zerokeys count
 	 */
 	function getNftCount() public view returns (uint256) {
 		return nftCount.current();
@@ -192,7 +167,7 @@ contract ZEROKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 
 	/*
 	 * @functionName getAllNft
-	 * @functionDescription get all the list of minted gmkeys
+	 * @functionDescription get all the list of minted zerokeys
 	 */
 	function getAllNft() public view returns (NftStruct[] memory) {
 		return nfts;
@@ -200,7 +175,7 @@ contract ZEROKeys is ERC721, ERC721Burnable, Ownable, EthService, MintService {
 
 	/*
 	 * @functionName getOneNft
-	 * @functionDescription get gmkeys information
+	 * @functionDescription get zerokeys information
 	 */
 	function getOneNft(uint256 _tokenId) public view returns (NftStruct memory) {
 		require(_exists(_tokenId), 'TID');
