@@ -12,7 +12,6 @@ import './services/eth.service.sol';
 contract PreSale is ERC1155, Ownable, EthService {
 	event TransferKeys(address indexed _receiver, uint256 _count);
 
-	string private baseTokenURI;
 	uint256 private price;
 
 	struct AccessPassStruct {
@@ -23,13 +22,14 @@ contract PreSale is ERC1155, Ownable, EthService {
 		string image;
 	}
 
-	uint256 private constant MAXSUPPLY = 30000; // presale max supply
+	uint256 private constant MAXSUPPLY = 337; // presale max supply
 	uint256 private constant ACCESSPASS = 1;
+	string private constant ACCESSPASSURL = 'https://www.nftxt.xyz/api/accesspass?id=';
+	string private constant ACCESSPASSIMGURL = 'https://www.nftxt.xyz/accesspass?id=';
 
 	mapping(uint256 => AccessPassStruct) public accessPass;
 
-	constructor(string memory _baseTokenURI, uint256 _price) ERC1155('https://www.nftxt.xyz/api/accesspass?id={id}') {
-		baseTokenURI = _baseTokenURI;
+	constructor(uint256 _price) ERC1155('https://www.nftxt.xyz/api/accesspass?id={id}') {
 		price = _price;
 
 		_mint(msg.sender, ACCESSPASS, MAXSUPPLY, '');
@@ -39,13 +39,11 @@ contract PreSale is ERC1155, Ownable, EthService {
 		accessPass1.name = 'AccessPass';
 		accessPass1.maxSupply = MAXSUPPLY;
 		accessPass1.price = _price;
-		accessPass1.image = string(
-			abi.encodePacked('https://www.nftxt.xyz/api/imagepass?id=', Strings.toString(ACCESSPASS))
-		);
+		accessPass1.image = string(abi.encodePacked(ACCESSPASSIMGURL, Strings.toString(ACCESSPASS)));
 	}
 
 	function uri(uint256 _tokenId) public pure override returns (string memory) {
-		return string(abi.encodePacked('https://www.nftxt.xyz/api/accesspass?id=', Strings.toString(_tokenId)));
+		return string(abi.encodePacked(ACCESSPASSURL, Strings.toString(_tokenId)));
 	}
 
 	// BLOCKCHAIN FUNCTION ==========================================================================================
@@ -69,6 +67,24 @@ contract PreSale is ERC1155, Ownable, EthService {
 	}
 
 	/*
+	 * @functionName batchTransferPreSale
+	 * @functionDescription batch transfer access pass
+	 */
+	function batchTransferPreSale(
+		address _owner, // user/wallet address of NFT owner
+		address[] memory _receivers, // user/wallet address to recieve NFT
+		uint8 _count // number of keys to mint
+	) public onlyOwner {
+		uint256 receiversLen = _receivers.length;
+
+		uint256 i = 0;
+
+		for (i; i < receiversLen; i++) {
+			safeTransferFrom(_owner, _receivers[i], ACCESSPASS, _count, '');
+		}
+	}
+
+	/*
 	 * @functionName getPrice
 	 * @functionDescription get price
 	 */
@@ -80,8 +96,8 @@ contract PreSale is ERC1155, Ownable, EthService {
 	 * @functionName getBaseURI
 	 * @functionDescription get base uri
 	 */
-	function getBaseURI() public view returns (string memory) {
-		return baseTokenURI;
+	function getBaseURI() public pure returns (string memory) {
+		return ACCESSPASSURL;
 	}
 
 	/*

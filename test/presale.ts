@@ -5,30 +5,41 @@ describe.only('presale', async () => {
 	let PreSale: any;
 	let presale: any;
 
-	const baseTokenURI: string = 'https://www.jnpl.me/metadata?id=';
 	const owner: string = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266';
 	const receiver1: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0';
 	const receiver2: string = '0x30eDEc1C25218F5a748cccc54C562d7879e47CaA';
 
 	before(async () => {
 		PreSale = await ethers.getContractFactory('PreSale');
-		presale = await PreSale.deploy(baseTokenURI, ethers.utils.parseEther('0.1'));
+		presale = await PreSale.deploy(ethers.utils.parseEther('0.1'));
 		presale.deployed();
 	});
 
-	it('should initialize zerokey contract', async () => {
+	it('should initialize presale contract', async () => {
 		expect(await presale.getPrice()).to.equal(ethers.utils.parseEther('0.1'));
 
-		expect(await presale.getBaseURI()).to.equal('https://www.jnpl.me/metadata?id=');
+		expect(await presale.getBaseURI()).to.equal('https://www.nftxt.xyz/api/accesspass?id=');
 
 		const balance = await presale.balanceOf(owner, 1);
-		expect(Number(balance)).to.equal(30000);
+		expect(Number(balance)).to.equal(337);
 
 		const blockChain = await presale.getAccessPass(1);
-		expect(Number(blockChain['maxSupply'])).to.equal(30000);
+		expect(Number(blockChain['maxSupply'])).to.equal(337);
 	});
 
-	it('should generate presale (1)', async () => {
+	it('should generate batch presale (1)', async () => {
+		const blockChain = await presale.batchTransferPreSale(owner, [receiver1, receiver2], 2);
+		const blockChainWait = await blockChain.wait();
+		const blockChainEvent = blockChainWait.events[0];
+		const newTokenId: number = Number(blockChainEvent.args['id']);
+
+		expect(newTokenId).to.equal(1);
+
+		const balance = await presale.balanceOf(owner, 1);
+		expect(Number(balance)).to.equal(333);
+	});
+
+	it('should generate presale (2)', async () => {
 		const blockChain = await presale.transferPreSale(owner, receiver1, 5, {
 			value: ethers.utils.parseEther('0.5'),
 		});
@@ -39,7 +50,7 @@ describe.only('presale', async () => {
 		expect(newTokenId).to.equal(1);
 
 		const balance = await presale.balanceOf(owner, 1);
-		expect(Number(balance)).to.equal(29995);
+		expect(Number(balance)).to.equal(328);
 	});
 
 	it('should reject the presale (not enough coins)', async () => {
@@ -61,15 +72,15 @@ describe.only('presale', async () => {
 		expect(newTokenId).to.equal(1);
 
 		const balance = await presale.balanceOf(owner, 1);
-		expect(Number(balance)).to.equal(29990);
+		expect(Number(balance)).to.equal(323);
 	});
 
 	it('should get receiver balance', async () => {
 		const balance1 = await presale.balanceOf(receiver1, 1);
-		expect(Number(balance1)).to.equal(5);
+		expect(Number(balance1)).to.equal(7);
 
 		const balance2 = await presale.balanceOf(receiver2, 1);
-		expect(Number(balance2)).to.equal(5);
+		expect(Number(balance2)).to.equal(7);
 	});
 
 	it('should withdraw contract balance', async () => {

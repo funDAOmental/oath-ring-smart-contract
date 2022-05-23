@@ -56,6 +56,7 @@ export interface PreSaleInterface extends utils.Interface {
     "accessPass(uint256)": FunctionFragment;
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
+    "batchTransferPreSale(address,address[],uint8)": FunctionFragment;
     "getAccessPass(uint256)": FunctionFragment;
     "getBaseURI()": FunctionFragment;
     "getEthBalance()": FunctionFragment;
@@ -78,6 +79,7 @@ export interface PreSaleInterface extends utils.Interface {
       | "accessPass"
       | "balanceOf"
       | "balanceOfBatch"
+      | "batchTransferPreSale"
       | "getAccessPass"
       | "getBaseURI"
       | "getEthBalance"
@@ -106,6 +108,10 @@ export interface PreSaleInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "balanceOfBatch",
     values: [string[], BigNumberish[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "batchTransferPreSale",
+    values: [string, string[], BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getAccessPass",
@@ -163,6 +169,10 @@ export interface PreSaleInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "balanceOfBatch",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "batchTransferPreSale",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -354,6 +364,13 @@ export interface PreSale extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber[]]>;
 
+    batchTransferPreSale(
+      _owner: string,
+      _receivers: string[],
+      _count: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     getAccessPass(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -450,6 +467,13 @@ export interface PreSale extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber[]>;
 
+  batchTransferPreSale(
+    _owner: string,
+    _receivers: string[],
+    _count: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   getAccessPass(
     _tokenId: BigNumberish,
     overrides?: CallOverrides
@@ -545,6 +569,13 @@ export interface PreSale extends BaseContract {
       ids: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<BigNumber[]>;
+
+    batchTransferPreSale(
+      _owner: string,
+      _receivers: string[],
+      _count: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     getAccessPass(
       _tokenId: BigNumberish,
@@ -698,6 +729,13 @@ export interface PreSale extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    batchTransferPreSale(
+      _owner: string,
+      _receivers: string[],
+      _count: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     getAccessPass(
       _tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -785,6 +823,13 @@ export interface PreSale extends BaseContract {
       accounts: string[],
       ids: BigNumberish[],
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    batchTransferPreSale(
+      _owner: string,
+      _receivers: string[],
+      _count: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     getAccessPass(

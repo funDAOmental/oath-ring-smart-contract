@@ -12,10 +12,8 @@ async function main() {
 	console.log('deploying presale contract with the account:', deployer.address);
 	console.log('account balance:', (await deployer.getBalance()).toString());
 
-	const baseTokenURI: string = 'https://www.nftxt.xyz/api/accesspass?id=';
-
 	const PreSale = await ethers.getContractFactory('PreSale');
-	const presale = await PreSale.deploy(baseTokenURI, ethers.utils.parseEther('0.1'));
+	const presale = await PreSale.deploy(ethers.utils.parseEther('0.1'));
 
 	await presale.deployed();
 
