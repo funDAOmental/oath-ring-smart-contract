@@ -54,6 +54,12 @@ const config: HardhatUserConfig = {
 	etherscan: {
 		apiKey: process.env.ETHERSCAN_API_KEY,
 	},
+	typechain: {
+		outDir: "build/typechain",
+		target: "ethers-v5",
+		alwaysGenerateOverloads: false,
+		externalArtifacts: ["externalArtifacts/*.json"]
+	}
 };
 
 export default config;
