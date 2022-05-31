@@ -54,10 +54,13 @@ export declare namespace PreSale {
 export interface PreSaleInterface extends utils.Interface {
   functions: {
     "accessPass(uint256)": FunctionFragment;
+    "activatePreSale(address)": FunctionFragment;
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
     "batchTransferPreSale(address,address[],uint8)": FunctionFragment;
     "getAccessPass(uint256)": FunctionFragment;
+    "getActiveAccessPassCount()": FunctionFragment;
+    "getActiveAccessPassRandomNumber(address)": FunctionFragment;
     "getBaseURI()": FunctionFragment;
     "getEthBalance()": FunctionFragment;
     "getPrice()": FunctionFragment;
@@ -77,10 +80,13 @@ export interface PreSaleInterface extends utils.Interface {
   getFunction(
     nameOrSignatureOrTopic:
       | "accessPass"
+      | "activatePreSale"
       | "balanceOf"
       | "balanceOfBatch"
       | "batchTransferPreSale"
       | "getAccessPass"
+      | "getActiveAccessPassCount"
+      | "getActiveAccessPassRandomNumber"
       | "getBaseURI"
       | "getEthBalance"
       | "getPrice"
@@ -102,6 +108,10 @@ export interface PreSaleInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "activatePreSale",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, BigNumberish]
   ): string;
@@ -116,6 +126,14 @@ export interface PreSaleInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getAccessPass",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getActiveAccessPassCount",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getActiveAccessPassRandomNumber",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "getBaseURI",
@@ -166,6 +184,10 @@ export interface PreSaleInterface extends utils.Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "accessPass", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "activatePreSale",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "balanceOfBatch",
@@ -177,6 +199,14 @@ export interface PreSaleInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getAccessPass",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getActiveAccessPassCount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getActiveAccessPassRandomNumber",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getBaseURI", data: BytesLike): Result;
@@ -225,6 +255,7 @@ export interface PreSaleInterface extends utils.Interface {
   ): Result;
 
   events: {
+    "ActivateKeys(address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
@@ -233,6 +264,7 @@ export interface PreSaleInterface extends utils.Interface {
     "URI(string,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "ActivateKeys"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
@@ -240,6 +272,17 @@ export interface PreSaleInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
 }
+
+export interface ActivateKeysEventObject {
+  _address: string;
+  _randomNumber: BigNumber;
+}
+export type ActivateKeysEvent = TypedEvent<
+  [string, BigNumber],
+  ActivateKeysEventObject
+>;
+
+export type ActivateKeysEventFilter = TypedEventFilter<ActivateKeysEvent>;
 
 export interface ApprovalForAllEventObject {
   account: string;
@@ -352,6 +395,11 @@ export interface PreSale extends BaseContract {
       }
     >;
 
+    activatePreSale(
+      _address: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     balanceOf(
       account: string,
       id: BigNumberish,
@@ -375,6 +423,13 @@ export interface PreSale extends BaseContract {
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[PreSale.AccessPassStructStructOutput]>;
+
+    getActiveAccessPassCount(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getActiveAccessPassRandomNumber(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     getBaseURI(overrides?: CallOverrides): Promise<[string]>;
 
@@ -455,6 +510,11 @@ export interface PreSale extends BaseContract {
     }
   >;
 
+  activatePreSale(
+    _address: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   balanceOf(
     account: string,
     id: BigNumberish,
@@ -478,6 +538,13 @@ export interface PreSale extends BaseContract {
     _tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<PreSale.AccessPassStructStructOutput>;
+
+  getActiveAccessPassCount(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getActiveAccessPassRandomNumber(
+    _address: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   getBaseURI(overrides?: CallOverrides): Promise<string>;
 
@@ -558,6 +625,8 @@ export interface PreSale extends BaseContract {
       }
     >;
 
+    activatePreSale(_address: string, overrides?: CallOverrides): Promise<void>;
+
     balanceOf(
       account: string,
       id: BigNumberish,
@@ -581,6 +650,13 @@ export interface PreSale extends BaseContract {
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PreSale.AccessPassStructStructOutput>;
+
+    getActiveAccessPassCount(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getActiveAccessPassRandomNumber(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     getBaseURI(overrides?: CallOverrides): Promise<string>;
 
@@ -645,6 +721,15 @@ export interface PreSale extends BaseContract {
   };
 
   filters: {
+    "ActivateKeys(address,uint256)"(
+      _address?: string | null,
+      _randomNumber?: null
+    ): ActivateKeysEventFilter;
+    ActivateKeys(
+      _address?: string | null,
+      _randomNumber?: null
+    ): ActivateKeysEventFilter;
+
     "ApprovalForAll(address,address,bool)"(
       account?: string | null,
       operator?: string | null,
@@ -717,6 +802,11 @@ export interface PreSale extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    activatePreSale(
+      _address: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     balanceOf(
       account: string,
       id: BigNumberish,
@@ -738,6 +828,13 @@ export interface PreSale extends BaseContract {
 
     getAccessPass(
       _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getActiveAccessPassCount(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getActiveAccessPassRandomNumber(
+      _address: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -813,6 +910,11 @@ export interface PreSale extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    activatePreSale(
+      _address: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     balanceOf(
       account: string,
       id: BigNumberish,
@@ -834,6 +936,15 @@ export interface PreSale extends BaseContract {
 
     getAccessPass(
       _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getActiveAccessPassCount(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getActiveAccessPassRandomNumber(
+      _address: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

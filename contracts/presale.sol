@@ -4,13 +4,19 @@ pragma solidity ^0.8.11;
 
 import '@openzeppelin/contracts/token/ERC1155/ERC1155.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/utils/Counters.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 import 'hardhat/console.sol';
 
 import './services/eth.service.sol';
 
+import './libraries/helper.library.sol';
+
 contract PreSale is ERC1155, Ownable, EthService {
 	event TransferKeys(address indexed _receiver, uint256 _count);
+	event ActivateKeys(address indexed _address, uint256 _randomNumber);
+
+	using Counters for Counters.Counter;
 
 	uint256 private price;
 
@@ -22,12 +28,20 @@ contract PreSale is ERC1155, Ownable, EthService {
 		string image;
 	}
 
+	struct AccessPassRandomNumberStruct {
+		uint256 randomNumber;
+		bool exists;
+	}
+
 	uint256 private constant MAXSUPPLY = 337; // presale max supply
 	uint256 private constant ACCESSPASS = 1;
 	string private constant ACCESSPASSURL = 'https://www.nftxt.xyz/api/accesspass?id=';
 	string private constant ACCESSPASSIMGURL = 'https://www.nftxt.xyz/accesspass?id=';
 
 	mapping(uint256 => AccessPassStruct) public accessPass;
+
+	Counters.Counter private accessPassRandomNumberCount;
+	mapping(address => AccessPassRandomNumberStruct) private accessPassRandomNumber;
 
 	constructor(uint256 _price) ERC1155('https://www.nftxt.xyz/api/accesspass?id={id}') {
 		price = _price;
@@ -50,6 +64,8 @@ contract PreSale is ERC1155, Ownable, EthService {
 	// blockchain mint
 	// ERROR MSG:
 	// NEC: not enough coins
+	// DHA: dont have access pass
+	// ADE: access pass not yet active
 
 	/*
 	 * @functionName transferPreSale
@@ -82,6 +98,37 @@ contract PreSale is ERC1155, Ownable, EthService {
 		for (i; i < receiversLen; i++) {
 			safeTransferFrom(_owner, _receivers[i], ACCESSPASS, _count, '');
 		}
+	}
+
+	function activatePreSale(address _address) public {
+		require(balanceOf(_address, ACCESSPASS) >= 1, 'DHA');
+
+		uint256 randomNumber = HelperLibrary.getRandomNumber();
+
+		AccessPassRandomNumberStruct storage apRandomNumber = accessPassRandomNumber[_address];
+		apRandomNumber.randomNumber = randomNumber;
+		apRandomNumber.exists = true;
+
+		accessPassRandomNumberCount.increment();
+		emit ActivateKeys(_address, randomNumber);
+	}
+
+	/*
+	 * @functionName getActiveAccessPassCount
+	 * @functionDescription get active access pass count
+	 */
+	function getActiveAccessPassCount() public view returns (uint256) {
+		return accessPassRandomNumberCount.current();
+	}
+
+	/*
+	 * @functionName getActiveAccessPassRandomNumber
+	 * @functionDescription get active access pass random number
+	 */
+	function getActiveAccessPassRandomNumber(address _address) public view returns (uint256) {
+		require(accessPassRandomNumber[_address].exists, 'ADE');
+
+		return accessPassRandomNumber[_address].randomNumber;
 	}
 
 	/*

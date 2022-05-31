@@ -6,8 +6,6 @@ describe.only('randomness', async () => {
 	let Randomness: any;
 	let randomness: any;
 
-	// const ownerAddress: string = '0x924634D6964E171498f2a292185b1554893D95E5';
-
 	const epoch: number = 1;
 	const lastEpoch: number = 7;
 	const user1: string = 'EP001-USERA-1';
