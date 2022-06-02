@@ -115,13 +115,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	/**
 	 * @dev Override isApprovedForAll to allowlist user's OpenSea proxy accounts to enable gas-less listings.
 	 */
-	function isApprovedForAll(address owner, address operator)
-		public
-		view
-		virtual
-		override(ERC721, IERC721)
-		returns (bool)
-	{
+	function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
 		// Get a reference to OpenSea's proxy registry contract by instantiating
 		// the contract using the already existing address.
 		if (isOpenSeaProxyActive && proxyRegistry.proxies(owner) == operator) {
