@@ -10,12 +10,11 @@ describe.only('AccessPass TEST', async () => {
 	const mainUrl: string = 'https://www.nftxt.xyz';
 	const mainCost: BigNumber = ethers.utils.parseEther('0.1');
 
-	const owner: string = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266';
 	const receiver: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0';
 
 	before(async () => {
 		AccessPass = await ethers.getContractFactory('AccessPass');
-		accesspass = await AccessPass.deploy(openseaProxy, 111);
+		accesspass = await AccessPass.deploy(openseaProxy, 337);
 		accesspass.deployed();
 	});
 
@@ -24,7 +23,7 @@ describe.only('AccessPass TEST', async () => {
 		expect(proxyregistry).to.equal(openseaProxy);
 
 		const totalaccesspasses: number = await accesspass.totalAccessPasses();
-		expect(totalaccesspasses).to.equal(111);
+		expect(totalaccesspasses).to.equal(337);
 	});
 
 	it('should initialize accesspass base url', async () => {

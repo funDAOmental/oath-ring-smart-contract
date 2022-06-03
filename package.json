@@ -9,6 +9,7 @@
 	"license": "MIT",
 	"scripts": {
 		"build": "npx hardhat compile",
+		"deploy:accesspass:rinkeby": "npx hardhat run scripts/AccessPass.ts --network rinkeby",
 		"deploy:presale:rinkeby": "npx hardhat run scripts/deploy-presale.ts --network rinkeby",
 		"deploy:zerokeys:rinkeby": "npx hardhat run scripts/deploy-zerokeys.ts --network rinkeby",
 		"deploy:gmkeys:rinkeby": "npx hardhat run scripts/deploy-gmkeys.ts --network rinkeby",
