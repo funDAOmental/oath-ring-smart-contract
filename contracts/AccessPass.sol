@@ -3,8 +3,9 @@
 pragma solidity ^0.8.11;
 
 import '@openzeppelin/contracts/interfaces/IERC2981.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/utils/Counters.sol';
 
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
@@ -12,7 +13,12 @@ import { IProxyRegistry } from './external/opensea/IProxyRegistry.sol';
 
 contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	using Strings for uint256;
+	using Counters for Counters.Counter;
+
 	string private baseURI;
+
+	uint256 private constant MAXSUPPLY = 30;
+	Counters.Counter private accesspassCount;
 
 	address private royaltyPayout;
 	bool private isOpenSeaProxyActive = true;
@@ -55,18 +61,6 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	}
 
 	// ============ OWNER-ONLY ADMIN FUNCTIONS ============
-
-	/**
-	 * @notice
-	 * only allow minting for tokenId in range (100 200]
-	 * when publicSaleActive is True and
-	 * correct payment is provided
-	 * @dev
-	 * @param tokenId in range (100 200]
-	 */
-	function mint() external onlyOwner {
-		_safeMint(msg.sender, 0);
-	}
 
 	function setBaseURI(string memory baseURI_) external onlyOwner {
 		baseURI = baseURI_;
@@ -129,7 +123,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 * @dev See {IERC721Metadata-tokenURI}.
 	 */
 	function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-		require(_exists(tokenId), 'Nonexistent token');
+		require(_exists(tokenId), 'nonexistent token');
 		return string(abi.encodePacked(baseURI, '/', tokenId.toString(), '.json'));
 	}
 
@@ -142,7 +136,52 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 		override
 		returns (address receiver, uint256 royaltyAmount)
 	{
-		require(_exists(tokenId), 'Nonexistent token');
+		require(_exists(tokenId), 'nonexistent token');
 		return (royaltyPayout, SafeMath.div(SafeMath.mul(salePrice, sellerFeeBasisPoints), 1000));
+	}
+
+	/*
+	 * @functionName getAccesspassCount
+	 * @functionDescription get accesspass count
+	 */
+	function getAccesspassCount() public view returns (uint256) {
+		return accesspassCount.current();
+	}
+
+	/*
+	 * @functionName mint
+	 * @functionDescription mint accesspass
+	 */
+	function mint() public onlyOwner {
+		require(MAXSUPPLY >= accesspassCount.current() + 1, 'quantity exceeds max supply');
+
+		_safeMint(msg.sender, accesspassCount.current());
+		accesspassCount.increment();
+	}
+
+	/*
+	 * @functionName mintTo
+	 * @functionDescription mint accesspass with given address
+	 */
+	function mintTo(address _to) public onlyOwner {
+		require(MAXSUPPLY >= accesspassCount.current() + 1, 'quantity exceeds max supply');
+
+		_safeMint(_to, accesspassCount.current());
+		accesspassCount.increment();
+	}
+
+	/*
+	 * @functionName batchMintTo
+	 * @functionDescription batch mint accesspass with given addresses
+	 */
+	function batchMintTo(address[] memory _to) public onlyOwner {
+		require(MAXSUPPLY >= accesspassCount.current() + _to.length, 'quantity exceeds max supply');
+
+		uint256 toLen = _to.length;
+		uint256 i = 0;
+		for (i; i < toLen; i++) {
+			_safeMint(_to[i], accesspassCount.current());
+			accesspassCount.increment();
+		}
 	}
 }

@@ -10,7 +10,10 @@ describe.only('AccessPass TEST', async () => {
 	const mainUrl: string = 'https://www.nftxt.xyz';
 	const mainCost: BigNumber = ethers.utils.parseEther('0.1');
 
-	const receiver: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0';
+	const receiver1: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0';
+	const receiver2: string = '0x30eDEc1C25218F5a748cccc54C562d7879e47CaA';
+	const receiver3: string = '0xB07243398f1d0094b64f4C0a61B8C03233914036';
+	const receiver4: string = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266';
 
 	before(async () => {
 		AccessPass = await ethers.getContractFactory('AccessPass');
@@ -59,26 +62,26 @@ describe.only('AccessPass TEST', async () => {
 		const blockChain2 = await accesspass.setSellerFeeBasisPoints(199);
 		await blockChain2.wait();
 
-		const blockChain3 = await accesspass.setRoyaltyPayout(receiver);
+		const blockChain3 = await accesspass.setRoyaltyPayout(receiver1);
 		await blockChain3.wait();
 
 		const sellerfeebasispoints: number = await accesspass.sellerFeeBasisPoints();
 		expect(sellerfeebasispoints).to.equal(199);
 	});
 
-	it('should reject accesspass token (Nonexistent token)', async () => {
-		await expect(accesspass.tokenURI(0)).to.be.revertedWith('Nonexistent token');
+	it('should reject accesspass token (nonexistent token)', async () => {
+		await expect(accesspass.tokenURI(0)).to.be.revertedWith('nonexistent token');
 	});
 
-	it('should reject accesspass royalty (Nonexistent token)', async () => {
-		await expect(accesspass.royaltyInfo(0, mainCost)).to.be.revertedWith('Nonexistent token');
+	it('should reject accesspass royalty (nonexistent token)', async () => {
+		await expect(accesspass.royaltyInfo(0, mainCost)).to.be.revertedWith('nonexistent token');
 	});
 
 	it('should mint accesspass 0', async () => {
 		const blockChain = await accesspass.mint();
 		const blockChainWait = await blockChain.wait();
-		const blockChainEvent = blockChainWait.events[0];
 
+		const blockChainEvent = blockChainWait.events[0];
 		const newTokenId: number = Number(blockChainEvent.args['tokenId']);
 		expect(newTokenId).to.equal(0);
 	});
@@ -88,10 +91,60 @@ describe.only('AccessPass TEST', async () => {
 		expect(tokenUrl).to.equal(`${mainUrl}/0.json`);
 	});
 
+	it('should get accesspass count 0', async () => {
+		const tokenCount: number = await accesspass.getAccesspassCount();
+		expect(tokenCount).to.equal(1);
+	});
+
 	it('should get accesspass royalty 0', async () => {
 		const royaltyInfo = await accesspass.royaltyInfo(0, mainCost);
 		// console.log(royaltyInfo);
-		expect(royaltyInfo['receiver']).to.equal(receiver);
+		expect(royaltyInfo['receiver']).to.equal(receiver1);
 		expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.0199'));
+	});
+
+	it('should mint accesspass 1', async () => {
+		const blockChain = await accesspass.mintTo(receiver2);
+		const blockChainWait = await blockChain.wait();
+
+		const blockChainEvent = blockChainWait.events[0];
+		const newTokenId: number = Number(blockChainEvent.args['tokenId']);
+		expect(newTokenId).to.equal(1);
+	});
+
+	it('should get accesspass token 1', async () => {
+		const tokenUrl: string = await accesspass.tokenURI(1);
+		expect(tokenUrl).to.equal(`${mainUrl}/1.json`);
+	});
+
+	it('should get accesspass count 1', async () => {
+		const tokenCount: number = await accesspass.getAccesspassCount();
+		expect(tokenCount).to.equal(2);
+	});
+
+	it('should multiple mint accesspass 2, 3', async () => {
+		const blockChain = await accesspass.batchMintTo([receiver3, receiver4]);
+		const blockChainWait = await blockChain.wait();
+
+		const blockChainEvent2 = blockChainWait.events[0];
+		const newTokenId2: number = Number(blockChainEvent2.args['tokenId']);
+		expect(newTokenId2).to.equal(2);
+
+		const blockChainEvent3 = blockChainWait.events[1];
+		const newTokenId3: number = Number(blockChainEvent3.args['tokenId']);
+		expect(newTokenId3).to.equal(3);
+	});
+
+	it('should get accesspass token 2, 3', async () => {
+		const tokenUrl2: string = await accesspass.tokenURI(2);
+		expect(tokenUrl2).to.equal(`${mainUrl}/2.json`);
+
+		const tokenUrl3: string = await accesspass.tokenURI(3);
+		expect(tokenUrl3).to.equal(`${mainUrl}/3.json`);
+	});
+
+	it('should get accesspass count 1', async () => {
+		const tokenCount: number = await accesspass.getAccesspassCount();
+		expect(tokenCount).to.equal(4);
 	});
 });
