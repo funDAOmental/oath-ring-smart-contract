@@ -77,8 +77,12 @@ describe.only('AccessPass TEST', async () => {
 		await expect(accesspass.royaltyInfo(0, mainCost)).to.be.revertedWith('nonexistent token');
 	});
 
+	it('should reject accesspass mint (quantity exceeds)', async () => {
+		await expect(accesspass.mint(6)).to.be.revertedWith('quantity exceeds');
+	});
+
 	it('should mint accesspass 0', async () => {
-		const blockChain = await accesspass.mint();
+		const blockChain = await accesspass.mint(1);
 		const blockChainWait = await blockChain.wait();
 
 		const blockChainEvent = blockChainWait.events[0];
@@ -104,7 +108,7 @@ describe.only('AccessPass TEST', async () => {
 	});
 
 	it('should mint accesspass 1', async () => {
-		const blockChain = await accesspass.mintTo(receiver2);
+		const blockChain = await accesspass.mintTo(receiver2, 1);
 		const blockChainWait = await blockChain.wait();
 
 		const blockChainEvent = blockChainWait.events[0];
@@ -122,29 +126,36 @@ describe.only('AccessPass TEST', async () => {
 		expect(tokenCount).to.equal(2);
 	});
 
+	it('should get accesspass royalty 1', async () => {
+		const royaltyInfo = await accesspass.royaltyInfo(1, mainCost);
+		// console.log(royaltyInfo);
+		expect(royaltyInfo['receiver']).to.equal(receiver1);
+		expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.0199'));
+	});
+
 	it('should multiple mint accesspass 2, 3', async () => {
-		const blockChain = await accesspass.batchMintTo([receiver3, receiver4]);
+		const blockChain = await accesspass.batchMintTo([receiver3, receiver4], 2);
 		const blockChainWait = await blockChain.wait();
 
 		const blockChainEvent2 = blockChainWait.events[0];
 		const newTokenId2: number = Number(blockChainEvent2.args['tokenId']);
 		expect(newTokenId2).to.equal(2);
 
-		const blockChainEvent3 = blockChainWait.events[1];
+		const blockChainEvent3 = blockChainWait.events[3];
 		const newTokenId3: number = Number(blockChainEvent3.args['tokenId']);
-		expect(newTokenId3).to.equal(3);
+		expect(newTokenId3).to.equal(5);
 	});
 
 	it('should get accesspass token 2, 3', async () => {
 		const tokenUrl2: string = await accesspass.tokenURI(2);
 		expect(tokenUrl2).to.equal(`${mainUrl}/2.json`);
 
-		const tokenUrl3: string = await accesspass.tokenURI(3);
-		expect(tokenUrl3).to.equal(`${mainUrl}/3.json`);
+		const tokenUrl3: string = await accesspass.tokenURI(5);
+		expect(tokenUrl3).to.equal(`${mainUrl}/5.json`);
 	});
 
 	it('should get accesspass count 1', async () => {
 		const tokenCount: number = await accesspass.getAccesspassCount();
-		expect(tokenCount).to.equal(4);
+		expect(tokenCount).to.equal(6);
 	});
 });

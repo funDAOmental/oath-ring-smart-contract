@@ -18,6 +18,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	string private baseURI;
 
 	uint256 private constant MAXSUPPLY = 30;
+	uint256 private constant MAXQUANTITY = 5;
 	Counters.Counter private accesspassCount;
 
 	address private royaltyPayout;
@@ -152,36 +153,50 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 * @functionName mint
 	 * @functionDescription mint accesspass
 	 */
-	function mint() public onlyOwner {
-		require(MAXSUPPLY >= accesspassCount.current() + 1, 'quantity exceeds max supply');
+	function mint(uint8 _quantity) public onlyOwner {
+		require(MAXQUANTITY > _quantity, 'quantity exceeds');
+		require(MAXSUPPLY > accesspassCount.current() + _quantity, 'quantity exceeds max supply');
 
-		_safeMint(msg.sender, accesspassCount.current());
-		accesspassCount.increment();
+		uint8 i = 0;
+		for (i; i < _quantity; i++) {
+			_safeMint(msg.sender, accesspassCount.current());
+			accesspassCount.increment();
+		}
 	}
 
 	/*
 	 * @functionName mintTo
 	 * @functionDescription mint accesspass with given address
 	 */
-	function mintTo(address _to) public onlyOwner {
-		require(MAXSUPPLY >= accesspassCount.current() + 1, 'quantity exceeds max supply');
+	function mintTo(address _to, uint8 _quantity) public onlyOwner {
+		require(MAXQUANTITY > _quantity, 'quantity exceeds');
+		require(MAXSUPPLY > accesspassCount.current() + _quantity, 'quantity exceeds max supply');
 
-		_safeMint(_to, accesspassCount.current());
-		accesspassCount.increment();
+		uint8 i = 0;
+		for (i; i < _quantity; i++) {
+			_safeMint(_to, accesspassCount.current());
+			accesspassCount.increment();
+		}
 	}
 
 	/*
 	 * @functionName batchMintTo
 	 * @functionDescription batch mint accesspass with given addresses
 	 */
-	function batchMintTo(address[] memory _to) public onlyOwner {
-		require(MAXSUPPLY >= accesspassCount.current() + _to.length, 'quantity exceeds max supply');
+	function batchMintTo(address[] memory _to, uint8 _quantity) public onlyOwner {
+		uint256 qtyLen = _quantity * _to.length;
+
+		require(MAXQUANTITY > _quantity, 'quantity exceeds');
+		require(MAXSUPPLY >= accesspassCount.current() + qtyLen, 'quantity exceeds max supply');
 
 		uint256 toLen = _to.length;
-		uint256 i = 0;
-		for (i; i < toLen; i++) {
-			_safeMint(_to[i], accesspassCount.current());
-			accesspassCount.increment();
+		uint256 j = 0;
+		for (j; j < toLen; j++) {
+			uint8 i = 0;
+			for (i; i < _quantity; i++) {
+				_safeMint(_to[j], accesspassCount.current());
+				accesspassCount.increment();
+			}
 		}
 	}
 }
