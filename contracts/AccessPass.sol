@@ -72,6 +72,16 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 
 	/**
+	 * @notice Set the accessPassDescriptor.
+	 * @dev Only callable by the owner.
+	 */
+	function setAccessPassDescriptor(address accessPassDescriptor_) external onlyOwner {
+		require(accessPassDescriptor_ != address(0), 'INVALID_ADDRESS');
+		accessPassDescriptor = IAccessPassDescriptor(accessPassDescriptor_);
+	}
+
+
+	/**
 	 * @notice Set the _contractURIHash.
 	 * @dev Only callable by the owner.
 	 */

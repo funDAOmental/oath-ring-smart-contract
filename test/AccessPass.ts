@@ -18,7 +18,7 @@ describe.only('AccessPass TEST', async () => {
 	const receiver3: string = '0xB07243398f1d0094b64f4C0a61B8C03233914036';
 	const receiver4: string = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266';
 
-	before(async () => {
+	beforeEach(async () => {
 		AccessPassDescriptor = await ethers.getContractFactory('AccessPassDescriptor');
 		accessPassDescriptor = await AccessPassDescriptor.deploy();
 		accessPassDescriptor.deployed()
@@ -38,7 +38,23 @@ describe.only('AccessPass TEST', async () => {
 		expect(totalaccesspasses).to.equal(337);
 	});
 
-	it('should initialize accesspass hash url', async () => {
+	it('should updated accessPassDescriptor', async () => {
+		const oldAddress: string = await accesspass.accessPassDescriptor();
+		
+		const newAddress = "0xF57B2c51dED3A29e6891aba85459d600256Cf317"
+
+		await (await accesspass.setAccessPassDescriptor(newAddress));
+		const expected: string = await accesspass.accessPassDescriptor();
+
+		expect(newAddress).to.equal(newAddress);
+	});
+
+	it('should revert setAccessPassDescriptor for AddressZero', async () => {
+		const oldAddress: string = await accesspass.accessPassDescriptor();
+		await expect(accesspass.setAccessPassDescriptor(ethers.constants.AddressZero)).to.be.revertedWith("INVALID_ADDRESS");
+	});
+
+	it('should update accesspass hash url', async () => {
 		const url1: string = await accesspass.contractURI();
 		expect(url1).to.equal('ipfs://TODO');
 
@@ -89,6 +105,8 @@ describe.only('AccessPass TEST', async () => {
 	});
 
 	it('should get accesspass token 0', async () => {
+		await (await accesspass.mint());
+		
 		const tokenId = 0
 		const base64EncodedData: string = await accesspass.tokenURI(0);
 		const name = await accessPassDescriptor.collectionNamePrefix();
@@ -118,35 +136,13 @@ describe.only('AccessPass TEST', async () => {
 	});
 
 	it('should get accesspass royalty 0', async () => {
+		// Setup
+		await (await accesspass.mint());
+		await (await accesspass.setRoyaltyPayout(receiver1));
+
 		const royaltyInfo = await accesspass.royaltyInfo(0, mainCost);
 		// console.log(royaltyInfo);
 		expect(royaltyInfo['receiver']).to.equal(receiver1);
-		expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.0199'));
-	});
-
-	it('should mint accesspass 1', async () => {
-		const blockChain = await accesspass.mintTo(receiver2, 1);
-		const blockChainWait = await blockChain.wait();
-
-		const blockChainEvent = blockChainWait.events[0];
-		const newTokenId: number = Number(blockChainEvent.args['tokenId']);
-		expect(newTokenId).to.equal(1);
-	});
-
-	it('should get accesspass token 1', async () => {
-		const tokenUrl: string = await accesspass.tokenURI(1);
-		expect(tokenUrl).to.include(`${dataUriPrefix}`);
-	});
-
-	it('should get accesspass count 1', async () => {
-		const tokenCount: number = await accesspass.getAccesspassCount();
-		expect(tokenCount).to.equal(2);
-	});
-
-	it('should get accesspass royalty 1', async () => {
-		const royaltyInfo = await accesspass.royaltyInfo(1, mainCost);
-		// console.log(royaltyInfo);
-		expect(royaltyInfo['receiver']).to.equal(receiver1);
-		expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.0199'));
+		expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.01'));
 	});
 });
