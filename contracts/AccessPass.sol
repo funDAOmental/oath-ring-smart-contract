@@ -21,6 +21,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	Counters.Counter private accesspassCount;
 
+	string public collectionImage = 'IPFS://QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
 	address private royaltyPayout;
 	bool private isOpenSeaProxyActive = true;
 
@@ -77,6 +78,15 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	function setBaseURI(string memory baseURI_) external onlyOwner {
 		baseURI = baseURI_;
 	}
+
+	/**
+	 * @notice Set the collectionImage IPFS image.
+	 * @dev Only callable by the owner.
+	 */
+	function setCollectionImage(string memory collectionImage_) external onlyOwner {
+		collectionImage = collectionImage_;
+	}
+
 
 	/**
 	 * @notice Set the _contractURIHash.
