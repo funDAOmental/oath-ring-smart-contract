@@ -15,7 +15,7 @@ async function main() {
 	console.log('account balance:', (await deployer.getBalance()).toString());
 
 	const AccessPass = await ethers.getContractFactory('AccessPass');
-	const accesspass = await AccessPass.deploy(openseaProxy, 337);
+	const accesspass = await AccessPass.deploy(openseaProxy, 337, 5);
 
 	await accesspass.deployed();
 
