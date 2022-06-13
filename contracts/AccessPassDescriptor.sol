@@ -3,14 +3,54 @@
 pragma solidity ^0.8.11;
 
 import { Base64 } from 'base64-sol/base64.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 
-contract AccessPassDescriptor {
+contract AccessPassDescriptor is Ownable {
+	string public collectionImage = 'IPFS://QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
+    string public collectionDetails = 'Fundaomental AccessPass #';
+    string[] public collectionAttributes;
+    string public collectionNamePrefix = 'AccessPass #';
+
     struct TokenURIParams {
         string name;
         string description;
         string[] attributes;
         string image;
     }
+
+    /**
+	 * @notice Set the collectionImage IPFS image.
+	 * @dev Only callable by the owner.
+	 */
+	function setCollectionImage(string memory collectionImage_) external onlyOwner {
+		collectionImage = collectionImage_;
+	}
+
+    /**
+	 * @notice Set the collectionAttributes
+	 * @dev Only callable by the owner.
+	 */
+	function setCollectionAttributes(string[] memory collectionAttributes_) external onlyOwner {
+        require(collectionAttributes_.length %2 == 0, 'ATTRIBUTE_SETUP_FAILED');
+		collectionAttributes = collectionAttributes_;
+	}
+
+    /**
+	 * @notice Set the collectionDetails text.
+	 * @dev Only callable by the owner.
+	 */
+    function setCollectionDetails(string memory collectionDetails_) external onlyOwner {
+		collectionDetails = collectionDetails_;
+	}
+
+    /**
+	 * @notice Set the collectionNamePrefix.
+	 * @dev Only callable by the owner.
+	 */
+    function setCollectionNamePrefix(string memory collectionNamePrefix_) external onlyOwner {
+		collectionNamePrefix = collectionNamePrefix_;
+	}
+
     /**
      * @notice Construct an ERC721 token attributes.
      */
@@ -61,16 +101,15 @@ contract AccessPassDescriptor {
      * @notice Given a name, description, and seed, construct a base64 encoded data URI.
      */
     function genericDataURI(
-        string memory name,
-        string memory description,
-        string[] memory attributes, 
-        string memory image
-    ) external pure returns (string memory) {
+        string memory tokenId
+    ) external view returns (string memory) {
+        string memory _name = string(abi.encodePacked(collectionNamePrefix, tokenId));
+        string memory _description = string(abi.encodePacked(collectionDetails, tokenId));
         TokenURIParams memory params = TokenURIParams({
-            name: name,
-            description: description,
-            attributes : attributes,
-            image: image
+            name: _name,
+            description: _description,
+            attributes : collectionAttributes,
+            image: collectionImage
         });
         return constructTokenURI(params);
     }

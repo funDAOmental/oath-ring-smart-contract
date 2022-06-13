@@ -10,7 +10,7 @@ describe.only('AccessPass TEST', async () => {
 	let accessPassDescriptor: any;
 
 	const openseaProxy: string = '0xF57B2c51dED3A29e6891aba85459d600256Cf317';
-	const mainUrl: string = 'https://www.nftxt.xyz';
+	const dataUriPrefix: string = 'data:application/json;base64,';
 	const mainCost: BigNumber = ethers.utils.parseEther('0.1');
 
 	const receiver1: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0';
@@ -23,7 +23,7 @@ describe.only('AccessPass TEST', async () => {
 		accessPassDescriptor = await AccessPassDescriptor.deploy();
 		accessPassDescriptor.deployed()
 		AccessPass = await ethers.getContractFactory('AccessPass');
-		accesspass = await AccessPass.deploy(openseaProxy, accessPassDescriptor.address, 337);
+		accesspass = await AccessPass.deploy(openseaProxy, accessPassDescriptor.address, 337, 5);
 		accesspass.deployed();
 	});
 
@@ -36,17 +36,6 @@ describe.only('AccessPass TEST', async () => {
 
 		const totalaccesspasses: number = await accesspass.totalAccessPasses();
 		expect(totalaccesspasses).to.equal(337);
-	});
-
-	it('should initialize accesspass base url', async () => {
-		const url1: string = await accesspass.getBaseURI();
-		expect(url1).to.equal('');
-
-		const blockChain = await accesspass.setBaseURI(mainUrl);
-		await blockChain.wait();
-
-		const url2: string = await accesspass.getBaseURI();
-		expect(url2).to.equal(mainUrl);
 	});
 
 	it('should initialize accesspass hash url', async () => {
@@ -100,8 +89,27 @@ describe.only('AccessPass TEST', async () => {
 	});
 
 	it('should get accesspass token 0', async () => {
-		const tokenUrl: string = await accesspass.tokenURI(0);
-		expect(tokenUrl).to.equal(`${mainUrl}/0.json`);
+		const tokenId = 0
+		const base64EncodedData: string = await accesspass.tokenURI(0);
+		const name = await accessPassDescriptor.collectionNamePrefix();
+		const description = await accessPassDescriptor.collectionDetails();
+		const image = await accessPassDescriptor.collectionImage();
+
+		const metadata = JSON.parse(atob(base64EncodedData.split(",")[1]));
+		expect(base64EncodedData).to.include(dataUriPrefix);
+
+		//Check name was correctly combined
+		expect(metadata.name).to.equal(name + tokenId.toString());
+
+		//Check description was correctly combined
+		expect(metadata.description).to.equal(description + tokenId);
+
+		//Check attributes is empty
+		expect(metadata.attributes).to.deep.equal([]);
+
+		//Check image is set to collectionImage
+		expect(metadata.image).to.deep.equal(image)
+
 	});
 
 	it('should get accesspass count 0', async () => {
@@ -127,7 +135,7 @@ describe.only('AccessPass TEST', async () => {
 
 	it('should get accesspass token 1', async () => {
 		const tokenUrl: string = await accesspass.tokenURI(1);
-		expect(tokenUrl).to.equal(`${mainUrl}/1.json`);
+		expect(tokenUrl).to.include(`${dataUriPrefix}`);
 	});
 
 	it('should get accesspass count 1', async () => {
