@@ -192,27 +192,4 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 			accesspassCount.increment();
 		}
 	}
-
-	/*
-	 * @functionName batchMintTo
-	 * @functionDescription batch mint accesspass with given addresses
-	 * @param _to list of address to mint
-	 * @param _quantity quantity per mint
-	 */
-	function batchMintTo(address[] memory _to, uint8 _quantity) public onlyOwner {
-		uint256 qtyLen = _quantity * _to.length;
-
-		require(maxQuantity > _quantity, 'quantity exceeds');
-		require(totalAccesspass >= accesspassCount.current() + qtyLen, 'quantity exceeds max supply');
-
-		uint256 toLen = _to.length;
-		uint256 j = 0;
-		for (j; j < toLen; j++) {
-			uint8 i = 0;
-			for (i; i < _quantity; i++) {
-				_safeMint(_to[j], accesspassCount.current());
-				accesspassCount.increment();
-			}
-		}
-	}
 }

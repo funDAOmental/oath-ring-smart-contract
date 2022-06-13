@@ -132,30 +132,4 @@ describe.only('AccessPass TEST', async () => {
 		expect(royaltyInfo['receiver']).to.equal(receiver1);
 		expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.0199'));
 	});
-
-	it('should multiple mint accesspass 2, 3', async () => {
-		const blockChain = await accesspass.batchMintTo([receiver3, receiver4], 2);
-		const blockChainWait = await blockChain.wait();
-
-		const blockChainEvent2 = blockChainWait.events[0];
-		const newTokenId2: number = Number(blockChainEvent2.args['tokenId']);
-		expect(newTokenId2).to.equal(2);
-
-		const blockChainEvent3 = blockChainWait.events[3];
-		const newTokenId3: number = Number(blockChainEvent3.args['tokenId']);
-		expect(newTokenId3).to.equal(5);
-	});
-
-	it('should get accesspass token 2, 3', async () => {
-		const tokenUrl2: string = await accesspass.tokenURI(2);
-		expect(tokenUrl2).to.equal(`${mainUrl}/2.json`);
-
-		const tokenUrl3: string = await accesspass.tokenURI(5);
-		expect(tokenUrl3).to.equal(`${mainUrl}/5.json`);
-	});
-
-	it('should get accesspass count 1', async () => {
-		const tokenCount: number = await accesspass.getAccesspassCount();
-		expect(tokenCount).to.equal(6);
-	});
 });
