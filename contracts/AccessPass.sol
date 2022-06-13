@@ -16,16 +16,16 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	using Counters for Counters.Counter;
 
 	string private baseURI;
+	uint256 private totalAccesspass = 0;
+	uint256 private maxQuantity = 0;
 
-	uint256 private constant MAXSUPPLY = 30;
-	uint256 private constant MAXQUANTITY = 5;
 	Counters.Counter private accesspassCount;
 
 	address private royaltyPayout;
 	bool private isOpenSeaProxyActive = true;
+
 	// seller fee basis points 100 == 10%
 	uint16 public sellerFeeBasisPoints = 100;
-	uint256 public immutable totalAccessPasses;
 
 	// OpenSea's Proxy Registry
 	IProxyRegistry public immutable proxyRegistry;
@@ -37,12 +37,19 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	/**
 	 * @dev
-	 * @param openSeaProxyRegistry_ address for OpenSea proxy.
-	 * @param totalAccessPasses_ total number of tokens
+	 * @param _openSeaProxyRegistry address for OpenSea proxy.
+	 * @param _totalAccesspass total number of tokens
+	 * @param _maxQuantity max quantity per mint
 	 */
-	constructor(IProxyRegistry openSeaProxyRegistry_, uint256 totalAccessPasses_) ERC721('Access Pass', 'ACCESS-PASS') {
-		proxyRegistry = openSeaProxyRegistry_;
-		totalAccessPasses = totalAccessPasses_;
+	constructor(
+		IProxyRegistry _openSeaProxyRegistry,
+		uint256 _totalAccesspass,
+		uint256 _maxQuantity
+	) ERC721('Access Pass', 'ACCESS-PASS') {
+		proxyRegistry = _openSeaProxyRegistry;
+		totalAccesspass = _totalAccesspass;
+		maxQuantity = _maxQuantity;
+
 		royaltyPayout = address(this);
 	}
 
@@ -52,6 +59,10 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	function getBaseURI() external view returns (string memory) {
 		return baseURI;
+	}
+
+	function getTotalAccesspass() external view returns (uint256) {
+		return totalAccesspass;
 	}
 
 	/**
@@ -152,10 +163,11 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	/*
 	 * @functionName mint
 	 * @functionDescription mint accesspass
+	 * @param _quantity quantity per mint
 	 */
 	function mint(uint8 _quantity) public onlyOwner {
-		require(MAXQUANTITY > _quantity, 'quantity exceeds');
-		require(MAXSUPPLY > accesspassCount.current() + _quantity, 'quantity exceeds max supply');
+		require(maxQuantity > _quantity, 'quantity exceeds');
+		require(totalAccesspass > accesspassCount.current() + _quantity, 'quantity exceeds max supply');
 
 		uint8 i = 0;
 		for (i; i < _quantity; i++) {
@@ -167,10 +179,12 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	/*
 	 * @functionName mintTo
 	 * @functionDescription mint accesspass with given address
+	 * @param _to address to mint
+	 * @param _quantity quantity per mint
 	 */
 	function mintTo(address _to, uint8 _quantity) public onlyOwner {
-		require(MAXQUANTITY > _quantity, 'quantity exceeds');
-		require(MAXSUPPLY > accesspassCount.current() + _quantity, 'quantity exceeds max supply');
+		require(maxQuantity > _quantity, 'quantity exceeds');
+		require(totalAccesspass > accesspassCount.current() + _quantity, 'quantity exceeds max supply');
 
 		uint8 i = 0;
 		for (i; i < _quantity; i++) {
@@ -182,12 +196,14 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	/*
 	 * @functionName batchMintTo
 	 * @functionDescription batch mint accesspass with given addresses
+	 * @param _to list of address to mint
+	 * @param _quantity quantity per mint
 	 */
 	function batchMintTo(address[] memory _to, uint8 _quantity) public onlyOwner {
 		uint256 qtyLen = _quantity * _to.length;
 
-		require(MAXQUANTITY > _quantity, 'quantity exceeds');
-		require(MAXSUPPLY >= accesspassCount.current() + qtyLen, 'quantity exceeds max supply');
+		require(maxQuantity > _quantity, 'quantity exceeds');
+		require(totalAccesspass >= accesspassCount.current() + qtyLen, 'quantity exceeds max supply');
 
 		uint256 toLen = _to.length;
 		uint256 j = 0;

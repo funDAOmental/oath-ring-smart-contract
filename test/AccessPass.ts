@@ -17,7 +17,7 @@ describe.only('AccessPass TEST', async () => {
 
 	before(async () => {
 		AccessPass = await ethers.getContractFactory('AccessPass');
-		accesspass = await AccessPass.deploy(openseaProxy, 337);
+		accesspass = await AccessPass.deploy(openseaProxy, 20, 5);
 		accesspass.deployed();
 	});
 
@@ -25,8 +25,8 @@ describe.only('AccessPass TEST', async () => {
 		const proxyregistry: string = await accesspass.proxyRegistry();
 		expect(proxyregistry).to.equal(openseaProxy);
 
-		const totalaccesspasses: number = await accesspass.totalAccessPasses();
-		expect(totalaccesspasses).to.equal(337);
+		const totalaccesspasses: number = await accesspass.getTotalAccesspass();
+		expect(totalaccesspasses).to.equal(20);
 	});
 
 	it('should initialize accesspass base url', async () => {
