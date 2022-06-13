@@ -9,6 +9,7 @@ import '@openzeppelin/contracts/utils/Counters.sol';
 
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
+import { IAccessPassDescriptor} from './interfaces/IAccessPassDescriptor.sol';
 import { IProxyRegistry } from './external/opensea/IProxyRegistry.sol';
 
 contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
@@ -16,8 +17,8 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	using Counters for Counters.Counter;
 
 	string private baseURI;
-	uint256 private totalAccesspass = 0;
-	uint256 private maxQuantity = 0;
+	uint256 public totalAccessPasses;
+	uint256 public maxQuantity;
 
 	Counters.Counter private accesspassCount;
 
@@ -30,6 +31,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	// OpenSea's Proxy Registry
 	IProxyRegistry public immutable proxyRegistry;
+	IAccessPassDescriptor public accessPassDescriptor;
 
 	// IPFS content hash of contract-level metadata
 	string private contractURIHash = 'TODO';
@@ -38,19 +40,14 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	/**
 	 * @dev
-	 * @param _openSeaProxyRegistry address for OpenSea proxy.
-	 * @param _totalAccesspass total number of tokens
-	 * @param _maxQuantity max quantity per mint
+	 * @param openSeaProxyRegistry_ address for OpenSea proxy.
+	 * @param accessPassDescriptor_ address for OpenSea proxy.
+	 * @param totalAccessPasses_ total number of tokens
 	 */
-	constructor(
-		IProxyRegistry _openSeaProxyRegistry,
-		uint256 _totalAccesspass,
-		uint256 _maxQuantity
-	) ERC721('Access Pass', 'ACCESS-PASS') {
-		proxyRegistry = _openSeaProxyRegistry;
-		totalAccesspass = _totalAccesspass;
-		maxQuantity = _maxQuantity;
-
+	constructor(address openSeaProxyRegistry_ , address accessPassDescriptor_, uint256 totalAccessPasses_) ERC721('Access Pass', 'ACCESS-PASS') {
+		proxyRegistry = IProxyRegistry(openSeaProxyRegistry_);
+		accessPassDescriptor = IAccessPassDescriptor(accessPassDescriptor_);
+		totalAccessPasses = totalAccessPasses_;
 		royaltyPayout = address(this);
 	}
 
@@ -60,10 +57,6 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	function getBaseURI() external view returns (string memory) {
 		return baseURI;
-	}
-
-	function getTotalAccesspass() external view returns (uint256) {
-		return totalAccesspass;
 	}
 
 	/**
@@ -177,7 +170,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 */
 	function mint(uint8 _quantity) public onlyOwner {
 		require(maxQuantity > _quantity, 'quantity exceeds');
-		require(totalAccesspass > accesspassCount.current() + _quantity, 'quantity exceeds max supply');
+		require(totalAccessPasses > accesspassCount.current() + _quantity, 'quantity exceeds max supply');
 
 		uint8 i = 0;
 		for (i; i < _quantity; i++) {
@@ -194,7 +187,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 */
 	function mintTo(address _to, uint8 _quantity) public onlyOwner {
 		require(maxQuantity > _quantity, 'quantity exceeds');
-		require(totalAccesspass > accesspassCount.current() + _quantity, 'quantity exceeds max supply');
+		require(totalAccessPasses > accesspassCount.current() + _quantity, 'quantity exceeds max supply');
 
 		uint8 i = 0;
 		for (i; i < _quantity; i++) {

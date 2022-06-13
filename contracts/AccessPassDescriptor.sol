@@ -65,7 +65,7 @@ contract AccessPassDescriptor {
         string memory description,
         string[] memory attributes, 
         string memory image
-    ) public pure returns (string memory) {
+    ) external pure returns (string memory) {
         TokenURIParams memory params = TokenURIParams({
             name: name,
             description: description,

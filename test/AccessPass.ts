@@ -6,6 +6,9 @@ describe.only('AccessPass TEST', async () => {
 	let AccessPass: any;
 	let accesspass: any;
 
+	let AccessPassDescriptor: any;
+	let accessPassDescriptor: any;
+
 	const openseaProxy: string = '0xF57B2c51dED3A29e6891aba85459d600256Cf317';
 	const mainUrl: string = 'https://www.nftxt.xyz';
 	const mainCost: BigNumber = ethers.utils.parseEther('0.1');
@@ -16,8 +19,11 @@ describe.only('AccessPass TEST', async () => {
 	const receiver4: string = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266';
 
 	before(async () => {
+		AccessPassDescriptor = await ethers.getContractFactory('AccessPassDescriptor');
+		accessPassDescriptor = await AccessPassDescriptor.deploy();
+		accessPassDescriptor.deployed()
 		AccessPass = await ethers.getContractFactory('AccessPass');
-		accesspass = await AccessPass.deploy(openseaProxy, 20, 5);
+		accesspass = await AccessPass.deploy(openseaProxy, accessPassDescriptor.address, 337);
 		accesspass.deployed();
 	});
 
@@ -25,8 +31,11 @@ describe.only('AccessPass TEST', async () => {
 		const proxyregistry: string = await accesspass.proxyRegistry();
 		expect(proxyregistry).to.equal(openseaProxy);
 
-		const totalaccesspasses: number = await accesspass.getTotalAccesspass();
-		expect(totalaccesspasses).to.equal(20);
+		const descriptor: string = await accesspass.accessPassDescriptor();
+		expect(descriptor).to.equal(accessPassDescriptor.address);
+
+		const totalaccesspasses: number = await accesspass.totalAccessPasses();
+		expect(totalaccesspasses).to.equal(337);
 	});
 
 	it('should initialize accesspass base url', async () => {
