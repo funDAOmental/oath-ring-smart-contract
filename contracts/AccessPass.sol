@@ -51,6 +51,37 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	// ============ PUBLIC FUNCTIONS FOR MINTING ============
 
+	/**
+	 * @dev mint accesspass
+	 * @param quantity_ quantity per mint
+	 */
+	function mint(uint8 quantity_) public onlyOwner {
+		require(maxQuantity > quantity_, 'quantity exceeds');
+		require(totalAccessPasses > accessPassCount.current() + quantity_, 'quantity exceeds max supply');
+
+		uint8 i = 0;
+		for (i; i < quantity_; i++) {
+			_safeMint(msg.sender, accessPassCount.current());
+			accessPassCount.increment();
+		}
+	}
+
+	/**
+	 * @dev mint accesspass
+	 * @param to_ address to mint
+	 * @param quantity_ quantity per mint
+	 */
+	function mintTo(address to_, uint8 quantity_) public onlyOwner {
+		require(maxQuantity > quantity_, 'quantity exceeds');
+		require(totalAccessPasses > accessPassCount.current() + quantity_, 'quantity exceeds max supply');
+
+		uint8 i = 0;
+		for (i; i < quantity_; i++) {
+			_safeMint(to_, accessPassCount.current());
+			accessPassCount.increment();
+		}
+	}
+
 	// ============ PUBLIC READ-ONLY FUNCTIONS ==============
 
 	/**
@@ -58,6 +89,22 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 */
 	function contractURI() public view returns (string memory) {
 		return string(abi.encodePacked('ipfs://', contractURIHash));
+	}
+
+	/**
+	 * @dev getAccesspassCount
+	 * @notice get accesspass count
+	 */
+	function getAccessPassCount() public view returns (uint256) {
+		return accessPassCount.current();
+	}
+
+	/**
+	 * @dev See {IERC721Metadata-tokenURI}.
+	 */
+	function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+		require(_exists(tokenId), 'Nonexistent token');
+		return accessPassDescriptor.genericDataURI(tokenId.toString());
 	}
 
 	// ============ OWNER-ONLY ADMIN FUNCTIONS ============
@@ -90,11 +137,23 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 		isOpenSeaProxyActive = _isOpenSeaProxyActive;
 	}
 
+	/**
+	 * @notice
+	 * set default selling fees will be interpreted if nothing 
+	 * is specified
+	 * @dev Only callable by the owner.
+	 */
 	function setSellerFeeBasisPoints(uint16 _sellerFeeBasisPoints) external onlyOwner {
 		require(_sellerFeeBasisPoints <= 200, 'Max Roalty check failed! > 20%');
 		sellerFeeBasisPoints = _sellerFeeBasisPoints;
 	}
 
+	/**
+	 * @notice
+	 * set default royalty payout address if nothing 
+	 * is specified
+	 * @dev Only callable by the owner.
+	 */
 	function setRoyaltyPayout(address _royaltyPayout) external onlyOwner {
 		require(_royaltyPayout != address(0), 'Zero Address not allowed');
 		royaltyPayout = _royaltyPayout;
@@ -126,14 +185,6 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	}
 
 	/**
-	 * @dev See {IERC721Metadata-tokenURI}.
-	 */
-	function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-		require(_exists(tokenId), 'Nonexistent token');
-		return accessPassDescriptor.genericDataURI(tokenId.toString());
-	}
-
-	/**
 	 * @dev See {IERC165-royaltyInfo}.
 	 */
 	function royaltyInfo(uint256 tokenId, uint256 salePrice)
@@ -144,47 +195,5 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	{
 		require(_exists(tokenId), 'Nonexistent token');
 		return (royaltyPayout, SafeMath.div(SafeMath.mul(salePrice, sellerFeeBasisPoints), 1000));
-	}
-
-	/*
-	 * @functionName getAccesspassCount
-	 * @functionDescription get accesspass count
-	 */
-	function getAccessPassCount() public view returns (uint256) {
-		return accessPassCount.current();
-	}
-
-
-	/*
-	 * @functionName mint
-	 * @functionDescription mint accesspass
-	 * @param _quantity quantity per mint
-	 */
-	function mint(uint8 _quantity) public onlyOwner {
-		require(maxQuantity > _quantity, 'quantity exceeds');
-		require(totalAccessPasses > accessPassCount.current() + _quantity, 'quantity exceeds max supply');
-
-		uint8 i = 0;
-		for (i; i < _quantity; i++) {
-			_safeMint(msg.sender, accessPassCount.current());
-			accessPassCount.increment();
-		}
-	}
-
-	/*
-	 * @functionName mintTo
-	 * @functionDescription mint accesspass with given address
-	 * @param _to address to mint
-	 * @param _quantity quantity per mint
-	 */
-	function mintTo(address _to, uint8 _quantity) public onlyOwner {
-		require(maxQuantity > _quantity, 'quantity exceeds');
-		require(totalAccessPasses > accessPassCount.current() + _quantity, 'quantity exceeds max supply');
-
-		uint8 i = 0;
-		for (i; i < _quantity; i++) {
-			_safeMint(_to, accessPassCount.current());
-			accessPassCount.increment();
-		}
 	}
 }
