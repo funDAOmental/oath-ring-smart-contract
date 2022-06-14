@@ -6,8 +6,11 @@ describe.only('AccessPass TEST', async () => {
 	let AccessPass: any;
 	let accesspass: any;
 
+	let AccessPassDescriptor: any;
+	let accessPassDescriptor: any;
+
 	const openseaProxy: string = '0xF57B2c51dED3A29e6891aba85459d600256Cf317';
-	const mainUrl: string = 'https://www.nftxt.xyz';
+	const dataUriPrefix: string = 'data:application/json;base64,';
 	const mainCost: BigNumber = ethers.utils.parseEther('0.1');
 
 	const receiver1: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0';
@@ -15,9 +18,12 @@ describe.only('AccessPass TEST', async () => {
 	const receiver3: string = '0xB07243398f1d0094b64f4C0a61B8C03233914036';
 	const receiver4: string = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266';
 
-	before(async () => {
+	beforeEach(async () => {
+		AccessPassDescriptor = await ethers.getContractFactory('AccessPassDescriptor');
+		accessPassDescriptor = await AccessPassDescriptor.deploy();
+		accessPassDescriptor.deployed()
 		AccessPass = await ethers.getContractFactory('AccessPass');
-		accesspass = await AccessPass.deploy(openseaProxy, 20, 5);
+		accesspass = await AccessPass.deploy(openseaProxy, accessPassDescriptor.address, 337, 5);
 		accesspass.deployed();
 	});
 
@@ -25,22 +31,30 @@ describe.only('AccessPass TEST', async () => {
 		const proxyregistry: string = await accesspass.proxyRegistry();
 		expect(proxyregistry).to.equal(openseaProxy);
 
-		const totalaccesspasses: number = await accesspass.getTotalAccesspass();
-		expect(totalaccesspasses).to.equal(20);
+		const descriptor: string = await accesspass.accessPassDescriptor();
+		expect(descriptor).to.equal(accessPassDescriptor.address);
+
+		const totalaccesspasses: number = await accesspass.totalAccessPasses();
+		expect(totalaccesspasses).to.equal(337);
 	});
 
-	it('should initialize accesspass base url', async () => {
-		const url1: string = await accesspass.getBaseURI();
-		expect(url1).to.equal('');
+	it('should updated accessPassDescriptor', async () => {
+		const oldAddress: string = await accesspass.accessPassDescriptor();
+		
+		const newAddress = "0xF57B2c51dED3A29e6891aba85459d600256Cf317"
 
-		const blockChain = await accesspass.setBaseURI(mainUrl);
-		await blockChain.wait();
+		await (await accesspass.setAccessPassDescriptor(newAddress));
+		const expected: string = await accesspass.accessPassDescriptor();
 
-		const url2: string = await accesspass.getBaseURI();
-		expect(url2).to.equal(mainUrl);
+		expect(newAddress).to.equal(newAddress);
 	});
 
-	it('should initialize accesspass hash url', async () => {
+	it('should revert setAccessPassDescriptor for AddressZero', async () => {
+		const oldAddress: string = await accesspass.accessPassDescriptor();
+		await expect(accesspass.setAccessPassDescriptor(ethers.constants.AddressZero)).to.be.revertedWith("INVALID_ADDRESS");
+	});
+
+	it('should update accesspass hash url', async () => {
 		const url1: string = await accesspass.contractURI();
 		expect(url1).to.equal('ipfs://TODO');
 
@@ -69,12 +83,12 @@ describe.only('AccessPass TEST', async () => {
 		expect(sellerfeebasispoints).to.equal(199);
 	});
 
-	it('should reject accesspass token (nonexistent token)', async () => {
-		await expect(accesspass.tokenURI(0)).to.be.revertedWith('nonexistent token');
+	it('should reject accesspass token (Nonexistent token)', async () => {
+		await expect(accesspass.tokenURI(0)).to.be.revertedWith('Nonexistent token');
 	});
 
-	it('should reject accesspass royalty (nonexistent token)', async () => {
-		await expect(accesspass.royaltyInfo(0, mainCost)).to.be.revertedWith('nonexistent token');
+	it('should reject accesspass royalty (Nonexistent token)', async () => {
+		await expect(accesspass.royaltyInfo(0, mainCost)).to.be.revertedWith('Nonexistent token');
 	});
 
 	it('should reject accesspass mint (quantity exceeds)', async () => {
@@ -91,45 +105,44 @@ describe.only('AccessPass TEST', async () => {
 	});
 
 	it('should get accesspass token 0', async () => {
-		const tokenUrl: string = await accesspass.tokenURI(0);
-		expect(tokenUrl).to.equal(`${mainUrl}/0.json`);
+		await (await accesspass.mint(1));
+		
+		const tokenId = 0
+		const base64EncodedData: string = await accesspass.tokenURI(0);
+		const name = await accessPassDescriptor.collectionNamePrefix();
+		const description = await accessPassDescriptor.collectionDetails();
+		const image = await accessPassDescriptor.collectionImage();
+
+		const metadata = JSON.parse(atob(base64EncodedData.split(",")[1]));
+		expect(base64EncodedData).to.include(dataUriPrefix);
+
+		//Check name was correctly combined
+		expect(metadata.name).to.equal(name + tokenId.toString());
+
+		//Check description was correctly combined
+		expect(metadata.description).to.equal(description + tokenId);
+
+		//Check attributes is empty
+		expect(metadata.attributes).to.deep.equal([]);
+
+		//Check image is set to collectionImage
+		expect(metadata.image).to.deep.equal(image)
+
 	});
 
 	it('should get accesspass count 0', async () => {
-		const tokenCount: number = await accesspass.getAccesspassCount();
-		expect(tokenCount).to.equal(1);
+		const tokenCount: number = await accesspass.getAccessPassCount();
+		expect(tokenCount).to.equal(0);
 	});
 
 	it('should get accesspass royalty 0', async () => {
+		// Setup
+		await (await accesspass.mint(1));
+		await (await accesspass.setRoyaltyPayout(receiver1));
+
 		const royaltyInfo = await accesspass.royaltyInfo(0, mainCost);
 		// console.log(royaltyInfo);
 		expect(royaltyInfo['receiver']).to.equal(receiver1);
-		expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.0199'));
-	});
-
-	it('should mint accesspass 1', async () => {
-		const blockChain = await accesspass.mintTo(receiver2, 1);
-		const blockChainWait = await blockChain.wait();
-
-		const blockChainEvent = blockChainWait.events[0];
-		const newTokenId: number = Number(blockChainEvent.args['tokenId']);
-		expect(newTokenId).to.equal(1);
-	});
-
-	it('should get accesspass token 1', async () => {
-		const tokenUrl: string = await accesspass.tokenURI(1);
-		expect(tokenUrl).to.equal(`${mainUrl}/1.json`);
-	});
-
-	it('should get accesspass count 1', async () => {
-		const tokenCount: number = await accesspass.getAccesspassCount();
-		expect(tokenCount).to.equal(2);
-	});
-
-	it('should get accesspass royalty 1', async () => {
-		const royaltyInfo = await accesspass.royaltyInfo(1, mainCost);
-		// console.log(royaltyInfo);
-		expect(royaltyInfo['receiver']).to.equal(receiver1);
-		expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.0199'));
+		expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.01'));
 	});
 });
