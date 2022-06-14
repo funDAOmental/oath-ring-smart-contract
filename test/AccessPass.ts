@@ -83,12 +83,12 @@ describe.only('AccessPass TEST', async () => {
 		expect(sellerfeebasispoints).to.equal(199);
 	});
 
-	it('should reject accesspass token (nonexistent token)', async () => {
-		await expect(accesspass.tokenURI(0)).to.be.revertedWith('nonexistent token');
+	it('should reject accesspass token (Nonexistent token)', async () => {
+		await expect(accesspass.tokenURI(0)).to.be.revertedWith('Nonexistent token');
 	});
 
-	it('should reject accesspass royalty (nonexistent token)', async () => {
-		await expect(accesspass.royaltyInfo(0, mainCost)).to.be.revertedWith('nonexistent token');
+	it('should reject accesspass royalty (Nonexistent token)', async () => {
+		await expect(accesspass.royaltyInfo(0, mainCost)).to.be.revertedWith('Nonexistent token');
 	});
 
 	it('should reject accesspass mint (quantity exceeds)', async () => {
@@ -105,7 +105,7 @@ describe.only('AccessPass TEST', async () => {
 	});
 
 	it('should get accesspass token 0', async () => {
-		await (await accesspass.mint());
+		await (await accesspass.mint(1));
 		
 		const tokenId = 0
 		const base64EncodedData: string = await accesspass.tokenURI(0);
@@ -131,13 +131,13 @@ describe.only('AccessPass TEST', async () => {
 	});
 
 	it('should get accesspass count 0', async () => {
-		const tokenCount: number = await accesspass.getAccesspassCount();
-		expect(tokenCount).to.equal(1);
+		const tokenCount: number = await accesspass.getAccessPassCount();
+		expect(tokenCount).to.equal(0);
 	});
 
 	it('should get accesspass royalty 0', async () => {
 		// Setup
-		await (await accesspass.mint());
+		await (await accesspass.mint(1));
 		await (await accesspass.setRoyaltyPayout(receiver1));
 
 		const royaltyInfo = await accesspass.royaltyInfo(0, mainCost);

@@ -63,15 +63,6 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	// ============ OWNER-ONLY ADMIN FUNCTIONS ============
 
 	/**
-	 * @notice mint
-	 * @dev
-	 */
-	function mint() external onlyOwner {
-		_safeMint(msg.sender, 0);
-	}
-
-
-	/**
 	 * @notice Set the accessPassDescriptor.
 	 * @dev Only callable by the owner.
 	 */
@@ -151,7 +142,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 		override
 		returns (address receiver, uint256 royaltyAmount)
 	{
-		require(_exists(tokenId), 'nonexistent token');
+		require(_exists(tokenId), 'Nonexistent token');
 		return (royaltyPayout, SafeMath.div(SafeMath.mul(salePrice, sellerFeeBasisPoints), 1000));
 	}
 
