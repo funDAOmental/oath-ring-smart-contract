@@ -14,17 +14,24 @@ async function main() {
 	console.log('deploying accesspass contract with the account:', deployer.address);
 	console.log('account balance:', (await deployer.getBalance()).toString());
 
-	const AccessPass = await ethers.getContractFactory('AccessPass');
-	const accesspass = await AccessPass.deploy(openseaProxy, 337, 5);
+	try {
+		const AccessPassDescriptor = await ethers.getContractFactory('AccessPassDescriptor');
+		const accessPassDescriptor = await AccessPassDescriptor.deploy();
+		await accessPassDescriptor.deployed();
+		console.log('accesspass descriptor deployed to:', accessPassDescriptor.address);
 
-	await accesspass.deployed();
-
-	console.log('accesspass contract deployed to:', accesspass.address);
+		const AccessPass = await ethers.getContractFactory('AccessPass');
+		const accesspass = await AccessPass.deploy(openseaProxy, accessPassDescriptor.address, 337, 5);
+		await accesspass.deployed();
+		console.log('accesspass contract deployed to:', accesspass.address);
+	} catch (error) {
+		throw new Error(`try catch error: ${JSON.stringify(error)}`);
+	}
 }
 
 main()
 	.then(() => process.exit(0))
 	.catch((error) => {
-		console.error('accesspass deployment error:', error);
+		console.error(`accesspass contract error: ${JSON.stringify(error)}`);
 		process.exit(1);
 	});

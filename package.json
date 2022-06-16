@@ -15,7 +15,7 @@
 		"deploy:gmkeys:rinkeby": "npx hardhat run scripts/deploy-gmkeys.ts --network rinkeby",
 		"deploy:randomness:rinkeby": "npx hardhat run scripts/deploy-randomness.ts --network rinkeby",
 		"test": "npx hardhat test",
-		"test:accesspass": "npx hardhat test test/AccessPass*",
+		"test:accesspass": "npx hardhat test test/AccessPass*.spec.ts",
 		"test:presale": "npx hardhat test test/presale",
 		"test:zerokeys": "npx hardhat test test/zerokeys",
 		"test:gmkeys": "npx hardhat test test/gmkeys",
