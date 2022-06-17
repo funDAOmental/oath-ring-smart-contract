@@ -23,8 +23,10 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	// seller fee basis points 100 == 10%
 	uint16 public sellerFeeBasisPoints = 100;
-	uint256 public totalAccessPasses;
+	uint256 private totalAccessPasses;
 	uint256 private maxQuantity;
+
+	uint256 private totalAccessPassesSilver = 1000; // hardcoded
 
 	// OpenSea's Proxy Registry
 	IProxyRegistry public immutable proxyRegistry;
@@ -62,7 +64,10 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 */
 	function mint(uint8 quantity_) public onlyOwner {
 		require(maxQuantity > quantity_, 'quantity exceeds');
-		require(totalAccessPasses > accessPassCount.current() + quantity_, 'quantity exceeds max supply');
+		require(
+			totalAccessPasses + totalAccessPassesSilver > accessPassCount.current() + quantity_,
+			'quantity exceeds max supply'
+		);
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
@@ -78,7 +83,10 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 */
 	function mintTo(address to_, uint8 quantity_) public onlyOwner {
 		require(maxQuantity > quantity_, 'quantity exceeds');
-		require(totalAccessPasses > accessPassCount.current() + quantity_, 'quantity exceeds max supply');
+		require(
+			totalAccessPasses + totalAccessPassesSilver > accessPassCount.current() + quantity_,
+			'quantity exceeds max supply'
+		);
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
@@ -106,6 +114,14 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 */
 	function contractURI() public view returns (string memory) {
 		return string(abi.encodePacked('ipfs://', contractURIHash));
+	}
+
+	/**
+	 * @dev gettotalAccessPasses
+	 * @notice get total accesspass count
+	 */
+	function getTotalAccessPasses() public view returns (uint256) {
+		return totalAccessPasses;
 	}
 
 	/**
