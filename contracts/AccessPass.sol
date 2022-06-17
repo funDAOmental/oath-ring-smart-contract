@@ -9,7 +9,7 @@ import '@openzeppelin/contracts/utils/Counters.sol';
 
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
-import { IAccessPassDescriptor} from './interfaces/IAccessPassDescriptor.sol';
+import { IAccessPassDescriptor } from './interfaces/IAccessPassDescriptor.sol';
 import { IProxyRegistry } from './external/opensea/IProxyRegistry.sol';
 
 contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
@@ -41,7 +41,12 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 * @param accessPassDescriptor_ address for OpenSea proxy.
 	 * @param totalAccessPasses_ total number of tokens
 	 */
-	constructor(address openSeaProxyRegistry_ , address accessPassDescriptor_, uint256 totalAccessPasses_, uint256 maxQuantity_) ERC721('Access Pass', 'ACCESS-PASS') {
+	constructor(
+		address openSeaProxyRegistry_,
+		address accessPassDescriptor_,
+		uint256 totalAccessPasses_,
+		uint256 maxQuantity_
+	) ERC721('Access Pass', 'ACCESS-PASS') {
 		proxyRegistry = IProxyRegistry(openSeaProxyRegistry_);
 		accessPassDescriptor = IAccessPassDescriptor(accessPassDescriptor_);
 		totalAccessPasses = totalAccessPasses_;
@@ -85,6 +90,18 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	// ============ PUBLIC READ-ONLY FUNCTIONS ==============
 
 	/**
+	 * @dev getAccesspassCount
+	 * @notice get accesspass token type (0-gold, 1-silver)
+	 */
+	function _getTokenType(uint256 tokenId) internal pure returns (uint8) {
+		if (tokenId <= totalAccessPasses) {
+			return 0;
+		}
+
+		return 1;
+	}
+
+	/**
 	 * @notice The IPFS URI of contract-level metadata.
 	 */
 	function contractURI() public view returns (string memory) {
@@ -104,7 +121,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 */
 	function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
 		require(_exists(tokenId), 'Nonexistent token');
-		return accessPassDescriptor.genericDataURI(tokenId.toString());
+		return accessPassDescriptor.genericDataURI(tokenId.toString(), _getTokenType(tokenId));
 	}
 
 	// ============ OWNER-ONLY ADMIN FUNCTIONS ============
@@ -117,7 +134,6 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 		require(accessPassDescriptor_ != address(0), 'INVALID_ADDRESS');
 		accessPassDescriptor = IAccessPassDescriptor(accessPassDescriptor_);
 	}
-
 
 	/**
 	 * @notice Set the _contractURIHash.
@@ -139,7 +155,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	/**
 	 * @notice
-	 * set default selling fees will be interpreted if nothing 
+	 * set default selling fees will be interpreted if nothing
 	 * is specified
 	 * @dev Only callable by the owner.
 	 */
@@ -150,7 +166,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	/**
 	 * @notice
-	 * set default royalty payout address if nothing 
+	 * set default royalty payout address if nothing
 	 * is specified
 	 * @dev Only callable by the owner.
 	 */
