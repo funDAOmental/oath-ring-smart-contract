@@ -14,13 +14,14 @@ describe.only('AccessPassDescriptor TEST', async () => {
 			descriptor = await AccessPassDescriptor.deploy();
 			descriptor.deployed();
 		});
-		it('should return correct base64 encoded metadata', async () => {
-			const name = await descriptor.collectionNamePrefix();
-			const description = await descriptor.collectionDetails();
-			const image = await descriptor.collectionImage();
+		it('should return correct gold base64 encoded metadata', async () => {
+			const name = await descriptor.collectionGoldPrefix();
+			const description = await descriptor.collectionGoldDetails();
+			const image = await descriptor.collectionGoldImage();
 			const expected_prefix = "data:application/json;base64,"
+			const attributes: any = ['type','â\u0098\u0089']
 			const tokenId = "1"
-			const result = await descriptor.genericDataURI(tokenId);
+			const result = await descriptor.genericDataURI(tokenId, 0);
 			// Extract and base64 decode metadata
 			const metadata = JSON.parse(atob(result.split(",")[1]));
 
@@ -32,26 +33,24 @@ describe.only('AccessPassDescriptor TEST', async () => {
 			//Check description was correctly combined
 			expect(metadata.description).to.equal(description + tokenId);
 
-			//Check attributes is empty
-			expect(metadata.attributes).to.deep.equal([]);
+			// Check attribues are set correctly
+			expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
+			expect(metadata.attributes[0].value).to.equal(attributes[1]);
 
 			//Check image is set to collectionImage
 			expect(metadata.image).to.deep.equal(image)
 		});
 
-		it('should return base64 encoded metadata with single attribute', async () => {
-			const name = await descriptor.collectionNamePrefix();
-			const description = await descriptor.collectionDetails();
-			const image = await descriptor.collectionImage();
+		it('should return base64 encoded silver metadata attribute', async () => {
+			const name = await descriptor.collectionSilverPrefix();
+			const description = await descriptor.collectionSilverDetails();
+			const image = await descriptor.collectionSilverImage();
 
-			const attributes: any = ['test', 'value']
+			const attributes: any = ['type','â\u0098½']
 			const expected_prefix = "data:application/json;base64,"
 			const tokenId = "1"
 
-			// Set expected attributes
-			await (await descriptor.setCollectionAttributes(attributes))
-
-			const result = await descriptor.genericDataURI(tokenId);
+			const result = await descriptor.genericDataURI(tokenId, 1);
 
 			// Extract and base64 decode metadata
 			const metadata = JSON.parse(atob(result.split(",")[1]));
@@ -81,12 +80,12 @@ describe.only('AccessPassDescriptor TEST', async () => {
 			descriptor.deployed();
 		});
 
-		it('should update collectionNamePrefix', async () => {
-			const beforeUpdate = await descriptor.collectionNamePrefix();
+		it('should update collectionGoldPrefix', async () => {
+			const beforeUpdate = await descriptor.collectionGoldPrefix();
 			const expected = "Some String"
-			await (await descriptor.setCollectionNamePrefix(expected));
+			await (await descriptor.setCollectionGoldPrefix(expected));
 
-			const afterUpdate = await descriptor.collectionNamePrefix();
+			const afterUpdate = await descriptor.collectionGoldPrefix();
 
 			// Check before and new are different
 			expect(afterUpdate).to.not.equal(beforeUpdate);
@@ -95,12 +94,26 @@ describe.only('AccessPassDescriptor TEST', async () => {
 			expect(afterUpdate).to.equal(expected);
 		});
 
-		it('should update collectionDetails', async () => {
-			const beforeUpdate = await descriptor.collectionDetails();
+		it('should update collectionSilverPrefix', async () => {
+			const beforeUpdate = await descriptor.collectionSilverPrefix();
 			const expected = "Some String"
-			await (await descriptor.setCollectionDetails(expected));
+			await (await descriptor.setCollectionSilverPrefix(expected));
 
-			const afterUpdate = await descriptor.collectionDetails();
+			const afterUpdate = await descriptor.collectionSilverPrefix();
+
+			// Check before and new are different
+			expect(afterUpdate).to.not.equal(beforeUpdate);
+
+			// Check after namePrefix update it's correct
+			expect(afterUpdate).to.equal(expected);
+		});
+
+		it('should update collectionGoldDetails', async () => {
+			const beforeUpdate = await descriptor.collectionGoldDetails();
+			const expected = "Some Gold"
+			await (await descriptor.setCollectionGoldDetails(expected));
+
+			const afterUpdate = await descriptor.collectionGoldDetails();
 
 			// Check before and new are different
 			expect(afterUpdate).to.not.equal(beforeUpdate);
@@ -109,24 +122,40 @@ describe.only('AccessPassDescriptor TEST', async () => {
 			expect(afterUpdate).to.equal(expected);
 		});
 
-		it('should update collectionAttributes', async () => {
+		it('should update collectionSilverDetails', async () => {
+			const beforeUpdate = await descriptor.collectionSilverDetails();
+			const expected = "Some Silver"
+			await (await descriptor.setCollectionSilverDetails(expected));
 
-			const attributes: string[] = ['Some String', 'Some Value']
-			await (await descriptor.setCollectionAttributes(attributes))
+			const afterUpdate = await descriptor.collectionSilverDetails();
 
 			// Check before and new are different
-			for (var i in attributes) {
-				expect(await descriptor.collectionAttributes(i)).to.equal(attributes[i]);
-			}
+			expect(afterUpdate).to.not.equal(beforeUpdate);
 
+			// Check after collectionDetails update it's correct
+			expect(afterUpdate).to.equal(expected);
 		});
 
-		it('should update collectionImage', async () => {
-			const beforeUpdate = await descriptor.collectionImage();
+		it('should update setCollectionGoldImage', async () => {
+			const beforeUpdate = await descriptor.collectionGoldImage();
 			const expected = "Some String"
-			await (await descriptor.setCollectionImage(expected));
+			await (await descriptor.setCollectionGoldImage(expected));
 
-			const afterUpdate = await descriptor.collectionImage();
+			const afterUpdate = await descriptor.collectionGoldImage();
+
+			// Check before and new are different
+			expect(afterUpdate).to.not.equal(beforeUpdate);
+
+			// Check after collectionDetails update it's correct
+			expect(afterUpdate).to.equal(expected);
+		});
+
+		it('should update setCollectionSilverImage', async () => {
+			const beforeUpdate = await descriptor.collectionSilverImage();
+			const expected = "Some String"
+			await (await descriptor.setCollectionSilverImage(expected));
+
+			const afterUpdate = await descriptor.collectionSilverImage();
 
 			// Check before and new are different
 			expect(afterUpdate).to.not.equal(beforeUpdate);
@@ -136,41 +165,5 @@ describe.only('AccessPassDescriptor TEST', async () => {
 		});
 
 
-	});
-
-	it('should return base64 encoded metadata with multiple attribute', async () => {
-		const name = await descriptor.collectionNamePrefix();
-		const description = await descriptor.collectionDetails();
-		const image = await descriptor.collectionImage();
-
-		const attributes: any = ['attribute1', 'value', "attribute2", "value"]
-		const expected_prefix = "data:application/json;base64,"
-		const tokenId = "1"
-
-		// Set expected attributes
-		await (await descriptor.setCollectionAttributes(attributes))
-
-		const result = await descriptor.genericDataURI(tokenId);
-
-		// Extract and base64 decode metadata
-		const metadata = JSON.parse(atob(result.split(",")[1]));
-
-		// Check data prefix is correct 
-		expect(result).to.include(expected_prefix)
-
-		// Check name was correctly combined
-		expect(metadata.name).to.equal(name + tokenId);
-
-		// Check description was correctly combined
-		expect(metadata.description).to.equal(description + tokenId);
-
-		// Check image is set to collectionImage
-		expect(metadata.image).to.deep.equal(image)
-
-		// Check attribues are set correctly
-		expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
-		expect(metadata.attributes[0].value).to.equal(attributes[1]);
-		expect(metadata.attributes[1].trait_type).to.equal(attributes[2]);
-		expect(metadata.attributes[1].value).to.equal(attributes[3]);
 	});
 });
