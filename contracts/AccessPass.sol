@@ -24,9 +24,9 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	// seller fee basis points 100 == 10%
 	uint16 public sellerFeeBasisPoints = 100;
 	uint256 public totalAccessPasses;
-	uint256 private maxQuantity;
-	uint256 private goldQantity = 337;
-	uint256 private silverQantity = 1000;
+	uint256 public maxQuantity = 5;
+	uint256 public goldQuantity = 337;
+	uint256 public silverQuantity = 1000;
 
 	// OpenSea's Proxy Registry
 	IProxyRegistry public immutable proxyRegistry;
@@ -41,13 +41,15 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 * @dev
 	 * @param openSeaProxyRegistry_ address for OpenSea proxy.
 	 * @param accessPassDescriptor_ address for OpenSea proxy.
-	 * @param totalAccessPasses_ total number of tokens
+	 * @param goldQuantity_	total number of goldToken
+	 * @param silverQuantity_	total number of goldToken
 	 */
-	constructor(address openSeaProxyRegistry_ , address accessPassDescriptor_, uint256 totalAccessPasses_, uint256 maxQuantity_) ERC721('Access Pass', 'ACCESS-PASS') {
+	constructor(address openSeaProxyRegistry_ , address accessPassDescriptor_, uint256 goldQuantity_ , uint256 silverQuantity_) ERC721('Access Pass', 'ACCESS-PASS') {
 		proxyRegistry = IProxyRegistry(openSeaProxyRegistry_);
 		accessPassDescriptor = IAccessPassDescriptor(accessPassDescriptor_);
-		totalAccessPasses = totalAccessPasses_;
-		maxQuantity = maxQuantity_;
+		totalAccessPasses = goldQuantity_ + silverQuantity_;
+		goldQuantity = goldQuantity_;
+		silverQuantity = silverQuantity_;
 		royaltyPayout = address(this);
 	}
 
@@ -58,7 +60,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 * @param quantity_ quantity per mint
 	 */
 	function mint(uint8 quantity_) public onlyOwner {
-		require(maxQuantity > quantity_, 'quantity exceeds');
+		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
 		require(totalAccessPasses > accessPassCount.current() + quantity_, 'quantity exceeds max supply');
 
 		uint8 i = 0;
@@ -74,7 +76,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 * @param quantity_ quantity per mint
 	 */
 	function mintTo(address to_, uint8 quantity_) public onlyOwner {
-		require(maxQuantity > quantity_, 'quantity exceeds');
+		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
 		require(totalAccessPasses > accessPassCount.current() + quantity_, 'quantity exceeds max supply');
 
 		uint8 i = 0;
@@ -121,7 +123,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 * @dev return tokenType.
 	*/
 	function _getTokenType(uint256 tokenId) internal view returns (uint256) {
-		return tokenId>goldQantity ? 1 : 0;
+		return tokenId>=goldQuantity ? 1 : 0;
 	}
 
 
@@ -198,7 +200,6 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 		if (isOpenSeaProxyActive && proxyRegistry.proxies(owner) == operator) {
 			return true;
 		}
-
 		return super.isApprovedForAll(owner, operator);
 	}
 
