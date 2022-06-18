@@ -25,6 +25,8 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	uint16 public sellerFeeBasisPoints = 100;
 	uint256 public totalAccessPasses;
 	uint256 private maxQuantity;
+	uint256 private goldQantity = 337;
+	uint256 private silverQantity = 1000;
 
 	// OpenSea's Proxy Registry
 	IProxyRegistry public immutable proxyRegistry;
@@ -91,6 +93,14 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 		return string(abi.encodePacked('ipfs://', contractURIHash));
 	}
 
+
+	/**
+	 * @notice return tokenType.
+	 */
+	function tokenType(uint256 tokenId) public view returns (uint256) {
+		return _getTokenType(tokenId);
+	}
+
 	/**
 	 * @dev getAccesspassCount
 	 * @notice get accesspass count
@@ -104,8 +114,16 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 */
 	function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
 		require(_exists(tokenId), 'Nonexistent token');
-		return accessPassDescriptor.genericDataURI(tokenId.toString());
+		return accessPassDescriptor.genericDataURI(tokenId.toString(), _getTokenType(tokenId));
 	}
+
+	/**
+	 * @dev return tokenType.
+	*/
+	function _getTokenType(uint256 tokenId) internal view returns (uint256) {
+		return tokenId>goldQantity ? 1 : 0;
+	}
+
 
 	// ============ OWNER-ONLY ADMIN FUNCTIONS ============
 

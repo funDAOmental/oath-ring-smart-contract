@@ -109,9 +109,9 @@ describe.only('AccessPass TEST', async () => {
 		
 		const tokenId = 0
 		const base64EncodedData: string = await accesspass.tokenURI(0);
-		const name = await accessPassDescriptor.collectionNamePrefix();
-		const description = await accessPassDescriptor.collectionDetails();
-		const image = await accessPassDescriptor.collectionImage();
+		const name = await accessPassDescriptor.collectionGoldPrefix();
+		const description = await accessPassDescriptor.collectionGoldDetails();
+		const image = await accessPassDescriptor.collectionGoldImage();
 
 		const metadata = JSON.parse(atob(base64EncodedData.split(",")[1]));
 		expect(base64EncodedData).to.include(dataUriPrefix);
@@ -121,9 +121,6 @@ describe.only('AccessPass TEST', async () => {
 
 		//Check description was correctly combined
 		expect(metadata.description).to.equal(description + tokenId);
-
-		//Check attributes is empty
-		expect(metadata.attributes).to.deep.equal([]);
 
 		//Check image is set to collectionImage
 		expect(metadata.image).to.deep.equal(image)

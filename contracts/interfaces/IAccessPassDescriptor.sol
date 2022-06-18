@@ -7,7 +7,8 @@ pragma solidity ^0.8.11;
 interface IAccessPassDescriptor {
 
     function genericDataURI(
-        string memory tokenId
+        string memory tokenId,
+        uint256 tokenType
     ) external view returns (string memory);
 
 }
