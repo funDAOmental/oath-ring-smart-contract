@@ -134,11 +134,18 @@ describe.only('AccessPass TEST', async () => {
 			accessPassDescriptor = await AccessPassDescriptor.deploy();
 			accessPassDescriptor.deployed()
 			AccessPass = await ethers.getContractFactory('AccessPass');
-			accesspass = await AccessPass.deploy(openseaProxy, accessPassDescriptor.address, 5, 10);
+			accesspass = await AccessPass.deploy(openseaProxy, accessPassDescriptor.address, 7, 7);
 			accesspass.deployed();
 		});
-		it('should reject accesspass mint (quantity exceeds)', async () => {
-			await expect(accesspass.mint(6)).to.be.revertedWith('quantity exceeds');
+		it('should reject accesspass mint (quantity exceeds max per tx)', async () => {
+			await expect(accesspass.mint(6)).to.be.revertedWith('quantity exceeds max per tx');
+		});
+
+		it('should reject accesspass mint maxSupply reached', async () => {
+			await accesspass.mint(5)
+			await accesspass.mint(5)
+			await accesspass.mint(3)
+			await expect(accesspass.mint(2)).to.be.revertedWith('quantity exceeds max supply');
 		});
 
 		it('should mint accesspass 0', async () => {
