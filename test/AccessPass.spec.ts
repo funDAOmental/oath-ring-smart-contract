@@ -6,6 +6,8 @@ describe.only('AccessPass TEST', async () => {
 	let AccessPass: any;
 	let accesspass: any;
 
+	let deployer: any;
+
 	let AccessPassDescriptor: any;
 	let accessPassDescriptor: any;
 
@@ -126,10 +128,16 @@ describe.only('AccessPass TEST', async () => {
 			expect(royaltyInfo['receiver']).to.equal(receiver1);
 			expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.01'));
 		});
+
+		it('should get AccessPassCount 0', async () => {
+			const tokenCount: number = await accesspass.getAccessPassCount();
+			expect(tokenCount).to.equal(0);
+		});
 	});
 
 	describe.only('Mint functions', async () => {	
 		beforeEach(async () => {
+			deployer = (await ethers.getSigners())[0];
 			AccessPassDescriptor = await ethers.getContractFactory('AccessPassDescriptor');
 			accessPassDescriptor = await AccessPassDescriptor.deploy();
 			accessPassDescriptor.deployed()
@@ -157,7 +165,7 @@ describe.only('AccessPass TEST', async () => {
 			expect(newTokenId).to.equal(0);
 		});
 
-		it('should get accesspass token 0', async () => {
+		it('should get accesspass token 0 type gold', async () => {
 			await (await accesspass.mint(1));
 			
 			const tokenId = 0
@@ -165,23 +173,58 @@ describe.only('AccessPass TEST', async () => {
 			const name = await accessPassDescriptor.collectionGoldPrefix();
 			const description = await accessPassDescriptor.collectionGoldDetails();
 			const image = await accessPassDescriptor.collectionGoldImage();
+			const attributes: any = ['type','â\u0098\u0089']
+
+			expect(await accesspass.balanceOf(deployer.address)).to.equal(1);
 
 			const metadata = JSON.parse(atob(base64EncodedData.split(",")[1]));
 			expect(base64EncodedData).to.include(dataUriPrefix);
 
-			//Check name was correctly combined
+			// Check name was correctly combined
 			expect(metadata.name).to.equal(name + tokenId.toString());
 
-			//Check description was correctly combined
+			// Check description was correctly combined
 			expect(metadata.description).to.equal(description + tokenId);
 
-			//Check image is set to collectionImage
+			// Check image is set to collectionImage
 			expect(metadata.image).to.deep.equal(image)
+
+			// Check attribues are set correctly
+			expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
+			expect(metadata.attributes[0].value).to.equal(attributes[1]);
 		});
 
-		it('should get accesspass count 0', async () => {
-			const tokenCount: number = await accesspass.getAccessPassCount();
-			expect(tokenCount).to.equal(0);
+
+		it('should get accesspass token 7 type silver', async () => {
+			// mint all gold supply
+			await accesspass.mint(5)
+			await accesspass.mint(2)
+			await (await accesspass.mint(1));
+			
+			const tokenId = 7
+			const base64EncodedData: string = await accesspass.tokenURI(tokenId);
+			const name = await accessPassDescriptor.collectionSilverPrefix();
+			const description = await accessPassDescriptor.collectionSilverDetails();
+			const image = await accessPassDescriptor.collectionSilverImage();
+			const attributes: any = ['type','â\u0098½']
+
+			expect(await accesspass.balanceOf(deployer.address)).to.equal(8);
+
+			const metadata = JSON.parse(atob(base64EncodedData.split(",")[1]));
+			expect(base64EncodedData).to.include(dataUriPrefix);
+
+			// Check name was correctly combined
+			expect(metadata.name).to.equal(name + tokenId.toString());
+
+			// Check description was correctly combined
+			expect(metadata.description).to.equal(description + tokenId);
+
+			// Check image is set to collectionImage
+			expect(metadata.image).to.deep.equal(image)
+
+			// Check attribues are set correctly
+			expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
+			expect(metadata.attributes[0].value).to.equal(attributes[1]);
 		});
 	});
 });
