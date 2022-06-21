@@ -136,7 +136,7 @@ describe.only('AccessPass TEST', async () => {
 		});
 	});
 
-	describe.only('Mint functions', async () => {
+	describe.only('Mint functions Gold', async () => {
 		beforeEach(async () => {
 			deployer = (await ethers.getSigners())[0];
 			AccessPassDescriptor = await ethers.getContractFactory('AccessPassDescriptor');
@@ -194,21 +194,49 @@ describe.only('AccessPass TEST', async () => {
 			expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
 			expect(metadata.attributes[0].value).to.equal(attributes[1]);
 		});
+	});
 
-		// it('should get accesspass token 7 type silver', async () => {
-		// 	// mint all gold supply
-		// 	await accesspass.mintSilver(5);
-		// 	await accesspass.mintSilver(2);
+	describe.only('Mint functions Silver', async () => {
+		beforeEach(async () => {
+			deployer = (await ethers.getSigners())[0];
+			AccessPassDescriptor = await ethers.getContractFactory('AccessPassDescriptor');
+			accessPassDescriptor = await AccessPassDescriptor.deploy();
+			accessPassDescriptor.deployed();
+			AccessPass = await ethers.getContractFactory('AccessPass');
+			accesspass = await AccessPass.deploy(openseaProxy, accessPassDescriptor.address, 7, 7);
+			accesspass.deployed();
+		});
+
+		it('should reject accesspass mint (quantity exceeds max per tx)', async () => {
+			await expect(accesspass.mintSilver(6)).to.be.revertedWith('quantity exceeds max per tx');
+		});
+
+		it('should reject accesspass mint maxSupply reached', async () => {
+			await accesspass.mintSilver(5);
+			await accesspass.mintSilver(2);
+			await expect(accesspass.mintSilver(2)).to.be.revertedWith('quantity exceeds max supply');
+		});
+
+		it('should mint accesspass 0', async () => {
+			const blockChain = await accesspass.mintSilver(1);
+			const blockChainWait = await blockChain.wait();
+
+			const blockChainEvent = blockChainWait.events[0];
+			const newTokenId: number = Number(blockChainEvent.args['tokenId']);
+			expect(newTokenId).to.equal(0);
+		});
+
+		// it('should get accesspass token 0 type silver', async () => {
 		// 	await await accesspass.mintSilver(1);
 
-		// 	const tokenId = 7;
-		// 	const base64EncodedData: string = await accesspass.tokenURI(tokenId);
+		// 	const tokenId = 0;
+		// 	const base64EncodedData: string = await accesspass.tokenURI(0);
 		// 	const name = await accessPassDescriptor.collectionSilverPrefix();
 		// 	const description = await accessPassDescriptor.collectionSilverDetails();
 		// 	const image = await accessPassDescriptor.collectionSilverImage();
-		// 	const attributes: any = ['type', 'â\u0098½'];
+		// 	const attributes: any = ['type', 'â\u0098\u0089'];
 
-		// 	expect(await accesspass.balanceOf(deployer.address)).to.equal(8);
+		// 	expect(await accesspass.balanceOf(deployer.address)).to.equal(1);
 
 		// 	const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
 		// 	expect(base64EncodedData).to.include(dataUriPrefix);
@@ -216,15 +244,15 @@ describe.only('AccessPass TEST', async () => {
 		// 	// Check name was correctly combined
 		// 	expect(metadata.name).to.equal(name + tokenId.toString());
 
-		// 	// Check description was correctly combined
-		// 	expect(metadata.description).to.equal(description + tokenId);
+		// 	// // Check description was correctly combined
+		// 	// expect(metadata.description).to.equal(description + tokenId);
 
-		// 	// Check image is set to collectionImage
-		// 	expect(metadata.image).to.deep.equal(image);
+		// 	// // Check image is set to collectionImage
+		// 	// expect(metadata.image).to.deep.equal(image);
 
-		// 	// Check attribues are set correctly
-		// 	expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
-		// 	expect(metadata.attributes[0].value).to.equal(attributes[1]);
+		// 	// // Check attribues are set correctly
+		// 	// expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
+		// 	// expect(metadata.attributes[0].value).to.equal(attributes[1]);
 		// });
 	});
 });

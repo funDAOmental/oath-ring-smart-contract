@@ -17,6 +17,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	using Strings for uint256;
 	using Counters for Counters.Counter;
 
+	Counters.Counter private accessPassCount;
 	Counters.Counter private goldCount;
 	Counters.Counter private silverCount;
 
@@ -73,8 +74,9 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
-			_safeMint(msg.sender, goldCount.current());
+			_safeMint(msg.sender, accessPassCount.current());
 			goldCount.increment();
+			accessPassCount.increment();
 		}
 	}
 
@@ -89,8 +91,9 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
-			_safeMint(msg.sender, silverCount.current());
+			_safeMint(msg.sender, accessPassCount.current());
 			silverCount.increment();
+			accessPassCount.increment();
 		}
 	}
 
@@ -106,8 +109,9 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
-			_safeMint(to_, goldCount.current());
+			_safeMint(to_, accessPassCount.current());
 			goldCount.increment();
+			accessPassCount.increment();
 		}
 	}
 
@@ -123,8 +127,9 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
-			_safeMint(to_, silverCount.current());
+			_safeMint(to_, accessPassCount.current());
 			silverCount.increment();
+			accessPassCount.increment();
 		}
 	}
 
