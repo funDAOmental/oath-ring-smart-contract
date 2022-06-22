@@ -38,6 +38,8 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	// IPFS content hash of contract-level metadata
 	string private contractURIHash = 'TODO';
 
+	mapping(uint256 => bool) public tokenType;
+
 	// ============ ACCESS CONTROL/SANITY MODIFIERS ============
 
 	/**
@@ -74,9 +76,11 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
+			tokenType[accessPassCount.current()] = true;
 			_safeMint(msg.sender, accessPassCount.current());
 			goldCount.increment();
 			accessPassCount.increment();
+			
 		}
 	}
 
@@ -91,6 +95,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
+			tokenType[accessPassCount.current()] = false;
 			_safeMint(msg.sender, accessPassCount.current());
 			silverCount.increment();
 			accessPassCount.increment();
@@ -109,6 +114,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
+			tokenType[accessPassCount.current()] = true;
 			_safeMint(to_, accessPassCount.current());
 			goldCount.increment();
 			accessPassCount.increment();
@@ -127,6 +133,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
+			tokenType[accessPassCount.current()] = false;
 			_safeMint(to_, accessPassCount.current());
 			silverCount.increment();
 			accessPassCount.increment();
@@ -183,7 +190,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 * @param tokenId token id
 	 */
 	function _getTokenType(uint256 tokenId) internal view returns (uint256) {
-		return tokenId >= goldQuantity ? 1 : 0;
+		return tokenType[tokenId] ? 0 : 1;
 	}
 
 	// ============ OWNER-ONLY ADMIN FUNCTIONS ============

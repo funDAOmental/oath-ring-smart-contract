@@ -1,19 +1,21 @@
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
-import { ethers } from 'hardhat';
+import { ethers } from "hardhat";
+import { ethers as tsEthers } from "ethers";
 
 describe.only('AccessPass TEST', async () => {
 	let AccessPass: any;
 	let accesspass: any;
 
 	let deployer: any;
+	let user: tsEthers.Wallet;
 
 	let AccessPassDescriptor: any;
 	let accessPassDescriptor: any;
 
 	const openseaProxy: string = '0xF57B2c51dED3A29e6891aba85459d600256Cf317';
 	const dataUriPrefix: string = 'data:application/json;base64,';
-	const mainCost: BigNumber = ethers.utils.parseEther('0.1');
+	const mainCost: BigNumber = tsEthers.utils.parseEther('0.1');
 	const goldQuantity: number = 337;
 	const silverQuantity: number = 1000;
 
@@ -139,6 +141,10 @@ describe.only('AccessPass TEST', async () => {
 	describe.only('Mint functions Gold', async () => {
 		beforeEach(async () => {
 			deployer = (await ethers.getSigners())[0];
+			user = new ethers.Wallet(
+				"0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef",
+				deployer.provider
+			  );
 			AccessPassDescriptor = await ethers.getContractFactory('AccessPassDescriptor');
 			accessPassDescriptor = await AccessPassDescriptor.deploy();
 			accessPassDescriptor.deployed();
@@ -156,6 +162,16 @@ describe.only('AccessPass TEST', async () => {
 			await accesspass.mintGold(2);
 			await expect(accesspass.mintGold(2)).to.be.revertedWith('quantity exceeds max supply');
 		});
+
+		it('should mintToGold user accesspass 0', async () => {
+			const tx = await accesspass.mintToGold(user.address, 1);
+			const result = await tx.wait();
+			const blockChainEvent = result.events[0];
+			const newTokenId: number = Number(blockChainEvent.args['tokenId']);
+			expect(newTokenId).to.equal(0);
+			expect(await accesspass.balanceOf(user.address)).to.equal(1)
+		});
+
 
 		it('should mint accesspass 0', async () => {
 			const blockChain = await accesspass.mintGold(1);
@@ -199,6 +215,10 @@ describe.only('AccessPass TEST', async () => {
 	describe.only('Mint functions Silver', async () => {
 		beforeEach(async () => {
 			deployer = (await ethers.getSigners())[0];
+			user = new ethers.Wallet(
+				"0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef",
+				deployer.provider
+			  );
 			AccessPassDescriptor = await ethers.getContractFactory('AccessPassDescriptor');
 			accessPassDescriptor = await AccessPassDescriptor.deploy();
 			accessPassDescriptor.deployed();
@@ -226,33 +246,45 @@ describe.only('AccessPass TEST', async () => {
 			expect(newTokenId).to.equal(0);
 		});
 
-		// it('should get accesspass token 0 type silver', async () => {
-		// 	await await accesspass.mintSilver(1);
+		it('should mintToSilver user accesspass 0', async () => {
+			const tx = await accesspass.mintToSilver(user.address, 1);
+			const result = await tx.wait();
+			const blockChainEvent = result.events[0];
+			const newTokenId: number = Number(blockChainEvent.args['tokenId']);
+			expect(newTokenId).to.equal(0);
+			expect(await accesspass.balanceOf(user.address)).to.equal(1)
+		});
 
-		// 	const tokenId = 0;
-		// 	const base64EncodedData: string = await accesspass.tokenURI(0);
-		// 	const name = await accessPassDescriptor.collectionSilverPrefix();
-		// 	const description = await accessPassDescriptor.collectionSilverDetails();
-		// 	const image = await accessPassDescriptor.collectionSilverImage();
-		// 	const attributes: any = ['type', 'â\u0098\u0089'];
+		it('should get accesspass token 0 type silver', async () => {
+			await await accesspass.mintSilver(1);
 
-		// 	expect(await accesspass.balanceOf(deployer.address)).to.equal(1);
+			const tokenId = 0;
+			const base64EncodedData: string = await accesspass.tokenURI(0);
+			const name = await accessPassDescriptor.collectionSilverPrefix();
+			const description = await accessPassDescriptor.collectionSilverDetails();
+			const image = await accessPassDescriptor.collectionSilverImage();
+			const attributes: any = ['type', 'â\u0098½'];
 
-		// 	const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
-		// 	expect(base64EncodedData).to.include(dataUriPrefix);
+			expect(await accesspass.balanceOf(deployer.address)).to.equal(1);
 
-		// 	// Check name was correctly combined
-		// 	expect(metadata.name).to.equal(name + tokenId.toString());
+			// check token type is silver
+			expect(await accesspass.tokenType(0)).to.equal(false);
 
-		// 	// // Check description was correctly combined
-		// 	// expect(metadata.description).to.equal(description + tokenId);
+			const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
+			expect(base64EncodedData).to.include(dataUriPrefix);
 
-		// 	// // Check image is set to collectionImage
-		// 	// expect(metadata.image).to.deep.equal(image);
+			// Check name was correctly combined
+			expect(metadata.name).to.equal(name + tokenId.toString());
 
-		// 	// // Check attribues are set correctly
-		// 	// expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
-		// 	// expect(metadata.attributes[0].value).to.equal(attributes[1]);
-		// });
+			// Check description was correctly combined
+			expect(metadata.description).to.equal(description + tokenId);
+
+			// Check image is set to collectionImage
+			expect(metadata.image).to.deep.equal(image);
+
+			// Check attribues are set correctly
+			expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
+			expect(metadata.attributes[0].value).to.equal(attributes[1]);
+		});
 	});
 });
