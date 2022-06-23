@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
-import { ethers } from "hardhat";
-import { ethers as tsEthers } from "ethers";
+import { ethers } from 'hardhat';
+import { ethers as tsEthers } from 'ethers';
 
 describe.only('AccessPass TEST', async () => {
 	let AccessPass: any;
@@ -141,10 +141,7 @@ describe.only('AccessPass TEST', async () => {
 	describe.only('Mint functions Gold', async () => {
 		beforeEach(async () => {
 			deployer = (await ethers.getSigners())[0];
-			user = new ethers.Wallet(
-				"0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef",
-				deployer.provider
-			  );
+			user = new ethers.Wallet('0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef', deployer.provider);
 			AccessPassDescriptor = await ethers.getContractFactory('AccessPassDescriptor');
 			accessPassDescriptor = await AccessPassDescriptor.deploy();
 			accessPassDescriptor.deployed();
@@ -169,9 +166,8 @@ describe.only('AccessPass TEST', async () => {
 			const blockChainEvent = result.events[0];
 			const newTokenId: number = Number(blockChainEvent.args['tokenId']);
 			expect(newTokenId).to.equal(0);
-			expect(await accesspass.balanceOf(user.address)).to.equal(1)
+			expect(await accesspass.balanceOf(user.address)).to.equal(1);
 		});
-
 
 		it('should mint accesspass 0', async () => {
 			const blockChain = await accesspass.mintGold(1);
@@ -194,6 +190,8 @@ describe.only('AccessPass TEST', async () => {
 
 			expect(await accesspass.balanceOf(deployer.address)).to.equal(1);
 
+			expect(await accesspass.tokenType(0)).to.equal(true);
+
 			const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
 			expect(base64EncodedData).to.include(dataUriPrefix);
 
@@ -215,10 +213,7 @@ describe.only('AccessPass TEST', async () => {
 	describe.only('Mint functions Silver', async () => {
 		beforeEach(async () => {
 			deployer = (await ethers.getSigners())[0];
-			user = new ethers.Wallet(
-				"0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef",
-				deployer.provider
-			  );
+			user = new ethers.Wallet('0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef', deployer.provider);
 			AccessPassDescriptor = await ethers.getContractFactory('AccessPassDescriptor');
 			accessPassDescriptor = await AccessPassDescriptor.deploy();
 			accessPassDescriptor.deployed();
@@ -231,44 +226,59 @@ describe.only('AccessPass TEST', async () => {
 			await expect(accesspass.mintSilver(6)).to.be.revertedWith('quantity exceeds max per tx');
 		});
 
+		it('should reject accesspass mint gold token not minted', async () => {
+			await expect(accesspass.mintSilver(2)).to.be.revertedWith('gold token is not yet minted');
+		});
+
 		it('should reject accesspass mint maxSupply reached', async () => {
+			await accesspass.mintGold(5);
+			await accesspass.mintGold(2);
+
 			await accesspass.mintSilver(5);
 			await accesspass.mintSilver(2);
 			await expect(accesspass.mintSilver(2)).to.be.revertedWith('quantity exceeds max supply');
 		});
 
 		it('should mint accesspass 0', async () => {
+			await accesspass.mintGold(5);
+			await accesspass.mintGold(2);
+
 			const blockChain = await accesspass.mintSilver(1);
 			const blockChainWait = await blockChain.wait();
 
 			const blockChainEvent = blockChainWait.events[0];
 			const newTokenId: number = Number(blockChainEvent.args['tokenId']);
-			expect(newTokenId).to.equal(0);
+			expect(newTokenId).to.equal(7);
 		});
 
 		it('should mintToSilver user accesspass 0', async () => {
+			await accesspass.mintGold(5);
+			await accesspass.mintGold(2);
+
 			const tx = await accesspass.mintToSilver(user.address, 1);
 			const result = await tx.wait();
 			const blockChainEvent = result.events[0];
 			const newTokenId: number = Number(blockChainEvent.args['tokenId']);
-			expect(newTokenId).to.equal(0);
-			expect(await accesspass.balanceOf(user.address)).to.equal(1)
+			expect(newTokenId).to.equal(7);
+			expect(await accesspass.balanceOf(user.address)).to.equal(1);
 		});
 
 		it('should get accesspass token 0 type silver', async () => {
+			await accesspass.mintGold(5);
+			await accesspass.mintGold(2);
 			await await accesspass.mintSilver(1);
 
-			const tokenId = 0;
-			const base64EncodedData: string = await accesspass.tokenURI(0);
+			const tokenId = 7;
+			const base64EncodedData: string = await accesspass.tokenURI(7);
 			const name = await accessPassDescriptor.collectionSilverPrefix();
 			const description = await accessPassDescriptor.collectionSilverDetails();
 			const image = await accessPassDescriptor.collectionSilverImage();
 			const attributes: any = ['type', 'â\u0098½'];
 
-			expect(await accesspass.balanceOf(deployer.address)).to.equal(1);
+			expect(await accesspass.balanceOf(deployer.address)).to.equal(8);
 
 			// check token type is silver
-			expect(await accesspass.tokenType(0)).to.equal(false);
+			expect(await accesspass.tokenType(7)).to.equal(false);
 
 			const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
 			expect(base64EncodedData).to.include(dataUriPrefix);

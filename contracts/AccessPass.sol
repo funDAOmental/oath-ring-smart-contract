@@ -80,7 +80,6 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 			_safeMint(msg.sender, accessPassCount.current());
 			goldCount.increment();
 			accessPassCount.increment();
-			
 		}
 	}
 
@@ -91,6 +90,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 */
 	function mintSilver(uint8 quantity_) public onlyOwner {
 		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
+		require(goldQuantity <= goldCount.current(), 'gold token is not yet minted');
 		require(silverQuantity >= silverCount.current() + quantity_, 'quantity exceeds max supply');
 
 		uint8 i = 0;
@@ -129,6 +129,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 */
 	function mintToSilver(address to_, uint8 quantity_) public onlyOwner {
 		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
+		require(goldQuantity <= goldCount.current(), 'gold token is not yet minted');
 		require(silverQuantity >= silverCount.current() + quantity_, 'quantity exceeds max supply');
 
 		uint8 i = 0;
