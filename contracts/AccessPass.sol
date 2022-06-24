@@ -6,10 +6,11 @@ import '@openzeppelin/contracts/interfaces/IERC2981.sol';
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
+import 'hardhat/console.sol';
 
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
-import { IAccessPassDescriptor} from './interfaces/IAccessPassDescriptor.sol';
+import { IAccessPassDescriptor } from './interfaces/IAccessPassDescriptor.sol';
 import { IProxyRegistry } from './external/opensea/IProxyRegistry.sol';
 
 contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
@@ -17,6 +18,8 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	using Counters for Counters.Counter;
 
 	Counters.Counter private accessPassCount;
+	Counters.Counter private goldCount;
+	Counters.Counter private silverCount;
 
 	address private royaltyPayout;
 	bool private isOpenSeaProxyActive = true;
@@ -24,9 +27,9 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	// seller fee basis points 100 == 10%
 	uint16 public sellerFeeBasisPoints = 100;
 	uint256 public totalAccessPasses;
-	uint256 private maxQuantity;
-	uint256 private goldQantity = 337;
-	uint256 private silverQantity = 1000;
+	uint256 public maxQuantity = 5; // 5 default value
+	uint256 public goldQuantity = 337; // 337 default value
+	uint256 public silverQuantity = 1000; // 1000 default value
 
 	// OpenSea's Proxy Registry
 	IProxyRegistry public immutable proxyRegistry;
@@ -35,51 +38,105 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	// IPFS content hash of contract-level metadata
 	string private contractURIHash = 'TODO';
 
+	mapping(uint256 => bool) public tokenType;
+
 	// ============ ACCESS CONTROL/SANITY MODIFIERS ============
 
 	/**
 	 * @dev
 	 * @param openSeaProxyRegistry_ address for OpenSea proxy.
 	 * @param accessPassDescriptor_ address for OpenSea proxy.
-	 * @param totalAccessPasses_ total number of tokens
+	 * @param goldQuantity_	total number of goldToken
+	 * @param silverQuantity_	total number of goldToken
 	 */
-	constructor(address openSeaProxyRegistry_ , address accessPassDescriptor_, uint256 totalAccessPasses_, uint256 maxQuantity_) ERC721('Access Pass', 'ACCESS-PASS') {
+	constructor(
+		address openSeaProxyRegistry_,
+		address accessPassDescriptor_,
+		uint256 goldQuantity_,
+		uint256 silverQuantity_
+	) ERC721('Access Pass', 'ACCESS-PASS') {
 		proxyRegistry = IProxyRegistry(openSeaProxyRegistry_);
 		accessPassDescriptor = IAccessPassDescriptor(accessPassDescriptor_);
-		totalAccessPasses = totalAccessPasses_;
-		maxQuantity = maxQuantity_;
+		totalAccessPasses = goldQuantity_ + silverQuantity_;
+		goldQuantity = goldQuantity_;
+		silverQuantity = silverQuantity_;
 		royaltyPayout = address(this);
 	}
 
 	// ============ PUBLIC FUNCTIONS FOR MINTING ============
 
 	/**
-	 * @dev mint accesspass
+	 * @dev mintGold
+	 * @notice mint gold token
 	 * @param quantity_ quantity per mint
 	 */
-	function mint(uint8 quantity_) public onlyOwner {
-		require(maxQuantity > quantity_, 'quantity exceeds');
-		require(totalAccessPasses > accessPassCount.current() + quantity_, 'quantity exceeds max supply');
+	function mintGold(uint8 quantity_) public onlyOwner {
+		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
+		require(goldQuantity >= goldCount.current() + quantity_, 'quantity exceeds max supply');
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
+			tokenType[accessPassCount.current()] = true;
 			_safeMint(msg.sender, accessPassCount.current());
+			goldCount.increment();
 			accessPassCount.increment();
 		}
 	}
 
 	/**
-	 * @dev mint accesspass
-	 * @param to_ address to mint
+	 * @dev mintSilver
+	 * @notice mint silver token
 	 * @param quantity_ quantity per mint
 	 */
-	function mintTo(address to_, uint8 quantity_) public onlyOwner {
-		require(maxQuantity > quantity_, 'quantity exceeds');
-		require(totalAccessPasses > accessPassCount.current() + quantity_, 'quantity exceeds max supply');
+	function mintSilver(uint8 quantity_) public onlyOwner {
+		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
+		require(goldQuantity <= goldCount.current(), 'gold token is not yet minted');
+		require(silverQuantity >= silverCount.current() + quantity_, 'quantity exceeds max supply');
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
+			tokenType[accessPassCount.current()] = false;
+			_safeMint(msg.sender, accessPassCount.current());
+			silverCount.increment();
+			accessPassCount.increment();
+		}
+	}
+
+	/**
+	 * @dev mintToGold
+	 * @notice mint gold to token
+	 * @param to_ address to mint
+	 * @param quantity_ quantity per mint
+	 */
+	function mintToGold(address to_, uint8 quantity_) public onlyOwner {
+		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
+		require(goldQuantity >= goldCount.current() + quantity_, 'quantity exceeds max supply');
+
+		uint8 i = 0;
+		for (i; i < quantity_; i++) {
+			tokenType[accessPassCount.current()] = true;
 			_safeMint(to_, accessPassCount.current());
+			goldCount.increment();
+			accessPassCount.increment();
+		}
+	}
+
+	/**
+	 * @dev mintToSilver
+	 * @notice mint silver to token
+	 * @param to_ address to mint
+	 * @param quantity_ quantity per mint
+	 */
+	function mintToSilver(address to_, uint8 quantity_) public onlyOwner {
+		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
+		require(goldQuantity <= goldCount.current(), 'gold token is not yet minted');
+		require(silverQuantity >= silverCount.current() + quantity_, 'quantity exceeds max supply');
+
+		uint8 i = 0;
+		for (i; i < quantity_; i++) {
+			tokenType[accessPassCount.current()] = false;
+			_safeMint(to_, accessPassCount.current());
+			silverCount.increment();
 			accessPassCount.increment();
 		}
 	}
@@ -87,18 +144,11 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	// ============ PUBLIC READ-ONLY FUNCTIONS ==============
 
 	/**
+	 * @dev contractURI
 	 * @notice The IPFS URI of contract-level metadata.
 	 */
 	function contractURI() public view returns (string memory) {
 		return string(abi.encodePacked('ipfs://', contractURIHash));
-	}
-
-
-	/**
-	 * @notice return tokenType.
-	 */
-	function tokenType(uint256 tokenId) public view returns (uint256) {
-		return _getTokenType(tokenId);
 	}
 
 	/**
@@ -106,11 +156,29 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 * @notice get accesspass count
 	 */
 	function getAccessPassCount() public view returns (uint256) {
-		return accessPassCount.current();
+		return goldCount.current() + silverCount.current();
 	}
 
 	/**
-	 * @dev See {IERC721Metadata-tokenURI}.
+	 * @dev getAccessPassGoldCount
+	 * @notice get accesspass gold count
+	 */
+	function getAccessPassGoldCount() public view returns (uint256) {
+		return goldCount.current();
+	}
+
+	/**
+	 * @dev getAccessPassSilverCount
+	 * @notice get accesspass silver count
+	 */
+	function getAccessPassSilverCount() public view returns (uint256) {
+		return silverCount.current();
+	}
+
+	/**
+	 * @dev tokenURI.
+	 * @notice See {IERC721Metadata-tokenURI}.
+	 * @param tokenId token id
 	 */
 	function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
 		require(_exists(tokenId), 'Nonexistent token');
@@ -118,12 +186,13 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	}
 
 	/**
-	 * @dev return tokenType.
-	*/
+	 * @dev _getTokenType.
+	 * @notice get token type.
+	 * @param tokenId token id
+	 */
 	function _getTokenType(uint256 tokenId) internal view returns (uint256) {
-		return tokenId>goldQantity ? 1 : 0;
+		return tokenType[tokenId] ? 0 : 1;
 	}
-
 
 	// ============ OWNER-ONLY ADMIN FUNCTIONS ============
 
@@ -135,7 +204,6 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 		require(accessPassDescriptor_ != address(0), 'INVALID_ADDRESS');
 		accessPassDescriptor = IAccessPassDescriptor(accessPassDescriptor_);
 	}
-
 
 	/**
 	 * @notice Set the _contractURIHash.
@@ -157,7 +225,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	/**
 	 * @notice
-	 * set default selling fees will be interpreted if nothing 
+	 * set default selling fees will be interpreted if nothing
 	 * is specified
 	 * @dev Only callable by the owner.
 	 */
@@ -168,7 +236,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	/**
 	 * @notice
-	 * set default royalty payout address if nothing 
+	 * set default royalty payout address if nothing
 	 * is specified
 	 * @dev Only callable by the owner.
 	 */
@@ -198,7 +266,6 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 		if (isOpenSeaProxyActive && proxyRegistry.proxies(owner) == operator) {
 			return true;
 		}
-
 		return super.isApprovedForAll(owner, operator);
 	}
 
