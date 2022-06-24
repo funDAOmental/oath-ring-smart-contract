@@ -9,6 +9,8 @@ async function main() {
 	// await hre.run('compile');
 
 	const openseaProxy: string = '0xF57B2c51dED3A29e6891aba85459d600256Cf317';
+	const goldQuantity: number = 337;
+	const silverQuantity: number = 1000;
 
 	const [deployer] = await ethers.getSigners(); // get the account to deploy the contract
 	console.log('deploying accesspass contract with the account:', deployer.address);
@@ -21,7 +23,12 @@ async function main() {
 		console.log('accesspass descriptor deployed to:', accessPassDescriptor.address);
 
 		const AccessPass = await ethers.getContractFactory('AccessPass');
-		const accesspass = await AccessPass.deploy(openseaProxy, accessPassDescriptor.address, 337, 5);
+		const accesspass = await AccessPass.deploy(
+			openseaProxy,
+			accessPassDescriptor.address,
+			goldQuantity,
+			silverQuantity
+		);
 		await accesspass.deployed();
 		console.log('accesspass contract deployed to:', accesspass.address);
 	} catch (error) {
