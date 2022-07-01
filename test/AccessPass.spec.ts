@@ -186,7 +186,7 @@ describe.only('AccessPass TEST', async () => {
 			const name = await accessPassDescriptor.collectionGoldPrefix();
 			const description = await accessPassDescriptor.collectionGoldDetails();
 			const image = await accessPassDescriptor.collectionGoldImage();
-			const attributes: any = ['type', 'â\u0098\u0089'];
+			const attributes: any = ['class', 'â\u0098\u0089', 'type', 'GOLD'];
 
 			expect(await accesspass.balanceOf(deployer.address)).to.equal(1);
 
@@ -207,6 +207,8 @@ describe.only('AccessPass TEST', async () => {
 			// Check attribues are set correctly
 			expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
 			expect(metadata.attributes[0].value).to.equal(attributes[1]);
+			expect(metadata.attributes[1].trait_type).to.equal(attributes[2]);
+			expect(metadata.attributes[1].value).to.equal(attributes[3]);
 		});
 	});
 
@@ -273,7 +275,7 @@ describe.only('AccessPass TEST', async () => {
 			const name = await accessPassDescriptor.collectionSilverPrefix();
 			const description = await accessPassDescriptor.collectionSilverDetails();
 			const image = await accessPassDescriptor.collectionSilverImage();
-			const attributes: any = ['type', 'â\u0098½'];
+			const attributes: any = ['class', 'â\u0098½', 'type', 'SILVER'];
 
 			expect(await accesspass.balanceOf(deployer.address)).to.equal(8);
 
@@ -295,6 +297,8 @@ describe.only('AccessPass TEST', async () => {
 			// Check attribues are set correctly
 			expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
 			expect(metadata.attributes[0].value).to.equal(attributes[1]);
+			expect(metadata.attributes[1].trait_type).to.equal(attributes[2]);
+			expect(metadata.attributes[1].value).to.equal(attributes[3]);
 		});
 	});
 });
