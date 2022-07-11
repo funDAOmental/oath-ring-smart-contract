@@ -54,7 +54,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 		address accessPassDescriptor_,
 		uint256 goldQuantity_,
 		uint256 silverQuantity_
-	) ERC721('Access Pass', 'ACCESS-PASS') {
+	) ERC721('Access Pass by funDAOmental', 'ACCESSPASS') {
 		proxyRegistry = IProxyRegistry(openSeaProxyRegistry_);
 		accessPassDescriptor = IAccessPassDescriptor(accessPassDescriptor_);
 		totalAccessPasses = goldQuantity_ + silverQuantity_;

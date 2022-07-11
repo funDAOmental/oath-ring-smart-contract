@@ -9,7 +9,7 @@ async function main() {
 	// await hre.run('compile');
 
 	const openseaProxy: string = '0xF57B2c51dED3A29e6891aba85459d600256Cf317';
-	const goldQuantity: number = 337;
+	const goldQuantity: number = 5;
 	const silverQuantity: number = 1000;
 
 	const [deployer] = await ethers.getSigners(); // get the account to deploy the contract
