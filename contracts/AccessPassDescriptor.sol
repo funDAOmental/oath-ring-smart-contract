@@ -6,18 +6,23 @@ import { Base64 } from 'base64-sol/base64.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 
 contract AccessPassDescriptor is Ownable {
+	string[5] public __attributes = ['symbol', 'type', 'access pass', 'role', 'weight'];
+	string public __collectionPrefix = 'Oath Ring #';
+
 	string public collectionGoldImage = 'https://ipfs.io/ipfs/QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
 	string public collectionSilverImage = 'https://ipfs.io/ipfs/QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
-	string public collectionGoldPrefix = 'Golden Oath Ring #';
-	string public collectionGoldDetails = 'Description of Golden Oath Ring #';
-	string public collectionSilverPrefix = 'Silver Oath Ring #';
-	string public collectionSilverDetails = 'Description of Silver Oath Ring #';
+	string public collectionGoldPrefix = ' High Council';
+	string public collectionGoldDetails =
+		"funDAOmental is improving governance and helping people form reciprocal, cooperative communities. A High Council Oath Ring provides access to funDAOmental's High Council governance and its reward pool, and VIP access to the team, community, releases and drops.";
+	string public collectionSilverPrefix = ' Low Council';
+	string public collectionSilverDetails =
+		"funDAOmental is improving governance and helping people form reciprocal, cooperative communities. A Low Council Oath Ring provides access to funDAOmental's Low Council governance and its reward pool.";
 
 	struct TokenURIParams {
 		string name;
 		string description;
-		string[2] attributes;
-		string[2] attributeValues;
+		string[5] attributes;
+		string[5] attributeValues;
 		string image;
 	}
 
@@ -75,8 +80,8 @@ contract AccessPassDescriptor is Ownable {
 	function _generateAttributes(TokenURIParams memory params) internal pure returns (string memory attributes) {
 		string memory _attributes = '[';
 		if (params.attributes.length > 0) {
-			string[2] memory att = params.attributes;
-			string[2] memory attVal = params.attributeValues;
+			string[5] memory att = params.attributes;
+			string[5] memory attVal = params.attributeValues;
 			for (uint256 i = 0; i < att.length; i++) {
 				if (i == 0) {
 					_attributes = string(
@@ -129,24 +134,23 @@ contract AccessPassDescriptor is Ownable {
 		string memory _prefix = collectionSilverPrefix;
 		string memory _details = collectionSilverDetails;
 		string memory _image = collectionSilverImage;
-		string[2] memory _attributes = ['class', 'type'];
-		string[2] memory _attributeValues = [unicode'☽', 'SILVER'];
+
+		string[5] memory _attributeValues = [unicode'🜛', 'SILVER', 'false', 'low council', '1'];
 
 		// overwrite for type 0
 		if (tokenType == 0) {
 			_prefix = collectionGoldPrefix;
 			_details = collectionGoldDetails;
 			_image = collectionGoldImage;
-			_attributeValues = [unicode'☉', 'GOLD'];
+			_attributeValues = [unicode'☉', 'GOLD', 'true', 'high council', '1'];
 		}
 
-		_prefix = string(abi.encodePacked(_prefix, tokenId));
-		_details = string(abi.encodePacked(_details, tokenId));
+		_prefix = string(abi.encodePacked(__collectionPrefix, tokenId, _prefix));
 		return
 			TokenURIParams({
 				name: _prefix,
 				description: _details,
-				attributes: _attributes,
+				attributes: __attributes,
 				attributeValues: _attributeValues,
 				image: _image
 			});

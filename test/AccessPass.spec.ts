@@ -181,34 +181,43 @@ describe.only('AccessPass TEST', async () => {
 		it('should get accesspass token 0 type gold', async () => {
 			await await accesspass.mintGold(1);
 
+			const collectionPrefix = await accessPassDescriptor.__collectionPrefix();
+
 			const tokenId = 0;
 			const base64EncodedData: string = await accesspass.tokenURI(0);
 			const name = await accessPassDescriptor.collectionGoldPrefix();
 			const description = await accessPassDescriptor.collectionGoldDetails();
 			const image = await accessPassDescriptor.collectionGoldImage();
-			const attributes: any = ['class', 'â\u0098\u0089', 'type', 'GOLD'];
+
+			const attributes: string[] = ['symbol', 'type', 'access pass', 'role', 'weight'];
+			const attributeValues: any = ['â\u0098\u0089', 'GOLD', 'true', 'high council', '1'];
 
 			expect(await accesspass.balanceOf(deployer.address)).to.equal(1);
-
 			expect(await accesspass.tokenType(0)).to.equal(true);
-
-			const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
 			expect(base64EncodedData).to.include(dataUriPrefix);
 
+			const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
+
 			// Check name was correctly combined
-			expect(metadata.name).to.equal(name + tokenId.toString());
+			expect(metadata.name).to.equal(collectionPrefix + tokenId.toString() + name);
 
 			// Check description was correctly combined
-			expect(metadata.description).to.equal(description + tokenId);
+			expect(metadata.description).to.equal(description);
 
 			// Check image is set to collectionImage
 			expect(metadata.image).to.deep.equal(image);
 
 			// Check attribues are set correctly
 			expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
-			expect(metadata.attributes[0].value).to.equal(attributes[1]);
-			expect(metadata.attributes[1].trait_type).to.equal(attributes[2]);
-			expect(metadata.attributes[1].value).to.equal(attributes[3]);
+			expect(metadata.attributes[0].value).to.equal(attributeValues[0]);
+			expect(metadata.attributes[1].trait_type).to.equal(attributes[1]);
+			expect(metadata.attributes[1].value).to.equal(attributeValues[1]);
+			expect(metadata.attributes[2].trait_type).to.equal(attributes[2]);
+			expect(metadata.attributes[2].value).to.equal(attributeValues[2]);
+			expect(metadata.attributes[3].trait_type).to.equal(attributes[3]);
+			expect(metadata.attributes[3].value).to.equal(attributeValues[3]);
+			expect(metadata.attributes[4].trait_type).to.equal(attributes[4]);
+			expect(metadata.attributes[4].value).to.equal(attributeValues[4]);
 		});
 	});
 
@@ -270,35 +279,43 @@ describe.only('AccessPass TEST', async () => {
 			await accesspass.mintGold(2);
 			await await accesspass.mintSilver(1);
 
+			const collectionPrefix = await accessPassDescriptor.__collectionPrefix();
+
 			const tokenId = 7;
 			const base64EncodedData: string = await accesspass.tokenURI(7);
 			const name = await accessPassDescriptor.collectionSilverPrefix();
 			const description = await accessPassDescriptor.collectionSilverDetails();
 			const image = await accessPassDescriptor.collectionSilverImage();
-			const attributes: any = ['class', 'â\u0098½', 'type', 'SILVER'];
+
+			const attributes: string[] = ['symbol', 'type', 'access pass', 'role', 'weight'];
+			const attributeValues: any = ['ð\u009f\u009c\u009b', 'SILVER', 'false', 'low council', '1'];
 
 			expect(await accesspass.balanceOf(deployer.address)).to.equal(8);
-
-			// check token type is silver
 			expect(await accesspass.tokenType(7)).to.equal(false);
-
-			const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
 			expect(base64EncodedData).to.include(dataUriPrefix);
 
+			const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
+
 			// Check name was correctly combined
-			expect(metadata.name).to.equal(name + tokenId.toString());
+			expect(metadata.name).to.equal(collectionPrefix + tokenId.toString() + name);
 
 			// Check description was correctly combined
-			expect(metadata.description).to.equal(description + tokenId);
+			expect(metadata.description).to.equal(description);
 
 			// Check image is set to collectionImage
 			expect(metadata.image).to.deep.equal(image);
 
 			// Check attribues are set correctly
 			expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
-			expect(metadata.attributes[0].value).to.equal(attributes[1]);
-			expect(metadata.attributes[1].trait_type).to.equal(attributes[2]);
-			expect(metadata.attributes[1].value).to.equal(attributes[3]);
+			expect(metadata.attributes[0].value).to.equal(attributeValues[0]);
+			expect(metadata.attributes[1].trait_type).to.equal(attributes[1]);
+			expect(metadata.attributes[1].value).to.equal(attributeValues[1]);
+			expect(metadata.attributes[2].trait_type).to.equal(attributes[2]);
+			expect(metadata.attributes[2].value).to.equal(attributeValues[2]);
+			expect(metadata.attributes[3].trait_type).to.equal(attributes[3]);
+			expect(metadata.attributes[3].value).to.equal(attributeValues[3]);
+			expect(metadata.attributes[4].trait_type).to.equal(attributes[4]);
+			expect(metadata.attributes[4].value).to.equal(attributeValues[4]);
 		});
 	});
 });
