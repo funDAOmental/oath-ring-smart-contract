@@ -16,7 +16,7 @@ describe.only('AccessPassDescriptor TEST', async () => {
 		});
 
 		it('should return correct gold base64 encoded metadata', async () => {
-			const name = await descriptor.collectionGoldPrefix();
+			const name = ' â\u0098\u0089 High Council';
 			const description = await descriptor.collectionGoldDetails();
 			const image = await descriptor.collectionGoldImage();
 
@@ -55,7 +55,7 @@ describe.only('AccessPassDescriptor TEST', async () => {
 		});
 
 		it('should return correct silver base64 encoded metadata', async () => {
-			const name = await descriptor.collectionSilverPrefix();
+			const name = ' ð\u009f\u009c\u009b Low Council';
 			const description = await descriptor.collectionSilverDetails();
 			const image = await descriptor.collectionSilverImage();
 

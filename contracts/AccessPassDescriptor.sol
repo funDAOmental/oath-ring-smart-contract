@@ -11,10 +11,10 @@ contract AccessPassDescriptor is Ownable {
 
 	string public collectionGoldImage = 'https://ipfs.io/ipfs/QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
 	string public collectionSilverImage = 'https://ipfs.io/ipfs/QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
-	string public collectionGoldPrefix = ' High Council';
+	string public collectionGoldPrefix = unicode' ☉ High Council';
 	string public collectionGoldDetails =
 		"funDAOmental is improving governance and helping people form reciprocal, cooperative communities. A High Council Oath Ring provides access to funDAOmental's High Council governance and its reward pool, and VIP access to the team, community, releases and drops.";
-	string public collectionSilverPrefix = ' Low Council';
+	string public collectionSilverPrefix = unicode' 🜛 Low Council';
 	string public collectionSilverDetails =
 		"funDAOmental is improving governance and helping people form reciprocal, cooperative communities. A Low Council Oath Ring provides access to funDAOmental's Low Council governance and its reward pool.";
 

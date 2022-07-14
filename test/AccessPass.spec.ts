@@ -185,7 +185,8 @@ describe.only('AccessPass TEST', async () => {
 
 			const tokenId = 0;
 			const base64EncodedData: string = await accesspass.tokenURI(0);
-			const name = await accessPassDescriptor.collectionGoldPrefix();
+
+			const name = ' â\u0098\u0089 High Council';
 			const description = await accessPassDescriptor.collectionGoldDetails();
 			const image = await accessPassDescriptor.collectionGoldImage();
 
@@ -283,7 +284,8 @@ describe.only('AccessPass TEST', async () => {
 
 			const tokenId = 7;
 			const base64EncodedData: string = await accesspass.tokenURI(7);
-			const name = await accessPassDescriptor.collectionSilverPrefix();
+
+			const name = ' ð\u009f\u009c\u009b Low Council';
 			const description = await accessPassDescriptor.collectionSilverDetails();
 			const image = await accessPassDescriptor.collectionSilverImage();
 
