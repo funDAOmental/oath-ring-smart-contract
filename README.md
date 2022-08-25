@@ -1,4 +1,4 @@
-# NFTXT SMART CONTARACT
+# FUNDAOMENTAL SMART CONTARACT
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
