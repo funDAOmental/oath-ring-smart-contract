@@ -16,13 +16,13 @@ describe.only('AccessPassDescriptor TEST', async () => {
 		});
 
 		it('should return correct gold base64 encoded metadata', async () => {
-			const name = ' â\u0098\u0089 High Council';
+			const name = ' High Council';
 			const description = await descriptor.collectionGoldDetails();
 			const image = await descriptor.collectionGoldImage();
 
 			const collectionPrefix = await descriptor.__collectionPrefix();
-			const attributes: string[] = ['symbol', 'type', 'access pass', 'role', 'weight'];
-			const attributeValues: any = ['â\u0098\u0089', 'GOLD', 'true', 'high council', '1'];
+			const attributes: string[] = ['role', 'access pass', 'weight'];
+			const attributeValues: any = ['high council', 'true', '1'];
 			const expected_prefix = 'data:application/json;base64,';
 			const tokenId = '1';
 
@@ -48,20 +48,16 @@ describe.only('AccessPassDescriptor TEST', async () => {
 			expect(metadata.attributes[1].value).to.equal(attributeValues[1]);
 			expect(metadata.attributes[2].trait_type).to.equal(attributes[2]);
 			expect(metadata.attributes[2].value).to.equal(attributeValues[2]);
-			expect(metadata.attributes[3].trait_type).to.equal(attributes[3]);
-			expect(metadata.attributes[3].value).to.equal(attributeValues[3]);
-			expect(metadata.attributes[4].trait_type).to.equal(attributes[4]);
-			expect(metadata.attributes[4].value).to.equal(attributeValues[4]);
 		});
 
 		it('should return correct silver base64 encoded metadata', async () => {
-			const name = ' ð\u009f\u009c\u009b Low Council';
+			const name = ' Low Council';
 			const description = await descriptor.collectionSilverDetails();
 			const image = await descriptor.collectionSilverImage();
 
 			const collectionPrefix = await descriptor.__collectionPrefix();
-			const attributes: string[] = ['symbol', 'type', 'access pass', 'role', 'weight'];
-			const attributeValues: any = ['ð\u009f\u009c\u009b', 'SILVER', 'false', 'low council', '1'];
+			const attributes: string[] = ['role', 'access pass', 'weight'];
+			const attributeValues: any = ['low council', 'false', '1'];
 			const expected_prefix = 'data:application/json;base64,';
 			const tokenId = '1';
 
@@ -89,10 +85,6 @@ describe.only('AccessPassDescriptor TEST', async () => {
 			expect(metadata.attributes[1].value).to.equal(attributeValues[1]);
 			expect(metadata.attributes[2].trait_type).to.equal(attributes[2]);
 			expect(metadata.attributes[2].value).to.equal(attributeValues[2]);
-			expect(metadata.attributes[3].trait_type).to.equal(attributes[3]);
-			expect(metadata.attributes[3].value).to.equal(attributeValues[3]);
-			expect(metadata.attributes[4].trait_type).to.equal(attributes[4]);
-			expect(metadata.attributes[4].value).to.equal(attributeValues[4]);
 		});
 	});
 
