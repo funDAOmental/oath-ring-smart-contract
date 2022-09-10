@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.16;
 
 import '@openzeppelin/contracts/interfaces/IERC2981.sol';
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
@@ -10,10 +10,10 @@ import 'hardhat/console.sol';
 
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
-import { IAccessPassDescriptor } from './interfaces/IAccessPassDescriptor.sol';
+import { IOathRingsDescriptor } from './interfaces/IOathRingsDescriptor.sol';
 import { IProxyRegistry } from './external/opensea/IProxyRegistry.sol';
 
-contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
+contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 	using Strings for uint256;
 	using Counters for Counters.Counter;
 
@@ -26,14 +26,14 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 
 	// seller fee basis points 100 == 10%
 	uint16 public sellerFeeBasisPoints = 100;
-	uint256 public totalAccessPasses;
+	uint256 public totalOathRings;
 	uint256 public maxQuantity = 5; // 5 default value
 	uint256 public goldQuantity = 337; // 337 default value
 	uint256 public silverQuantity = 1000; // 1000 default value
 
 	// OpenSea's Proxy Registry
 	IProxyRegistry public immutable proxyRegistry;
-	IAccessPassDescriptor public accessPassDescriptor;
+	IOathRingsDescriptor public oathRingsDescriptor;
 
 	// IPFS content hash of contract-level metadata
 	string private contractURIHash = 'TODO';
@@ -45,19 +45,19 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	/**
 	 * @dev
 	 * @param openSeaProxyRegistry_ address for OpenSea proxy.
-	 * @param accessPassDescriptor_ address for OpenSea proxy.
+	 * @param oathRingsDescriptor_ address for OpenSea proxy.
 	 * @param goldQuantity_	total number of goldToken
 	 * @param silverQuantity_	total number of goldToken
 	 */
 	constructor(
 		address openSeaProxyRegistry_,
-		address accessPassDescriptor_,
+		address oathRingsDescriptor_,
 		uint256 goldQuantity_,
 		uint256 silverQuantity_
 	) ERC721('Access Pass by funDAOmental', 'ACCESSPASS') {
 		proxyRegistry = IProxyRegistry(openSeaProxyRegistry_);
-		accessPassDescriptor = IAccessPassDescriptor(accessPassDescriptor_);
-		totalAccessPasses = goldQuantity_ + silverQuantity_;
+		oathRingsDescriptor = IOathRingsDescriptor(oathRingsDescriptor_);
+		totalOathRings = goldQuantity_ + silverQuantity_;
 		goldQuantity = goldQuantity_;
 		silverQuantity = silverQuantity_;
 		royaltyPayout = address(this);
@@ -152,26 +152,26 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	}
 
 	/**
-	 * @dev getAccesspassCount
-	 * @notice get accesspass count
+	 * @dev getTotalOathRings
+	 * @notice get total oath rings
 	 */
-	function getAccessPassCount() public view returns (uint256) {
+	function getTotalOathRings() public view returns (uint256) {
 		return goldCount.current() + silverCount.current();
 	}
 
 	/**
-	 * @dev getAccessPassGoldCount
-	 * @notice get accesspass gold count
+	 * @dev getTotalGoldOathRings
+	 * @notice get number of gold oath rings
 	 */
-	function getAccessPassGoldCount() public view returns (uint256) {
+	function getTotalGoldOathRings() public view returns (uint256) {
 		return goldCount.current();
 	}
 
 	/**
-	 * @dev getAccessPassSilverCount
-	 * @notice get accesspass silver count
+	 * @dev getTotalSilverOathRings
+	 * @notice get number of silver oath rings
 	 */
-	function getAccessPassSilverCount() public view returns (uint256) {
+	function getTotalSilverOathRings() public view returns (uint256) {
 		return silverCount.current();
 	}
 
@@ -181,8 +181,8 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 * @param tokenId token id
 	 */
 	function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-		require(_exists(tokenId), 'Nonexistent token');
-		return accessPassDescriptor.genericDataURI(tokenId.toString(), _getTokenType(tokenId));
+		require(_exists(tokenId), 'non-existent tokenId');
+		return oathRingsDescriptor.genericDataURI(tokenId.toString(), _getTokenType(tokenId));
 	}
 
 	/**
@@ -197,12 +197,12 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	// ============ OWNER-ONLY ADMIN FUNCTIONS ============
 
 	/**
-	 * @notice Set the accessPassDescriptor.
+	 * @notice Set the oathRingsDescriptor.
 	 * @dev Only callable by the owner.
 	 */
-	function setAccessPassDescriptor(address accessPassDescriptor_) external onlyOwner {
-		require(accessPassDescriptor_ != address(0), 'INVALID_ADDRESS');
-		accessPassDescriptor = IAccessPassDescriptor(accessPassDescriptor_);
+	function setOathRingsDescriptor(address oathRingsDescriptor_) external onlyOwner {
+		require(oathRingsDescriptor_ != address(0), 'INVALID_ADDRESS');
+		oathRingsDescriptor = IOathRingsDescriptor(oathRingsDescriptor_);
 	}
 
 	/**
@@ -230,7 +230,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	 * @dev Only callable by the owner.
 	 */
 	function setSellerFeeBasisPoints(uint16 _sellerFeeBasisPoints) external onlyOwner {
-		require(_sellerFeeBasisPoints <= 200, 'Max Roalty check failed! > 20%');
+		require(_sellerFeeBasisPoints <= 200, 'Max royalty check failed! > 20%');
 		sellerFeeBasisPoints = _sellerFeeBasisPoints;
 	}
 
@@ -260,7 +260,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 	/**
 	 * @dev Override isApprovedForAll to allowlist user's OpenSea proxy accounts to enable gas-less listings.
 	 */
-	function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
+	function isApprovedForAll(address owner, address operator) public view virtual override(IERC721, ERC721) returns (bool) {
 		// Get a reference to OpenSea's proxy registry contract by instantiating
 		// the contract using the already existing address.
 		if (isOpenSeaProxyActive && proxyRegistry.proxies(owner) == operator) {
@@ -278,7 +278,7 @@ contract AccessPass is IERC2981, Ownable, ERC721Enumerable {
 		override
 		returns (address receiver, uint256 royaltyAmount)
 	{
-		require(_exists(tokenId), 'Nonexistent token');
+		require(_exists(tokenId), 'non-existent tokenId');
 		return (royaltyPayout, SafeMath.div(SafeMath.mul(salePrice, sellerFeeBasisPoints), 1000));
 	}
 }

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.16;
 
 import { Base64 } from 'base64-sol/base64.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 
-contract AccessPassDescriptor is Ownable {
+contract OathRingsDescriptor is Ownable {
 	string[3] public __attributes = ['role', 'access pass', 'weight'];
 	string public __collectionPrefix = 'Oath Ring #';
 

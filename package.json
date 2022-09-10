@@ -9,20 +9,14 @@
 	"license": "MIT",
 	"scripts": {
 		"build": "npx hardhat compile",
-		"deploy:accesspass:rinkeby": "npx hardhat run scripts/AccessPass.ts --network rinkeby",
-		"deploy:presale:rinkeby": "npx hardhat run scripts/deploy-presale.ts --network rinkeby",
-		"deploy:zerokeys:rinkeby": "npx hardhat run scripts/deploy-zerokeys.ts --network rinkeby",
-		"deploy:gmkeys:rinkeby": "npx hardhat run scripts/deploy-gmkeys.ts --network rinkeby",
-		"deploy:randomness:rinkeby": "npx hardhat run scripts/deploy-randomness.ts --network rinkeby",
+		"hh:task": "npx hardhat ",
+		"deploy:oathrings:rinkeby": "npx hardhat run scripts/deploy_oath_ring.ts --network rinkeby",
 		"test": "npx hardhat test",
-		"test:accesspass": "npx hardhat test test/AccessPass*.spec.ts",
-		"test:presale": "npx hardhat test test/presale",
-		"test:zerokeys": "npx hardhat test test/zerokeys",
-		"test:gmkeys": "npx hardhat test test/gmkeys",
-		"test:randomness": "npx hardhat test test/randomness",
+		"test:oathrings": "npx hardhat test test/oathRings*.spec.ts",
 		"lint": "tslint -c ./tslint.json './scripts/**/*.ts'",
 		"sollint": "solhint './contracts/**/*.sol'",
-		"clean:cache": "npx hardhat clean"
+		"clean:cache": "npx hardhat clean",
+		"clean:all": "rimraf dist tsconfig.tsbuildinfo node_modules artifacts build cache"
 	},
 	"dependencies": {
 		"@chainlink/contracts": "^0.4.1",
@@ -36,14 +30,15 @@
 		"base64-sol": "^1.1.0",
 		"bs58": "^5.0.0",
 		"dotenv": "^16.0.2",
+		"eslint": "^8.23.0",
 		"ethereum-waffle": "^3.4.4",
 		"ethers": "^5.7.0",
-		"hardhat": "^2.10.2",
-		"hardhat-gas-reporter": "^1.0.8",
+		"hardhat": "^2.11.1",
+		"hardhat-gas-reporter": "^1.0.9",
 		"solhint": "^3.3.7",
 		"ts-node": "^10.9.1",
 		"typechain": "^8.1.0",
-		"typescript": "^4.8.2"
+		"typescript": "^4.8.3"
 	},
 	"devDependencies": {
 		"@typechain/ethers-v5": "^10.1.0",
@@ -57,7 +52,8 @@
 		"chai-as-promised": "^7.1.1",
 		"prettier": "^2.7.1",
 		"prettier-plugin-solidity": "^1.0.0-beta.24",
-		"solidity-coverage": "^0.7.21",
+		"rimraf": "^3.0.2",
+		"solidity-coverage": "^0.8.2",
 		"tslint": "^6.1.3"
 	}
 }
