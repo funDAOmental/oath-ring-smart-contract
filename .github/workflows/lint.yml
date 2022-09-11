@@ -1,0 +1,42 @@
+name: Lint
+
+on:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  run-linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Set up node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Get cache directory
+        id: yarn-cache
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache yarn dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.yarn-cache.outputs.dir }}
+          key: yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            yarn-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --network-concurrency 1
+
+      - name: Run linters
+        uses: wearerequired/lint-action@v2
+        with:
+          github_token: ${{ secrets.github_token }}
+          prettier: true
+          auto_fix: true
+          prettier_extensions: "css,html,js,json,jsx,md,sass,scss,ts,tsx,vue,yaml,yml"

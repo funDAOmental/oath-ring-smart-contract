@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.16;
 
 import { Base64 } from 'base64-sol/base64.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 
-contract AccessPassDescriptor is Ownable {
+contract OathRingsDescriptor is Ownable {
 	string[3] public __attributes = ['role', 'access pass', 'weight'];
 	string public __collectionPrefix = 'Oath Ring #';
 
-	string public collectionGoldImage = 'https://ipfs.io/ipfs/QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
-	string public collectionSilverImage = 'https://ipfs.io/ipfs/QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
-	string public collectionGoldPrefix = ' High Council';
-	string public collectionGoldDetails =
+	string public collectionCouncilImage = 'https://ipfs.io/ipfs/QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
+	string public collectionGuildImage = 'https://ipfs.io/ipfs/QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
+	string public collectionCouncilPrefix = 'Council ';
+	string public collectionCouncilDetails =
 		'funDAOmental is improving governance and helping people form reciprocal, cooperative communities. A High Council Oath Ring provides access to funDAOmental High Council governance and its reward pool, and VIP access to the team, community, releases and drops.';
-	string public collectionSilverPrefix = ' Low Council';
-	string public collectionSilverDetails =
+	string public collectionGuildPrefix = 'Guild ';
+	string public collectionGuildDetails =
 		'funDAOmental is improving governance and helping people form reciprocal, cooperative communities. A Low Council Oath Ring provides access to funDAOmental Low Council governance and its reward pool.';
 
 	struct TokenURIParams {
@@ -27,51 +27,51 @@ contract AccessPassDescriptor is Ownable {
 	}
 
 	/**
-	 * @notice Set the collectionGoldImage IPFS image.
+	 * @notice Set the collectionCouncilImage IPFS image.
 	 * @dev Only callable by the owner.
 	 */
-	function setCollectionGoldImage(string memory collectionGoldImage_) external onlyOwner {
-		collectionGoldImage = collectionGoldImage_;
+	function setCollectionCouncilImage(string memory collectionCouncilImage_) external onlyOwner {
+		collectionCouncilImage = collectionCouncilImage_;
 	}
 
 	/**
 	 * @notice Set the collectionImage IPFS image.
 	 * @dev Only callable by the owner.
 	 */
-	function setCollectionSilverImage(string memory collectionSilverImage_) external onlyOwner {
-		collectionSilverImage = collectionSilverImage_;
+	function setCollectionGuildImage(string memory collectionGuildImage_) external onlyOwner {
+		collectionGuildImage = collectionGuildImage_;
 	}
 
 	/**
-	 * @notice Set the collectionGoldDetails text.
+	 * @notice Set the collectionCouncilDetails text.
 	 * @dev Only callable by the owner.
 	 */
-	function setCollectionGoldDetails(string memory collectionGoldDetails_) external onlyOwner {
-		collectionGoldDetails = collectionGoldDetails_;
+	function setCollectionCouncilDetails(string memory collectionCouncilDetails_) external onlyOwner {
+		collectionCouncilDetails = collectionCouncilDetails_;
 	}
 
 	/**
-	 * @notice Set the collectionGoldDetails text.
+	 * @notice Set the collectionCouncilDetails text.
 	 * @dev Only callable by the owner.
 	 */
-	function setCollectionSilverDetails(string memory collectionSilverDetails_) external onlyOwner {
-		collectionSilverDetails = collectionSilverDetails_;
+	function setCollectionGuildDetails(string memory collectionGuildDetails_) external onlyOwner {
+		collectionGuildDetails = collectionGuildDetails_;
 	}
 
 	/**
-	 * @notice Set the collectionGoldPrefix.
+	 * @notice Set the collectionCouncilPrefix.
 	 * @dev Only callable by the owner.
 	 */
-	function setCollectionGoldPrefix(string memory collectionGoldPrefix_) external onlyOwner {
-		collectionGoldPrefix = collectionGoldPrefix_;
+	function setCollectionCouncilPrefix(string memory collectionCouncilPrefix_) external onlyOwner {
+		collectionCouncilPrefix = collectionCouncilPrefix_;
 	}
 
 	/**
-	 * @notice Set the collectionSilverPrefix.
+	 * @notice Set the collectionGuildPrefix.
 	 * @dev Only callable by the owner.
 	 */
-	function setCollectionSilverPrefix(string memory collectionSilverPrefix_) external onlyOwner {
-		collectionSilverPrefix = collectionSilverPrefix_;
+	function setCollectionGuildPrefix(string memory collectionGuildPrefix_) external onlyOwner {
+		collectionGuildPrefix = collectionGuildPrefix_;
 	}
 
 	/**
@@ -131,21 +131,21 @@ contract AccessPassDescriptor is Ownable {
 	 * @notice Given a name, description, and seed, construct a base64 encoded data URI.
 	 */
 	function _getTokenURIParams(string memory tokenId, uint256 tokenType) internal view returns (TokenURIParams memory) {
-		string memory _prefix = collectionSilverPrefix;
-		string memory _details = collectionSilverDetails;
-		string memory _image = collectionSilverImage;
+		string memory _prefix = collectionGuildPrefix;
+		string memory _details = collectionGuildDetails;
+		string memory _image = collectionGuildImage;
 
 		string[3] memory _attributeValues = ['low council', 'false', '1'];
 
 		// overwrite for type 0
 		if (tokenType == 0) {
-			_prefix = collectionGoldPrefix;
-			_details = collectionGoldDetails;
-			_image = collectionGoldImage;
+			_prefix = collectionCouncilPrefix;
+			_details = collectionCouncilDetails;
+			_image = collectionCouncilImage;
 			_attributeValues = ['high council', 'true', '1'];
 		}
 
-		_prefix = string(abi.encodePacked(__collectionPrefix, tokenId, _prefix));
+		_prefix = string(abi.encodePacked(_prefix, __collectionPrefix, tokenId));
 		return
 			TokenURIParams({
 				name: _prefix,

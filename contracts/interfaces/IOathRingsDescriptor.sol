@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/// @title Interface for AccessPassDescriptor
+/// @title Interface for OathRingsDescriptor
 
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.16;
 
-interface IAccessPassDescriptor {
+interface IOathRingsDescriptor {
 
     function genericDataURI(
         string memory tokenId,
