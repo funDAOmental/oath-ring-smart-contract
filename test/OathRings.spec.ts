@@ -2,6 +2,7 @@ import { expect } from "chai";
 import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 import { ethers as tsEthers } from "ethers";
+import exp from "constants";
 
 describe.only("OathRings", async () => {
   let OathRings: any;
@@ -138,12 +139,12 @@ describe.only("OathRings", async () => {
       );
     });
 
-    it("should get oathRings royalty 0", async () => {
+    it("should get oathRings royalty 1", async () => {
       // Setup
       await (await oathRings.mintCouncil(1)).wait();
       await (await oathRings.setRoyaltyPayout(receiver1)).wait();
 
-      const royaltyInfo = await oathRings.royaltyInfo(0, mainCost);
+      const royaltyInfo = await oathRings.royaltyInfo(1, mainCost);
       expect(royaltyInfo["receiver"]).to.equal(receiver1);
       expect(royaltyInfo["royaltyAmount"]).to.equal(
         ethers.utils.parseEther("0.01")
@@ -178,12 +179,6 @@ describe.only("OathRings", async () => {
       oathRings.deployed();
     });
 
-    it("should reject oathRings mint (quantity exceeds max per tx)", async () => {
-      await expect(oathRings.mintCouncil(6)).to.be.revertedWith(
-        "quantity exceeds max per tx"
-      );
-    });
-
     it("should reject oathRings mint maxSupply reached", async () => {
       await oathRings.mintCouncil(5);
       await oathRings.mintCouncil(2);
@@ -192,38 +187,38 @@ describe.only("OathRings", async () => {
       );
     });
 
-    it("should mintToCouncil user oathRings 0", async () => {
+    it("should mintToCouncil user oathRings 1", async () => {
       const tx = await oathRings.mintToCouncil(user.address, 1);
       const result = await tx.wait();
       const blockChainEvent = result.events[0];
       const newTokenId: number = Number(blockChainEvent.args["tokenId"]);
-      expect(newTokenId).to.equal(0);
+      expect(newTokenId).to.equal(1);
       expect(await oathRings.balanceOf(user.address)).to.equal(1);
     });
 
-    it("should mint oathRings 0", async () => {
+    it("should mint oathRings 1", async () => {
       const blockChain = await oathRings.mintCouncil(1);
       const blockChainWait = await blockChain.wait();
 
       const blockChainEvent = blockChainWait.events[0];
       const newTokenId: number = Number(blockChainEvent.args["tokenId"]);
-      expect(newTokenId).to.equal(0);
+      expect(newTokenId).to.equal(1);
     });
 
-    it("should get oathRings token 0 type council", async () => {
+    it("should get oathRings token 1 type council", async () => {
       await await oathRings.mintCouncil(1);
 
       const collectionPrefix = await oathRingsDescriptor.__collectionPrefix();
 
-      const tokenId = 0;
-      const base64EncodedData: string = await oathRings.tokenURI(0);
+      const tokenId = 1;
+      const base64EncodedData: string = await oathRings.tokenURI(tokenId);
 
       const name = "Council ";
       const description = await oathRingsDescriptor.collectionCouncilDetails();
       const image = await oathRingsDescriptor.collectionCouncilImage();
 
       expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
-      expect(await oathRings.tokenType(0)).to.equal(true);
+      expect(await oathRings.tokenType(tokenId)).to.equal(true);
       expect(base64EncodedData).to.include(dataUriPrefix);
 
       const metadata = JSON.parse(atob(base64EncodedData.split(",")[1]));
@@ -263,12 +258,6 @@ describe.only("OathRings", async () => {
       oathRings.deployed();
     });
 
-    it("should reject oathRings mint (quantity exceeds max per tx)", async () => {
-      await expect(oathRings.mintGuild(6)).to.be.revertedWith(
-        "quantity exceeds max per tx"
-      );
-    });
-
     it("should reject oathRings mint council token not minted", async () => {
       await expect(oathRings.mintGuild(2)).to.be.revertedWith(
         "council token is not yet minted"
@@ -286,7 +275,7 @@ describe.only("OathRings", async () => {
       );
     });
 
-    it("should mint oathRings 0", async () => {
+    it("should mint oathRings 1", async () => {
       await oathRings.mintCouncil(5);
       await oathRings.mintCouncil(2);
 
@@ -295,10 +284,10 @@ describe.only("OathRings", async () => {
 
       const blockChainEvent = blockChainWait.events[0];
       const newTokenId: number = Number(blockChainEvent.args["tokenId"]);
-      expect(newTokenId).to.equal(7);
+      expect(newTokenId).to.equal(8);
     });
 
-    it("should mintToGuild user oathRings 0", async () => {
+    it("should mintToGuild user oathRings 1", async () => {
       await oathRings.mintCouncil(5);
       await oathRings.mintCouncil(2);
 
@@ -306,26 +295,26 @@ describe.only("OathRings", async () => {
       const result = await tx.wait();
       const blockChainEvent = result.events[0];
       const newTokenId: number = Number(blockChainEvent.args["tokenId"]);
-      expect(newTokenId).to.equal(7);
+      expect(newTokenId).to.equal(8);
       expect(await oathRings.balanceOf(user.address)).to.equal(1);
     });
 
-    it("should get oathRings token 0 type guild", async () => {
+    it("should get oathRings token 1 type guild", async () => {
       await oathRings.mintCouncil(5);
       await oathRings.mintCouncil(2);
       await await oathRings.mintGuild(1);
 
       const collectionPrefix = await oathRingsDescriptor.__collectionPrefix();
 
-      const tokenId = 7;
-      const base64EncodedData: string = await oathRings.tokenURI(7);
+      const tokenId = 8;
+      const base64EncodedData: string = await oathRings.tokenURI(tokenId);
 
       const name = "Guild ";
       const description = await oathRingsDescriptor.collectionGuildDetails();
       const image = await oathRingsDescriptor.collectionGuildImage();
 
       expect(await oathRings.balanceOf(deployer.address)).to.equal(8);
-      expect(await oathRings.tokenType(7)).to.equal(false);
+      expect(await oathRings.tokenType(tokenId)).to.equal(false);
       expect(base64EncodedData).to.include(dataUriPrefix);
 
       const metadata = JSON.parse(atob(base64EncodedData.split(",")[1]));
@@ -340,6 +329,45 @@ describe.only("OathRings", async () => {
 
       // Check image is set to collectionImage
       expect(metadata.image).to.deep.equal(image);
+    });
+  });
+
+	describe.only("Mint All", async () => {
+    beforeEach(async () => {
+      deployer = (await ethers.getSigners())[0];
+      user = new ethers.Wallet(
+        "0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef",
+        deployer.provider
+      );
+      OathRingsDescriptor = await ethers.getContractFactory(
+        "OathRingsDescriptor"
+      );
+      oathRingsDescriptor = await OathRingsDescriptor.deploy();
+      oathRingsDescriptor.deployed();
+      OathRings = await ethers.getContractFactory("OathRings");
+      oathRings = await OathRings.deploy(
+        openseaProxy,
+        oathRingsDescriptor.address,
+        337,
+        1000
+      );
+      oathRings.deployed();
+    });
+
+    it("should mint all Oath rings", async () => {
+			const maxCouncil = 337;
+			const maxGuild = 1000;
+			await (await oathRings.mintCouncil(137)).wait();
+			await (await oathRings.mintCouncil(100)).wait();
+			await (await oathRings.mintCouncil(100)).wait();
+
+			expect (await oathRings.getTotalCouncilOathRings()).to.equal(maxCouncil)
+
+			for (let i = 0; i < 10; i++) {
+				await (await oathRings.mintGuild(100)).wait();
+			} 
+			
+			expect(await oathRings.getTotalOathRings()).to.equal(maxCouncil + maxGuild)
     });
   });
 });

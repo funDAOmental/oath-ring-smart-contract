@@ -17,7 +17,7 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 	using Strings for uint256;
 	using Counters for Counters.Counter;
 
-	Counters.Counter private accessPassCount;
+	Counters.Counter private oathRingsCount;
 	Counters.Counter private councilCount;
 	Counters.Counter private guildCount;
 
@@ -27,7 +27,6 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 	// seller fee basis points 100 == 10%
 	uint16 public sellerFeeBasisPoints = 100;
 	uint256 public totalOathRings;
-	uint256 public maxQuantity = 5; // 5 default value
 	uint256 public councilQuantity = 337; // 337 default value
 	uint256 public guildQuantity = 1000; // 1000 default value
 
@@ -60,6 +59,7 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 		totalOathRings = councilQuantity_ + guildQuantity_;
 		councilQuantity = councilQuantity_;
 		guildQuantity = guildQuantity_;
+		oathRingsCount.increment(); // start with id 1
 		royaltyPayout = address(this);
 	}
 
@@ -70,16 +70,14 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 	 * @notice mint council token
 	 * @param quantity_ quantity per mint
 	 */
-	function mintCouncil(uint8 quantity_) public onlyOwner {
-		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
-		require(councilQuantity >= councilCount.current() + quantity_, 'quantity exceeds max supply');
+	function mintCouncil(uint256 quantity_) public onlyOwner {
+		require(councilCount.current() + quantity_ <= councilQuantity, 'quantity exceeds max supply');
 
-		uint8 i = 0;
-		for (i; i < quantity_; i++) {
-			tokenType[accessPassCount.current()] = true;
-			_safeMint(msg.sender, accessPassCount.current());
+		for (uint256 i; i < quantity_; i++) {
+			tokenType[oathRingsCount.current()] = true;
+			_safeMint(msg.sender, oathRingsCount.current());
 			councilCount.increment();
-			accessPassCount.increment();
+			oathRingsCount.increment();
 		}
 	}
 
@@ -88,17 +86,15 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 	 * @notice mint guild token
 	 * @param quantity_ quantity per mint
 	 */
-	function mintGuild(uint8 quantity_) public onlyOwner {
-		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
+	function mintGuild(uint256 quantity_) public onlyOwner {
 		require(councilQuantity <= councilCount.current(), 'council token is not yet minted');
 		require(guildQuantity >= guildCount.current() + quantity_, 'quantity exceeds max supply');
 
-		uint8 i = 0;
-		for (i; i < quantity_; i++) {
-			tokenType[accessPassCount.current()] = false;
-			_safeMint(msg.sender, accessPassCount.current());
+		for (uint256 i; i < quantity_; i++) {
+			tokenType[oathRingsCount.current()] = false;
+			_safeMint(msg.sender, oathRingsCount.current());
 			guildCount.increment();
-			accessPassCount.increment();
+			oathRingsCount.increment();
 		}
 	}
 
@@ -108,16 +104,14 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 	 * @param to_ address to mint
 	 * @param quantity_ quantity per mint
 	 */
-	function mintToCouncil(address to_, uint8 quantity_) public onlyOwner {
-		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
+	function mintToCouncil(address to_, uint256 quantity_) public onlyOwner {
 		require(councilQuantity >= councilCount.current() + quantity_, 'quantity exceeds max supply');
 
-		uint8 i = 0;
-		for (i; i < quantity_; i++) {
-			tokenType[accessPassCount.current()] = true;
-			_safeMint(to_, accessPassCount.current());
+		for (uint256 i; i < quantity_; i++) {
+			tokenType[oathRingsCount.current()] = true;
+			_safeMint(to_, oathRingsCount.current());
 			councilCount.increment();
-			accessPassCount.increment();
+			oathRingsCount.increment();
 		}
 	}
 
@@ -127,17 +121,14 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 	 * @param to_ address to mint
 	 * @param quantity_ quantity per mint
 	 */
-	function mintToGuild(address to_, uint8 quantity_) public onlyOwner {
-		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
-		require(councilQuantity <= councilCount.current(), 'council token is not yet minted');
+	function mintToGuild(address to_, uint256 quantity_) public onlyOwner {
 		require(guildQuantity >= guildCount.current() + quantity_, 'quantity exceeds max supply');
 
-		uint8 i = 0;
-		for (i; i < quantity_; i++) {
-			tokenType[accessPassCount.current()] = false;
-			_safeMint(to_, accessPassCount.current());
+		for (uint256 i; i < quantity_; i++) {
+			tokenType[oathRingsCount.current()] = false;
+			_safeMint(to_, oathRingsCount.current());
 			guildCount.increment();
-			accessPassCount.increment();
+			oathRingsCount.increment();
 		}
 	}
 
