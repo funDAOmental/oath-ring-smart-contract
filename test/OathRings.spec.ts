@@ -16,8 +16,8 @@ describe.only('OathRings', async () => {
 	const openseaProxy: string = '0xF57B2c51dED3A29e6891aba85459d600256Cf317';
 	const dataUriPrefix: string = 'data:application/json;base64,';
 	const mainCost: BigNumber = tsEthers.utils.parseEther('0.1');
-	const goldQuantity: number = 337;
-	const silverQuantity: number = 1000;
+	const councilQuantity: number = 337;
+	const guildQuantity: number = 1000;
 
 	const receiver1: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0';
 	const receiver2: string = '0x30eDEc1C25218F5a748cccc54C562d7879e47CaA';
@@ -30,7 +30,7 @@ describe.only('OathRings', async () => {
 			oathRingsDescriptor = await OathRingsDescriptor.deploy();
 			oathRingsDescriptor.deployed();
 			OathRings = await ethers.getContractFactory('OathRings');
-			oathRings = await OathRings.deploy(openseaProxy, oathRingsDescriptor.address, goldQuantity, silverQuantity);
+			oathRings = await OathRings.deploy(openseaProxy, oathRingsDescriptor.address, councilQuantity, guildQuantity);
 			oathRings.deployed();
 		});
 
@@ -46,17 +46,17 @@ describe.only('OathRings', async () => {
 
 		it('should initialize totalOathRings', async () => {
 			const totalOathRings: number = await oathRings.totalOathRings();
-			expect(totalOathRings).to.equal(goldQuantity + silverQuantity);
+			expect(totalOathRings).to.equal(councilQuantity + guildQuantity);
 		});
 
-		it('should initialize goldQuantity', async () => {
-			const goldQuantity: number = await oathRings.goldQuantity();
-			expect(goldQuantity).to.equal(goldQuantity);
+		it('should initialize councilQuantity', async () => {
+			const councilQuantity: number = await oathRings.councilQuantity();
+			expect(councilQuantity).to.equal(councilQuantity);
 		});
 
-		it('should initialize silverQuantity', async () => {
-			const silverQuantity: number = await oathRings.silverQuantity();
-			expect(silverQuantity).to.equal(silverQuantity);
+		it('should initialize guildQuantity', async () => {
+			const guildQuantity: number = await oathRings.guildQuantity();
+			expect(guildQuantity).to.equal(guildQuantity);
 		});
 	});
 
@@ -66,7 +66,7 @@ describe.only('OathRings', async () => {
 			oathRingsDescriptor = await OathRingsDescriptor.deploy();
 			oathRingsDescriptor.deployed();
 			OathRings = await ethers.getContractFactory('OathRings');
-			oathRings = await OathRings.deploy(openseaProxy, oathRingsDescriptor.address, goldQuantity, silverQuantity);
+			oathRings = await OathRings.deploy(openseaProxy, oathRingsDescriptor.address, councilQuantity, guildQuantity);
 			oathRings.deployed();
 		});
 
@@ -119,7 +119,7 @@ describe.only('OathRings', async () => {
 
 		it('should get oathRings royalty 0', async () => {
 			// Setup
-			await (await oathRings.mintGold(1)).wait();
+			await (await oathRings.mintCouncil(1)).wait();
 			await (await oathRings.setRoyaltyPayout(receiver1)).wait();
 
 			const royaltyInfo = await oathRings.royaltyInfo(0, mainCost);
@@ -133,7 +133,7 @@ describe.only('OathRings', async () => {
 		});
 	});
 
-	describe.only('Mint functions Gold', async () => {
+	describe.only('Mint functions Council', async () => {
 		beforeEach(async () => {
 			deployer = (await ethers.getSigners())[0];
 			user = new ethers.Wallet('0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef', deployer.provider);
@@ -146,17 +146,17 @@ describe.only('OathRings', async () => {
 		});
 
 		it('should reject oathRings mint (quantity exceeds max per tx)', async () => {
-			await expect(oathRings.mintGold(6)).to.be.revertedWith('quantity exceeds max per tx');
+			await expect(oathRings.mintCouncil(6)).to.be.revertedWith('quantity exceeds max per tx');
 		});
 
 		it('should reject oathRings mint maxSupply reached', async () => {
-			await oathRings.mintGold(5);
-			await oathRings.mintGold(2);
-			await expect(oathRings.mintGold(2)).to.be.revertedWith('quantity exceeds max supply');
+			await oathRings.mintCouncil(5);
+			await oathRings.mintCouncil(2);
+			await expect(oathRings.mintCouncil(2)).to.be.revertedWith('quantity exceeds max supply');
 		});
 
-		it('should mintToGold user oathRings 0', async () => {
-			const tx = await oathRings.mintToGold(user.address, 1);
+		it('should mintToCouncil user oathRings 0', async () => {
+			const tx = await oathRings.mintToCouncil(user.address, 1);
 			const result = await tx.wait();
 			const blockChainEvent = result.events[0];
 			const newTokenId: number = Number(blockChainEvent.args['tokenId']);
@@ -165,7 +165,7 @@ describe.only('OathRings', async () => {
 		});
 
 		it('should mint oathRings 0', async () => {
-			const blockChain = await oathRings.mintGold(1);
+			const blockChain = await oathRings.mintCouncil(1);
 			const blockChainWait = await blockChain.wait();
 
 			const blockChainEvent = blockChainWait.events[0];
@@ -173,17 +173,17 @@ describe.only('OathRings', async () => {
 			expect(newTokenId).to.equal(0);
 		});
 
-		it('should get oathRings token 0 type gold', async () => {
-			await await oathRings.mintGold(1);
+		it('should get oathRings token 0 type council', async () => {
+			await await oathRings.mintCouncil(1);
 
 			const collectionPrefix = await oathRingsDescriptor.__collectionPrefix();
 
 			const tokenId = 0;
 			const base64EncodedData: string = await oathRings.tokenURI(0);
 
-			const name = ' High Council';
-			const description = await oathRingsDescriptor.collectionGoldDetails();
-			const image = await oathRingsDescriptor.collectionGoldImage();
+			const name = 'Council ';
+			const description = await oathRingsDescriptor.collectionCouncilDetails();
+			const image = await oathRingsDescriptor.collectionCouncilImage();
 
 			expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
 			expect(await oathRings.tokenType(0)).to.equal(true);
@@ -192,7 +192,7 @@ describe.only('OathRings', async () => {
 			const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
 
 			// Check name was correctly combined
-			expect(metadata.name).to.equal(collectionPrefix + tokenId.toString() + name);
+			expect(metadata.name).to.equal(name + collectionPrefix + tokenId.toString());
 
 			// Check description was correctly combined
 			expect(metadata.description).to.equal(description);
@@ -202,7 +202,7 @@ describe.only('OathRings', async () => {
 		});
 	});
 
-	describe.only('Mint functions Silver', async () => {
+	describe.only('Mint functions Guild', async () => {
 		beforeEach(async () => {
 			deployer = (await ethers.getSigners())[0];
 			user = new ethers.Wallet('0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef', deployer.provider);
@@ -215,27 +215,27 @@ describe.only('OathRings', async () => {
 		});
 
 		it('should reject oathRings mint (quantity exceeds max per tx)', async () => {
-			await expect(oathRings.mintSilver(6)).to.be.revertedWith('quantity exceeds max per tx');
+			await expect(oathRings.mintGuild(6)).to.be.revertedWith('quantity exceeds max per tx');
 		});
 
-		it('should reject oathRings mint gold token not minted', async () => {
-			await expect(oathRings.mintSilver(2)).to.be.revertedWith('gold token is not yet minted');
+		it('should reject oathRings mint council token not minted', async () => {
+			await expect(oathRings.mintGuild(2)).to.be.revertedWith('council token is not yet minted');
 		});
 
 		it('should reject oathRings mint maxSupply reached', async () => {
-			await oathRings.mintGold(5);
-			await oathRings.mintGold(2);
+			await oathRings.mintCouncil(5);
+			await oathRings.mintCouncil(2);
 
-			await oathRings.mintSilver(5);
-			await oathRings.mintSilver(2);
-			await expect(oathRings.mintSilver(2)).to.be.revertedWith('quantity exceeds max supply');
+			await oathRings.mintGuild(5);
+			await oathRings.mintGuild(2);
+			await expect(oathRings.mintGuild(2)).to.be.revertedWith('quantity exceeds max supply');
 		});
 
 		it('should mint oathRings 0', async () => {
-			await oathRings.mintGold(5);
-			await oathRings.mintGold(2);
+			await oathRings.mintCouncil(5);
+			await oathRings.mintCouncil(2);
 
-			const blockChain = await oathRings.mintSilver(1);
+			const blockChain = await oathRings.mintGuild(1);
 			const blockChainWait = await blockChain.wait();
 
 			const blockChainEvent = blockChainWait.events[0];
@@ -243,11 +243,11 @@ describe.only('OathRings', async () => {
 			expect(newTokenId).to.equal(7);
 		});
 
-		it('should mintToSilver user oathRings 0', async () => {
-			await oathRings.mintGold(5);
-			await oathRings.mintGold(2);
+		it('should mintToGuild user oathRings 0', async () => {
+			await oathRings.mintCouncil(5);
+			await oathRings.mintCouncil(2);
 
-			const tx = await oathRings.mintToSilver(user.address, 1);
+			const tx = await oathRings.mintToGuild(user.address, 1);
 			const result = await tx.wait();
 			const blockChainEvent = result.events[0];
 			const newTokenId: number = Number(blockChainEvent.args['tokenId']);
@@ -255,19 +255,19 @@ describe.only('OathRings', async () => {
 			expect(await oathRings.balanceOf(user.address)).to.equal(1);
 		});
 
-		it('should get oathRings token 0 type silver', async () => {
-			await oathRings.mintGold(5);
-			await oathRings.mintGold(2);
-			await await oathRings.mintSilver(1);
+		it('should get oathRings token 0 type guild', async () => {
+			await oathRings.mintCouncil(5);
+			await oathRings.mintCouncil(2);
+			await await oathRings.mintGuild(1);
 
 			const collectionPrefix = await oathRingsDescriptor.__collectionPrefix();
 
 			const tokenId = 7;
 			const base64EncodedData: string = await oathRings.tokenURI(7);
 
-			const name = ' Low Council';
-			const description = await oathRingsDescriptor.collectionSilverDetails();
-			const image = await oathRingsDescriptor.collectionSilverImage();
+			const name = 'Guild ';
+			const description = await oathRingsDescriptor.collectionGuildDetails();
+			const image = await oathRingsDescriptor.collectionGuildImage();
 
 			expect(await oathRings.balanceOf(deployer.address)).to.equal(8);
 			expect(await oathRings.tokenType(7)).to.equal(false);
@@ -276,7 +276,7 @@ describe.only('OathRings', async () => {
 			const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
 
 			// Check name was correctly combined
-			expect(metadata.name).to.equal(collectionPrefix + tokenId.toString() + name);
+			expect(metadata.name).to.equal(name +collectionPrefix + tokenId.toString());
 
 			// Check description was correctly combined
 			expect(metadata.description).to.equal(description);

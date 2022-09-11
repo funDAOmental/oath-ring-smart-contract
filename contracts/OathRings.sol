@@ -18,8 +18,8 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 	using Counters for Counters.Counter;
 
 	Counters.Counter private accessPassCount;
-	Counters.Counter private goldCount;
-	Counters.Counter private silverCount;
+	Counters.Counter private councilCount;
+	Counters.Counter private guildCount;
 
 	address private royaltyPayout;
 	bool private isOpenSeaProxyActive = true;
@@ -28,8 +28,8 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 	uint16 public sellerFeeBasisPoints = 100;
 	uint256 public totalOathRings;
 	uint256 public maxQuantity = 5; // 5 default value
-	uint256 public goldQuantity = 337; // 337 default value
-	uint256 public silverQuantity = 1000; // 1000 default value
+	uint256 public councilQuantity = 337; // 337 default value
+	uint256 public guildQuantity = 1000; // 1000 default value
 
 	// OpenSea's Proxy Registry
 	IProxyRegistry public immutable proxyRegistry;
@@ -46,97 +46,97 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 	 * @dev
 	 * @param openSeaProxyRegistry_ address for OpenSea proxy.
 	 * @param oathRingsDescriptor_ address for OpenSea proxy.
-	 * @param goldQuantity_	total number of goldToken
-	 * @param silverQuantity_	total number of goldToken
+	 * @param councilQuantity_	total number of councilToken
+	 * @param guildQuantity_	total number of councilToken
 	 */
 	constructor(
 		address openSeaProxyRegistry_,
 		address oathRingsDescriptor_,
-		uint256 goldQuantity_,
-		uint256 silverQuantity_
-	) ERC721('Access Pass by funDAOmental', 'ACCESSPASS') {
+		uint256 councilQuantity_,
+		uint256 guildQuantity_
+	) ERC721('funDAOmental Oath Rings', 'OATHRINGS') {
 		proxyRegistry = IProxyRegistry(openSeaProxyRegistry_);
 		oathRingsDescriptor = IOathRingsDescriptor(oathRingsDescriptor_);
-		totalOathRings = goldQuantity_ + silverQuantity_;
-		goldQuantity = goldQuantity_;
-		silverQuantity = silverQuantity_;
+		totalOathRings = councilQuantity_ + guildQuantity_;
+		councilQuantity = councilQuantity_;
+		guildQuantity = guildQuantity_;
 		royaltyPayout = address(this);
 	}
 
 	// ============ PUBLIC FUNCTIONS FOR MINTING ============
 
 	/**
-	 * @dev mintGold
-	 * @notice mint gold token
+	 * @dev mintCouncil
+	 * @notice mint council token
 	 * @param quantity_ quantity per mint
 	 */
-	function mintGold(uint8 quantity_) public onlyOwner {
+	function mintCouncil(uint8 quantity_) public onlyOwner {
 		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
-		require(goldQuantity >= goldCount.current() + quantity_, 'quantity exceeds max supply');
+		require(councilQuantity >= councilCount.current() + quantity_, 'quantity exceeds max supply');
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
 			tokenType[accessPassCount.current()] = true;
 			_safeMint(msg.sender, accessPassCount.current());
-			goldCount.increment();
+			councilCount.increment();
 			accessPassCount.increment();
 		}
 	}
 
 	/**
-	 * @dev mintSilver
-	 * @notice mint silver token
+	 * @dev mintGuild
+	 * @notice mint guild token
 	 * @param quantity_ quantity per mint
 	 */
-	function mintSilver(uint8 quantity_) public onlyOwner {
+	function mintGuild(uint8 quantity_) public onlyOwner {
 		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
-		require(goldQuantity <= goldCount.current(), 'gold token is not yet minted');
-		require(silverQuantity >= silverCount.current() + quantity_, 'quantity exceeds max supply');
+		require(councilQuantity <= councilCount.current(), 'council token is not yet minted');
+		require(guildQuantity >= guildCount.current() + quantity_, 'quantity exceeds max supply');
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
 			tokenType[accessPassCount.current()] = false;
 			_safeMint(msg.sender, accessPassCount.current());
-			silverCount.increment();
+			guildCount.increment();
 			accessPassCount.increment();
 		}
 	}
 
 	/**
-	 * @dev mintToGold
-	 * @notice mint gold to token
+	 * @dev mintToCouncil
+	 * @notice mint council to token
 	 * @param to_ address to mint
 	 * @param quantity_ quantity per mint
 	 */
-	function mintToGold(address to_, uint8 quantity_) public onlyOwner {
+	function mintToCouncil(address to_, uint8 quantity_) public onlyOwner {
 		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
-		require(goldQuantity >= goldCount.current() + quantity_, 'quantity exceeds max supply');
+		require(councilQuantity >= councilCount.current() + quantity_, 'quantity exceeds max supply');
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
 			tokenType[accessPassCount.current()] = true;
 			_safeMint(to_, accessPassCount.current());
-			goldCount.increment();
+			councilCount.increment();
 			accessPassCount.increment();
 		}
 	}
 
 	/**
-	 * @dev mintToSilver
-	 * @notice mint silver to token
+	 * @dev mintToGuild
+	 * @notice mint guild to token
 	 * @param to_ address to mint
 	 * @param quantity_ quantity per mint
 	 */
-	function mintToSilver(address to_, uint8 quantity_) public onlyOwner {
+	function mintToGuild(address to_, uint8 quantity_) public onlyOwner {
 		require(quantity_ <= maxQuantity, 'quantity exceeds max per tx');
-		require(goldQuantity <= goldCount.current(), 'gold token is not yet minted');
-		require(silverQuantity >= silverCount.current() + quantity_, 'quantity exceeds max supply');
+		require(councilQuantity <= councilCount.current(), 'council token is not yet minted');
+		require(guildQuantity >= guildCount.current() + quantity_, 'quantity exceeds max supply');
 
 		uint8 i = 0;
 		for (i; i < quantity_; i++) {
 			tokenType[accessPassCount.current()] = false;
 			_safeMint(to_, accessPassCount.current());
-			silverCount.increment();
+			guildCount.increment();
 			accessPassCount.increment();
 		}
 	}
@@ -156,23 +156,23 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
 	 * @notice get total oath rings
 	 */
 	function getTotalOathRings() public view returns (uint256) {
-		return goldCount.current() + silverCount.current();
+		return councilCount.current() + guildCount.current();
 	}
 
 	/**
-	 * @dev getTotalGoldOathRings
-	 * @notice get number of gold oath rings
+	 * @dev getTotalCouncilOathRings
+	 * @notice get number of council oath rings
 	 */
-	function getTotalGoldOathRings() public view returns (uint256) {
-		return goldCount.current();
+	function getTotalCouncilOathRings() public view returns (uint256) {
+		return councilCount.current();
 	}
 
 	/**
-	 * @dev getTotalSilverOathRings
-	 * @notice get number of silver oath rings
+	 * @dev getTotalGuildOathRings
+	 * @notice get number of guild oath rings
 	 */
-	function getTotalSilverOathRings() public view returns (uint256) {
-		return silverCount.current();
+	function getTotalGuildOathRings() public view returns (uint256) {
+		return guildCount.current();
 	}
 
 	/**

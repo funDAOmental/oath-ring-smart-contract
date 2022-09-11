@@ -16,9 +16,9 @@ describe.only('OathRingsDescriptor', async () => {
 		});
 
 		it('should return correct gold base64 encoded metadata', async () => {
-			const name = ' High Council';
-			const description = await descriptor.collectionGoldDetails();
-			const image = await descriptor.collectionGoldImage();
+			const name = 'Council ';
+			const description = await descriptor.collectionCouncilDetails();
+			const image = await descriptor.collectionCouncilImage();
 
 			const collectionPrefix = await descriptor.__collectionPrefix();
 			const attributes: string[] = ['role', 'access pass', 'weight'];
@@ -33,7 +33,7 @@ describe.only('OathRingsDescriptor', async () => {
 			expect(result).to.include(expected_prefix);
 
 			//Check name was correctly combined
-			expect(metadata.name).to.equal(collectionPrefix + tokenId + name);
+			expect(metadata.name).to.equal(name + collectionPrefix + tokenId);
 
 			//Check description was correctly combined
 			expect(metadata.description).to.equal(description);
@@ -41,7 +41,7 @@ describe.only('OathRingsDescriptor', async () => {
 			// Check image is set to collectionImage
 			expect(metadata.image).to.deep.equal(image);
 
-			// Check attribues are set correctly
+			// Check attributes are set correctly
 			expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
 			expect(metadata.attributes[0].value).to.equal(attributeValues[0]);
 			expect(metadata.attributes[1].trait_type).to.equal(attributes[1]);
@@ -51,9 +51,9 @@ describe.only('OathRingsDescriptor', async () => {
 		});
 
 		it('should return correct silver base64 encoded metadata', async () => {
-			const name = ' Low Council';
-			const description = await descriptor.collectionSilverDetails();
-			const image = await descriptor.collectionSilverImage();
+			const name = 'Guild ';
+			const description = await descriptor.collectionGuildDetails();
+			const image = await descriptor.collectionGuildImage();
 
 			const collectionPrefix = await descriptor.__collectionPrefix();
 			const attributes: string[] = ['role', 'access pass', 'weight'];
@@ -70,7 +70,7 @@ describe.only('OathRingsDescriptor', async () => {
 			expect(result).to.include(expected_prefix);
 
 			// Check name was correctly combined
-			expect(metadata.name).to.equal(collectionPrefix + tokenId + name);
+			expect(metadata.name).to.equal(name + collectionPrefix + tokenId);
 
 			// Check description was correctly combined
 			expect(metadata.description).to.equal(description);
@@ -78,7 +78,7 @@ describe.only('OathRingsDescriptor', async () => {
 			// Check image is set to collectionImage
 			expect(metadata.image).to.deep.equal(image);
 
-			// Check attribues are set correctly
+			// Check attributes are set correctly
 			expect(metadata.attributes[0].trait_type).to.equal(attributes[0]);
 			expect(metadata.attributes[0].value).to.equal(attributeValues[0]);
 			expect(metadata.attributes[1].trait_type).to.equal(attributes[1]);
@@ -95,12 +95,12 @@ describe.only('OathRingsDescriptor', async () => {
 			descriptor.deployed();
 		});
 
-		it('should update collectionGoldPrefix', async () => {
-			const beforeUpdate = await descriptor.collectionGoldPrefix();
+		it('should update collectionCouncilPrefix', async () => {
+			const beforeUpdate = await descriptor.collectionCouncilPrefix();
 			const expected = 'Some String';
-			await await descriptor.setCollectionGoldPrefix(expected);
+			await await descriptor.setCollectionCouncilPrefix(expected);
 
-			const afterUpdate = await descriptor.collectionGoldPrefix();
+			const afterUpdate = await descriptor.collectionCouncilPrefix();
 
 			// Check before and new are different
 			expect(afterUpdate).to.not.equal(beforeUpdate);
@@ -109,12 +109,12 @@ describe.only('OathRingsDescriptor', async () => {
 			expect(afterUpdate).to.equal(expected);
 		});
 
-		it('should update collectionSilverPrefix', async () => {
-			const beforeUpdate = await descriptor.collectionSilverPrefix();
+		it('should update collectionGuildPrefix', async () => {
+			const beforeUpdate = await descriptor.collectionGuildPrefix();
 			const expected = 'Some String';
-			await await descriptor.setCollectionSilverPrefix(expected);
+			await await descriptor.setCollectionGuildPrefix(expected);
 
-			const afterUpdate = await descriptor.collectionSilverPrefix();
+			const afterUpdate = await descriptor.collectionGuildPrefix();
 
 			// Check before and new are different
 			expect(afterUpdate).to.not.equal(beforeUpdate);
@@ -123,26 +123,12 @@ describe.only('OathRingsDescriptor', async () => {
 			expect(afterUpdate).to.equal(expected);
 		});
 
-		it('should update collectionGoldDetails', async () => {
-			const beforeUpdate = await descriptor.collectionGoldDetails();
-			const expected = 'Some Gold';
-			await await descriptor.setCollectionGoldDetails(expected);
+		it('should update collectionCouncilDetails', async () => {
+			const beforeUpdate = await descriptor.collectionCouncilDetails();
+			const expected = 'Some Council';
+			await await descriptor.setCollectionCouncilDetails(expected);
 
-			const afterUpdate = await descriptor.collectionGoldDetails();
-
-			// Check before and new are different
-			expect(afterUpdate).to.not.equal(beforeUpdate);
-
-			// Check after collectionDetails update it's correct
-			expect(afterUpdate).to.equal(expected);
-		});
-
-		it('should update collectionSilverDetails', async () => {
-			const beforeUpdate = await descriptor.collectionSilverDetails();
-			const expected = 'Some Silver';
-			await await descriptor.setCollectionSilverDetails(expected);
-
-			const afterUpdate = await descriptor.collectionSilverDetails();
+			const afterUpdate = await descriptor.collectionCouncilDetails();
 
 			// Check before and new are different
 			expect(afterUpdate).to.not.equal(beforeUpdate);
@@ -151,12 +137,26 @@ describe.only('OathRingsDescriptor', async () => {
 			expect(afterUpdate).to.equal(expected);
 		});
 
-		it('should update setCollectionGoldImage', async () => {
-			const beforeUpdate = await descriptor.collectionGoldImage();
+		it('should update collectionGuildDetails', async () => {
+			const beforeUpdate = await descriptor.collectionGuildDetails();
+			const expected = 'Some Guild';
+			await await descriptor.setCollectionGuildDetails(expected);
+
+			const afterUpdate = await descriptor.collectionGuildDetails();
+
+			// Check before and new are different
+			expect(afterUpdate).to.not.equal(beforeUpdate);
+
+			// Check after collectionDetails update it's correct
+			expect(afterUpdate).to.equal(expected);
+		});
+
+		it('should update setCollectionCouncilImage', async () => {
+			const beforeUpdate = await descriptor.collectionCouncilImage();
 			const expected = 'Some String';
-			await await descriptor.setCollectionGoldImage(expected);
+			await await descriptor.setCollectionCouncilImage(expected);
 
-			const afterUpdate = await descriptor.collectionGoldImage();
+			const afterUpdate = await descriptor.collectionCouncilImage();
 
 			// Check before and new are different
 			expect(afterUpdate).to.not.equal(beforeUpdate);
@@ -165,12 +165,12 @@ describe.only('OathRingsDescriptor', async () => {
 			expect(afterUpdate).to.equal(expected);
 		});
 
-		it('should update setCollectionSilverImage', async () => {
-			const beforeUpdate = await descriptor.collectionSilverImage();
+		it('should update setCollectionGuildImage', async () => {
+			const beforeUpdate = await descriptor.collectionGuildImage();
 			const expected = 'Some String';
-			await await descriptor.setCollectionSilverImage(expected);
+			await await descriptor.setCollectionGuildImage(expected);
 
-			const afterUpdate = await descriptor.collectionSilverImage();
+			const afterUpdate = await descriptor.collectionGuildImage();
 
 			// Check before and new are different
 			expect(afterUpdate).to.not.equal(beforeUpdate);
