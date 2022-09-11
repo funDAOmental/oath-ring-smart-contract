@@ -1,18 +1,13 @@
 import { expect } from "chai";
-import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
 
 describe.only("OathRingsDescriptor", async () => {
   let OathRingsDescriptor: any;
   let descriptor: any;
 
-  const receiver: string = "0x58933D8678b574349bE3CdDd3de115468e8cb3f0";
-
   describe.only("metadata", async () => {
     before(async () => {
-      OathRingsDescriptor = await ethers.getContractFactory(
-        "OathRingsDescriptor"
-      );
+      OathRingsDescriptor = await ethers.getContractFactory("OathRingsDescriptor");
       descriptor = await OathRingsDescriptor.deploy();
       descriptor.deployed();
     });
@@ -92,9 +87,7 @@ describe.only("OathRingsDescriptor", async () => {
 
   describe.only("Admin functions", async () => {
     beforeEach(async () => {
-      OathRingsDescriptor = await ethers.getContractFactory(
-        "OathRingsDescriptor"
-      );
+      OathRingsDescriptor = await ethers.getContractFactory("OathRingsDescriptor");
       descriptor = await OathRingsDescriptor.deploy();
       descriptor.deployed();
     });

@@ -31,17 +31,14 @@ const config: HardhatUserConfig = {
   networks: {
     [process.env.ETHEREUM_NETWORK as string]: {
       url: process.env.ETHEREUM_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
   gasReporter: {
-    enabled:
-      process.env.REPORT_GAS !== undefined && process.env.REPORT_GAS == "1",
+    enabled: process.env.REPORT_GAS !== undefined && process.env.REPORT_GAS == "1",
     showTimeSpent: true,
     token: "ETH",
-    gasPriceApi:
-      "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
+    gasPriceApi: "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
     currency: "USD",
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },

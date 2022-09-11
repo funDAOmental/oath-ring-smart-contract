@@ -2,7 +2,6 @@ import { expect } from "chai";
 import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 import { ethers as tsEthers } from "ethers";
-import exp from "constants";
 
 describe.only("OathRings", async () => {
   let OathRings: any;
@@ -27,9 +26,7 @@ describe.only("OathRings", async () => {
 
   describe.only("Constructor", async () => {
     beforeEach(async () => {
-      OathRingsDescriptor = await ethers.getContractFactory(
-        "OathRingsDescriptor"
-      );
+      OathRingsDescriptor = await ethers.getContractFactory("OathRingsDescriptor");
       oathRingsDescriptor = await OathRingsDescriptor.deploy();
       oathRingsDescriptor.deployed();
       OathRings = await ethers.getContractFactory("OathRings");
@@ -37,7 +34,7 @@ describe.only("OathRings", async () => {
         openseaProxy,
         oathRingsDescriptor.address,
         councilQuantity,
-        guildQuantity
+        guildQuantity,
       );
       oathRings.deployed();
     });
@@ -70,9 +67,7 @@ describe.only("OathRings", async () => {
 
   describe.only("Admin functions", async () => {
     beforeEach(async () => {
-      OathRingsDescriptor = await ethers.getContractFactory(
-        "OathRingsDescriptor"
-      );
+      OathRingsDescriptor = await ethers.getContractFactory("OathRingsDescriptor");
       oathRingsDescriptor = await OathRingsDescriptor.deploy();
       oathRingsDescriptor.deployed();
       OathRings = await ethers.getContractFactory("OathRings");
@@ -80,7 +75,7 @@ describe.only("OathRings", async () => {
         openseaProxy,
         oathRingsDescriptor.address,
         councilQuantity,
-        guildQuantity
+        guildQuantity,
       );
       oathRings.deployed();
     });
@@ -96,7 +91,7 @@ describe.only("OathRings", async () => {
 
     it("should revert setOathRingsDescriptor for AddressZero", async () => {
       await expect(
-        oathRings.setOathRingsDescriptor(ethers.constants.AddressZero)
+        oathRings.setOathRingsDescriptor(ethers.constants.AddressZero),
       ).to.be.revertedWith("INVALID_ADDRESS");
     });
 
@@ -113,7 +108,7 @@ describe.only("OathRings", async () => {
 
     it("should reject oathRings royalty (Max royalty check failed! > 20%)", async () => {
       await expect(oathRings.setSellerFeeBasisPoints(201)).to.be.revertedWith(
-        "Max royalty check failed! > 20%"
+        "Max royalty check failed! > 20%",
       );
     });
 
@@ -122,21 +117,16 @@ describe.only("OathRings", async () => {
       await (await oathRings.setSellerFeeBasisPoints(199)).wait();
       await (await oathRings.setRoyaltyPayout(receiver1)).wait();
 
-      const sellerFeeBasisPoints: number =
-        await oathRings.sellerFeeBasisPoints();
+      const sellerFeeBasisPoints: number = await oathRings.sellerFeeBasisPoints();
       expect(sellerFeeBasisPoints).to.equal(199);
     });
 
     it("should reject oathRings token (non-existent tokenId)", async () => {
-      await expect(oathRings.tokenURI(0)).to.be.revertedWith(
-        "non-existent tokenId"
-      );
+      await expect(oathRings.tokenURI(0)).to.be.revertedWith("non-existent tokenId");
     });
 
     it("should reject oathRings royalty (non-existent tokenId)", async () => {
-      await expect(oathRings.royaltyInfo(0, mainCost)).to.be.revertedWith(
-        "non-existent tokenId"
-      );
+      await expect(oathRings.royaltyInfo(0, mainCost)).to.be.revertedWith("non-existent tokenId");
     });
 
     it("should get oathRings royalty 1", async () => {
@@ -146,9 +136,7 @@ describe.only("OathRings", async () => {
 
       const royaltyInfo = await oathRings.royaltyInfo(1, mainCost);
       expect(royaltyInfo["receiver"]).to.equal(receiver1);
-      expect(royaltyInfo["royaltyAmount"]).to.equal(
-        ethers.utils.parseEther("0.01")
-      );
+      expect(royaltyInfo["royaltyAmount"]).to.equal(ethers.utils.parseEther("0.01"));
     });
 
     it("should get OathRingsCount 0", async () => {
@@ -162,29 +150,20 @@ describe.only("OathRings", async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
         "0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef",
-        deployer.provider
+        deployer.provider,
       );
-      OathRingsDescriptor = await ethers.getContractFactory(
-        "OathRingsDescriptor"
-      );
+      OathRingsDescriptor = await ethers.getContractFactory("OathRingsDescriptor");
       oathRingsDescriptor = await OathRingsDescriptor.deploy();
       oathRingsDescriptor.deployed();
       OathRings = await ethers.getContractFactory("OathRings");
-      oathRings = await OathRings.deploy(
-        openseaProxy,
-        oathRingsDescriptor.address,
-        7,
-        7
-      );
+      oathRings = await OathRings.deploy(openseaProxy, oathRingsDescriptor.address, 7, 7);
       oathRings.deployed();
     });
 
     it("should reject oathRings mint maxSupply reached", async () => {
       await oathRings.mintCouncil(5);
       await oathRings.mintCouncil(2);
-      await expect(oathRings.mintCouncil(2)).to.be.revertedWith(
-        "quantity exceeds max supply"
-      );
+      await expect(oathRings.mintCouncil(2)).to.be.revertedWith("quantity exceeds max supply");
     });
 
     it("should mintToCouncil user oathRings 1", async () => {
@@ -224,9 +203,7 @@ describe.only("OathRings", async () => {
       const metadata = JSON.parse(atob(base64EncodedData.split(",")[1]));
 
       // Check name was correctly combined
-      expect(metadata.name).to.equal(
-        name + collectionPrefix + tokenId.toString()
-      );
+      expect(metadata.name).to.equal(name + collectionPrefix + tokenId.toString());
 
       // Check description was correctly combined
       expect(metadata.description).to.equal(description);
@@ -241,27 +218,18 @@ describe.only("OathRings", async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
         "0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef",
-        deployer.provider
+        deployer.provider,
       );
-      OathRingsDescriptor = await ethers.getContractFactory(
-        "OathRingsDescriptor"
-      );
+      OathRingsDescriptor = await ethers.getContractFactory("OathRingsDescriptor");
       oathRingsDescriptor = await OathRingsDescriptor.deploy();
       oathRingsDescriptor.deployed();
       OathRings = await ethers.getContractFactory("OathRings");
-      oathRings = await OathRings.deploy(
-        openseaProxy,
-        oathRingsDescriptor.address,
-        7,
-        7
-      );
+      oathRings = await OathRings.deploy(openseaProxy, oathRingsDescriptor.address, 7, 7);
       oathRings.deployed();
     });
 
     it("should reject oathRings mint council token not minted", async () => {
-      await expect(oathRings.mintGuild(2)).to.be.revertedWith(
-        "council token is not yet minted"
-      );
+      await expect(oathRings.mintGuild(2)).to.be.revertedWith("council token is not yet minted");
     });
 
     it("should reject oathRings mint maxSupply reached", async () => {
@@ -270,9 +238,7 @@ describe.only("OathRings", async () => {
 
       await oathRings.mintGuild(5);
       await oathRings.mintGuild(2);
-      await expect(oathRings.mintGuild(2)).to.be.revertedWith(
-        "quantity exceeds max supply"
-      );
+      await expect(oathRings.mintGuild(2)).to.be.revertedWith("quantity exceeds max supply");
     });
 
     it("should mint oathRings 1", async () => {
@@ -320,9 +286,7 @@ describe.only("OathRings", async () => {
       const metadata = JSON.parse(atob(base64EncodedData.split(",")[1]));
 
       // Check name was correctly combined
-      expect(metadata.name).to.equal(
-        name + collectionPrefix + tokenId.toString()
-      );
+      expect(metadata.name).to.equal(name + collectionPrefix + tokenId.toString());
 
       // Check description was correctly combined
       expect(metadata.description).to.equal(description);
@@ -332,42 +296,35 @@ describe.only("OathRings", async () => {
     });
   });
 
-	describe.only("Mint All", async () => {
+  describe.only("Mint All", async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
         "0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef",
-        deployer.provider
+        deployer.provider,
       );
-      OathRingsDescriptor = await ethers.getContractFactory(
-        "OathRingsDescriptor"
-      );
+      OathRingsDescriptor = await ethers.getContractFactory("OathRingsDescriptor");
       oathRingsDescriptor = await OathRingsDescriptor.deploy();
       oathRingsDescriptor.deployed();
       OathRings = await ethers.getContractFactory("OathRings");
-      oathRings = await OathRings.deploy(
-        openseaProxy,
-        oathRingsDescriptor.address,
-        337,
-        1000
-      );
+      oathRings = await OathRings.deploy(openseaProxy, oathRingsDescriptor.address, 337, 1000);
       oathRings.deployed();
     });
 
     it("should mint all Oath rings", async () => {
-			const maxCouncil = 337;
-			const maxGuild = 1000;
-			await (await oathRings.mintCouncil(137)).wait();
-			await (await oathRings.mintCouncil(100)).wait();
-			await (await oathRings.mintCouncil(100)).wait();
+      const maxCouncil = 337;
+      const maxGuild = 1000;
+      await (await oathRings.mintCouncil(137)).wait();
+      await (await oathRings.mintCouncil(100)).wait();
+      await (await oathRings.mintCouncil(100)).wait();
 
-			expect (await oathRings.getTotalCouncilOathRings()).to.equal(maxCouncil)
+      expect(await oathRings.getTotalCouncilOathRings()).to.equal(maxCouncil);
 
-			for (let i = 0; i < 10; i++) {
-				await (await oathRings.mintGuild(100)).wait();
-			} 
-			
-			expect(await oathRings.getTotalOathRings()).to.equal(maxCouncil + maxGuild)
+      for (let i = 0; i < 10; i++) {
+        await (await oathRings.mintGuild(100)).wait();
+      }
+
+      expect(await oathRings.getTotalOathRings()).to.equal(maxCouncil + maxGuild);
     });
   });
 });
