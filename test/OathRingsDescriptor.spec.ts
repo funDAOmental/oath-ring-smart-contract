@@ -18,8 +18,8 @@ describe.only('OathRingsDescriptor', async () => {
       const image = await descriptor.collectionCouncilImage();
 
       const collectionPrefix = await descriptor.__collectionPrefix();
-      const attributes: string[] = ['role', 'access pass', 'weight'];
-      const attributeValues: any = ['high council', 'true', '1'];
+      const attributes: string[] = ['Role', 'Access Pass'];
+      const attributeValues: any = ['Council', 'True'];
       const expected_prefix = 'data:application/json;base64,';
       const tokenId = '1';
 
@@ -43,8 +43,6 @@ describe.only('OathRingsDescriptor', async () => {
       expect(metadata.attributes[0].value).to.equal(attributeValues[0]);
       expect(metadata.attributes[1].trait_type).to.equal(attributes[1]);
       expect(metadata.attributes[1].value).to.equal(attributeValues[1]);
-      expect(metadata.attributes[2].trait_type).to.equal(attributes[2]);
-      expect(metadata.attributes[2].value).to.equal(attributeValues[2]);
     });
 
     it('should return correct silver base64 encoded metadata', async () => {
@@ -53,8 +51,8 @@ describe.only('OathRingsDescriptor', async () => {
       const image = await descriptor.collectionGuildImage();
 
       const collectionPrefix = await descriptor.__collectionPrefix();
-      const attributes: string[] = ['role', 'access pass', 'weight'];
-      const attributeValues: any = ['low council', 'false', '1'];
+      const attributes: string[] = ['Role', 'Access Pass'];
+      const attributeValues: any = ['Guild', 'False'];
       const expected_prefix = 'data:application/json;base64,';
       const tokenId = '1';
 
@@ -80,8 +78,6 @@ describe.only('OathRingsDescriptor', async () => {
       expect(metadata.attributes[0].value).to.equal(attributeValues[0]);
       expect(metadata.attributes[1].trait_type).to.equal(attributes[1]);
       expect(metadata.attributes[1].value).to.equal(attributeValues[1]);
-      expect(metadata.attributes[2].trait_type).to.equal(attributes[2]);
-      expect(metadata.attributes[2].value).to.equal(attributeValues[2]);
     });
   });
 
