@@ -64,6 +64,11 @@ describe.only('OathRings', async () => {
 
   describe.only('Admin functions', async () => {
     beforeEach(async () => {
+      deployer = (await ethers.getSigners())[0];
+      user = new ethers.Wallet(
+        '0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef',
+        deployer.provider,
+      );
       OathRingsDescriptor = await ethers.getContractFactory('OathRingsDescriptor');
       oathRingsDescriptor = await OathRingsDescriptor.deploy();
       oathRingsDescriptor.deployed();
@@ -75,6 +80,11 @@ describe.only('OathRings', async () => {
         guildQuantity,
       );
       oathRings.deployed();
+    });
+
+    it('should allow minting with minter role', async () => {
+      await (await oathRings.mintCouncil(1)).wait();
+      expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
     });
 
     it('should updated oathRingsDescriptor', async () => {
@@ -158,8 +168,8 @@ describe.only('OathRings', async () => {
     });
 
     it('should reject oathRings mint maxSupply reached', async () => {
-      await oathRings.mintCouncil(5);
-      await oathRings.mintCouncil(2);
+      await (await oathRings.mintCouncil(5)).wait();
+      await (await oathRings.mintCouncil(2)).wait();
       await expect(oathRings.mintCouncil(2)).to.be.revertedWith('quantity exceeds max supply');
     });
 
@@ -194,7 +204,7 @@ describe.only('OathRings', async () => {
       const image = await oathRingsDescriptor.collectionCouncilImage();
 
       expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
-      expect(await oathRings.tokenType(tokenId)).to.equal(true);
+      expect(await oathRings.getTokenType(tokenId)).to.equal(0);
       expect(base64EncodedData).to.include(dataUriPrefix);
 
       const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
@@ -225,23 +235,12 @@ describe.only('OathRings', async () => {
       oathRings.deployed();
     });
 
-    it('should reject oathRings mint council token not minted', async () => {
-      await expect(oathRings.mintGuild(2)).to.be.revertedWith('council token is not yet minted');
-    });
-
     it('should reject oathRings mint maxSupply reached', async () => {
-      await oathRings.mintCouncil(5);
-      await oathRings.mintCouncil(2);
-
-      await oathRings.mintGuild(5);
-      await oathRings.mintGuild(2);
+      await oathRings.mintGuild(7);
       await expect(oathRings.mintGuild(2)).to.be.revertedWith('quantity exceeds max supply');
     });
 
     it('should mint oathRings 1', async () => {
-      await oathRings.mintCouncil(5);
-      await oathRings.mintCouncil(2);
-
       const blockChain = await oathRings.mintGuild(1);
       const blockChainWait = await blockChain.wait();
 
@@ -251,9 +250,6 @@ describe.only('OathRings', async () => {
     });
 
     it('should mintToGuild user oathRings 1', async () => {
-      await oathRings.mintCouncil(5);
-      await oathRings.mintCouncil(2);
-
       const tx = await oathRings.mintToGuild(user.address, 1);
       const result = await tx.wait();
       const blockChainEvent = result.events[0];
@@ -263,10 +259,7 @@ describe.only('OathRings', async () => {
     });
 
     it('should get oathRings token 1 type guild', async () => {
-      await oathRings.mintCouncil(5);
-      await oathRings.mintCouncil(2);
       await await oathRings.mintGuild(1);
-
       const collectionPrefix = await oathRingsDescriptor.__collectionPrefix();
 
       const tokenId = 8;
@@ -276,8 +269,8 @@ describe.only('OathRings', async () => {
       const description = await oathRingsDescriptor.collectionGuildDetails();
       const image = await oathRingsDescriptor.collectionGuildImage();
 
-      expect(await oathRings.balanceOf(deployer.address)).to.equal(8);
-      expect(await oathRings.tokenType(tokenId)).to.equal(false);
+      expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
+      expect(await oathRings.getTokenType(tokenId)).to.equal(1);
       expect(base64EncodedData).to.include(dataUriPrefix);
 
       const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
