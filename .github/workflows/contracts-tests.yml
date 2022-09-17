@@ -2,11 +2,11 @@ name: Contracts Unit tests
 
 on:
   pull_request:
-    branches: ["main"]
+    branches: ['main']
 
 jobs:
   tests:
-    name: Contract Unit tets
+    name: Contract Unit test
     runs-on: ubuntu-latest
 
     strategy:
