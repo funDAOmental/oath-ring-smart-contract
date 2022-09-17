@@ -2,13 +2,8 @@
 
 /// @title Interface for OathRingsDescriptor
 
-pragma solidity ^0.8.16;
+pragma solidity ^0.8.17;
 
 interface IOathRingsDescriptor {
-
-    function genericDataURI(
-        string memory tokenId,
-        uint256 tokenType
-    ) external view returns (string memory);
-
+    function genericDataURI(string memory tokenId, uint256 tokenType) external view returns (string memory);
 }
