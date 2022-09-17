@@ -6,7 +6,7 @@ import { Base64 } from 'base64-sol/base64.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 
 contract OathRingsDescriptor is Ownable {
-    string[3] public __attributes = ['role', 'access pass', 'weight'];
+    string[2] public __attributes = ['Role', 'Access Pass'];
     string public __collectionPrefix = 'Oath Ring #';
 
     string public collectionCouncilImage = 'https://ipfs.io/ipfs/QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
@@ -21,8 +21,8 @@ contract OathRingsDescriptor is Ownable {
     struct TokenURIParams {
         string name;
         string description;
-        string[3] attributes;
-        string[3] attributeValues;
+        string[2] attributes;
+        string[2] attributeValues;
         string image;
     }
 
@@ -80,8 +80,8 @@ contract OathRingsDescriptor is Ownable {
     function _generateAttributes(TokenURIParams memory params) internal pure returns (string memory attributes) {
         string memory _attributes = '[';
         if (params.attributes.length > 0) {
-            string[3] memory att = params.attributes;
-            string[3] memory attVal = params.attributeValues;
+            string[2] memory att = params.attributes;
+            string[2] memory attVal = params.attributeValues;
             for (uint256 i = 0; i < att.length; i++) {
                 if (i == 0) {
                     _attributes = string(
@@ -139,14 +139,14 @@ contract OathRingsDescriptor is Ownable {
         string memory _details = collectionGuildDetails;
         string memory _image = collectionGuildImage;
 
-        string[3] memory _attributeValues = ['low council', 'false', '1'];
+        string[2] memory _attributeValues = ['Guild', 'False'];
 
         // overwrite for type 0
         if (tokenType == 0) {
             _prefix = collectionCouncilPrefix;
             _details = collectionCouncilDetails;
             _image = collectionCouncilImage;
-            _attributeValues = ['high council', 'true', '1'];
+            _attributeValues = ['Council', 'True'];
         }
 
         _prefix = string(abi.encodePacked(_prefix, __collectionPrefix, tokenId));
