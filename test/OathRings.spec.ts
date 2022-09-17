@@ -8,6 +8,7 @@ describe.only('OathRings', async () => {
   let oathRings: Contract;
 
   let deployer: any;
+  let minter: any;
   let user: tsEthers.Wallet;
 
   let OathRingsDescriptor: any;
@@ -21,7 +22,7 @@ describe.only('OathRings', async () => {
 
   const receiver1: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0';
 
-  describe.only('Constructor', async () => {
+  describe.skip('Constructor', async () => {
     beforeEach(async () => {
       OathRingsDescriptor = await ethers.getContractFactory('OathRingsDescriptor');
       oathRingsDescriptor = await OathRingsDescriptor.deploy();
@@ -65,10 +66,7 @@ describe.only('OathRings', async () => {
   describe.only('Admin functions', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
-      user = new ethers.Wallet(
-        '0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef',
-        deployer.provider,
-      );
+      minter = (await ethers.getSigners())[1];
       OathRingsDescriptor = await ethers.getContractFactory('OathRingsDescriptor');
       oathRingsDescriptor = await OathRingsDescriptor.deploy();
       oathRingsDescriptor.deployed();
@@ -82,9 +80,57 @@ describe.only('OathRings', async () => {
       oathRings.deployed();
     });
 
-    it('should allow minting with minter role', async () => {
+    it('should allow owner with minter role', async () => {
       await (await oathRings.mintCouncil(1)).wait();
       expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
+    });
+
+    it('should allow owner reinstate minter role', async () => {
+      await (await oathRings.removeMinter(deployer.address)).wait();
+      await expect(oathRings.mintCouncil(1)).to.be.revertedWith('caller is not the minter');
+      await (await oathRings.addMinter(deployer.address)).wait();
+      await (await oathRings.mintCouncil(1)).wait();
+      expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
+    });
+
+    it('should allow minter when added', async () => {
+      await (await oathRings.addMinter(minter.address)).wait();
+      await (await oathRings.connect(minter).mintCouncil(1)).wait();
+      expect(await oathRings.balanceOf(minter.address)).to.equal(1);
+    });
+
+    it('should allow reject minter after revoke minter role', async () => {
+      await (await oathRings.addMinter(minter.address)).wait();
+      await (await oathRings.connect(minter).mintCouncil(1)).wait();
+      expect(await oathRings.balanceOf(minter.address)).to.equal(1);
+      await (await oathRings.removeMinter(minter.address)).wait();
+      await expect(oathRings.connect(minter).mintCouncil(1)).to.be.revertedWith(
+        'caller is not the minter',
+      );
+    });
+
+    it('should reject mintCouncil when not minter role', async () => {
+      await expect(oathRings.connect(minter).mintCouncil(1)).to.be.revertedWith(
+        'caller is not the minter',
+      );
+    });
+
+    it('should reject mintToCouncil when not minter role', async () => {
+      await expect(oathRings.connect(minter).mintToCouncil(minter.address, 1)).to.be.revertedWith(
+        'caller is not the minter',
+      );
+    });
+
+    it('should reject mintCouncil when not mintGuild role', async () => {
+      await expect(oathRings.connect(minter).mintGuild(1)).to.be.revertedWith(
+        'caller is not the minter',
+      );
+    });
+
+    it('should reject mintToGuild when not minter role', async () => {
+      await expect(oathRings.connect(minter).mintToGuild(minter.address, 1)).to.be.revertedWith(
+        'caller is not the minter',
+      );
     });
 
     it('should updated oathRingsDescriptor', async () => {
@@ -152,7 +198,7 @@ describe.only('OathRings', async () => {
     });
   });
 
-  describe.only('Mint functions Council', async () => {
+  describe.skip('Mint functions Council', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
@@ -220,7 +266,7 @@ describe.only('OathRings', async () => {
     });
   });
 
-  describe.only('Mint functions Guild', async () => {
+  describe.skip('Mint functions Guild', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
@@ -286,7 +332,7 @@ describe.only('OathRings', async () => {
     });
   });
 
-  describe.only('Mint All', async () => {
+  describe.skip('Mint All', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
@@ -313,6 +359,7 @@ describe.only('OathRings', async () => {
       for (let i = 0; i < 10; i++) {
         await (await oathRings.mintGuild(100)).wait();
       }
+      expect(await oathRings.getTotalGuildOathRings()).to.equal(maxGuild);
 
       expect(await oathRings.getTotalOathRings()).to.equal(maxCouncil + maxGuild);
     });

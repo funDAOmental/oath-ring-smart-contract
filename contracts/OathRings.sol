@@ -19,6 +19,7 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     using Counters for Counters.Counter;
     mapping(address => bool) private isMinter;
 
+    uint256 private constant COUNT_OFFSET = 1;
     Counters.Counter private totalCount;
     Counters.Counter private councilCount;
     Counters.Counter private guildCount;
@@ -64,14 +65,14 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
         guildQuantity = guildQuantity_;
 
         // setup counter
-        councilCount._value = 1; // start with id 1
-        guildCount._value = councilQuantity + 1; // start with councilQuantity offset
+        councilCount._value = COUNT_OFFSET; // start with id 1
+        guildCount._value = councilQuantity + COUNT_OFFSET; // start with councilQuantity offset
         royaltyPayout = address(this);
         isMinter[_msgSender()] = true;
     }
 
     modifier onlyMinter() {
-        require(owner() == _msgSender(), 'Ownable: caller is not the owner');
+        require(isMinter[_msgSender()] == true, 'caller is not the minter');
         _;
     }
 
@@ -82,8 +83,8 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
      * @notice mint council token
      * @param quantity_ quantity per mint
      */
-    function mintCouncil(uint256 quantity_) public onlyOwner {
-        require(councilCount.current() + quantity_ - 1 <= councilQuantity, 'quantity exceeds max supply');
+    function mintCouncil(uint256 quantity_) public onlyMinter {
+        require(councilCount.current() + quantity_ - COUNT_OFFSET <= councilQuantity, 'quantity exceeds max supply');
         for (uint256 i; i < quantity_; i++) {
             //console.log(councilCount.current());
             _safeMint(msg.sender, councilCount.current());
@@ -97,8 +98,11 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
      * @notice mint guild token
      * @param quantity_ quantity per mint
      */
-    function mintGuild(uint256 quantity_) public onlyOwner {
-        require(guildCount.current() - councilQuantity + quantity_ - 2 <= guildQuantity, 'quantity exceeds max supply');
+    function mintGuild(uint256 quantity_) public onlyMinter {
+        require(
+            guildCount.current() - councilQuantity + quantity_ - 2 * COUNT_OFFSET <= guildQuantity,
+            'quantity exceeds max supply'
+        );
 
         for (uint256 i; i < quantity_; i++) {
             _safeMint(msg.sender, guildCount.current());
@@ -113,8 +117,8 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
      * @param to_ address to mint
      * @param quantity_ quantity per mint
      */
-    function mintToCouncil(address to_, uint256 quantity_) public onlyOwner {
-        require(councilCount.current() + quantity_ - 1 <= councilQuantity, 'quantity exceeds max supply');
+    function mintToCouncil(address to_, uint256 quantity_) public onlyMinter {
+        require(councilCount.current() + quantity_ - COUNT_OFFSET <= councilQuantity, 'quantity exceeds max supply');
         for (uint256 i; i < quantity_; i++) {
             _safeMint(to_, councilCount.current());
             councilCount.increment();
@@ -128,8 +132,11 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
      * @param to_ address to mint
      * @param quantity_ quantity per mint
      */
-    function mintToGuild(address to_, uint256 quantity_) public onlyOwner {
-        require(guildCount.current() - councilQuantity + quantity_ - 2 <= guildQuantity, 'quantity exceeds max supply');
+    function mintToGuild(address to_, uint256 quantity_) public onlyMinter {
+        require(
+            guildCount.current() - councilQuantity + quantity_ - 2 * COUNT_OFFSET <= guildQuantity,
+            'quantity exceeds max supply'
+        );
         for (uint256 i; i < quantity_; i++) {
             _safeMint(to_, guildCount.current());
             guildCount.increment();
@@ -160,7 +167,7 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
      * @notice get number of council oath rings
      */
     function getTotalCouncilOathRings() public view returns (uint256) {
-        return councilCount.current() - 1;
+        return councilCount.current() - COUNT_OFFSET;
     }
 
     /**
@@ -168,7 +175,7 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
      * @notice get number of guild oath rings
      */
     function getTotalGuildOathRings() public view returns (uint256) {
-        return guildCount.current() - councilQuantity;
+        return guildCount.current() - councilQuantity - COUNT_OFFSET;
     }
 
     /**
