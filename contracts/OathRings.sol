@@ -27,8 +27,8 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     address private royaltyPayout;
     bool private isOpenSeaProxyActive = true;
 
-    // seller fee basis points 100 == 10%
-    uint16 public sellerFeeBasisPoints = 100;
+    // seller fee basis points 1000 == 10%
+    uint16 public sellerFeeBasisPoints = 1000;
     uint256 public totalOathRings;
     uint256 public councilQuantity;
     uint256 public guildQuantity;
@@ -38,7 +38,7 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     IOathRingsDescriptor public oathRingsDescriptor;
 
     // IPFS content hash of contract-level metadata
-    string private contractURIHash = 'TODO';
+    string private contractURIHash = 'ipfs://'; //TODO
 
     // ============ ACCESS CONTROL/SANITY MODIFIERS ============
 
@@ -77,16 +77,14 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     }
 
     // ============ PUBLIC FUNCTIONS FOR MINTING ============
-
     /**
-     * @dev mintCouncil
+     * @dev mintCouncilOathRings
      * @notice mint council token
      * @param quantity_ quantity per mint
      */
-    function mintCouncil(uint256 quantity_) public onlyMinter {
+    function mintCouncilOathRings(uint256 quantity_) public onlyMinter {
         require(councilCount.current() + quantity_ - COUNT_OFFSET <= councilQuantity, 'quantity exceeds max supply');
         for (uint256 i; i < quantity_; i++) {
-            //console.log(councilCount.current());
             _safeMint(msg.sender, councilCount.current());
             councilCount.increment();
             totalCount.increment();
@@ -94,11 +92,11 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     }
 
     /**
-     * @dev mintGuild
+     * @dev mintGuildOathRings
      * @notice mint guild token
      * @param quantity_ quantity per mint
      */
-    function mintGuild(uint256 quantity_) public onlyMinter {
+    function mintGuildOathRings(uint256 quantity_) public onlyMinter {
         require(
             guildCount.current() - councilQuantity + quantity_ - 2 * COUNT_OFFSET <= guildQuantity,
             'quantity exceeds max supply'
@@ -112,12 +110,12 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     }
 
     /**
-     * @dev mintToCouncil
+     * @dev mintToCouncilOathRings
      * @notice mint council to token
      * @param to_ address to mint
      * @param quantity_ quantity per mint
      */
-    function mintToCouncil(address to_, uint256 quantity_) public onlyMinter {
+    function mintToCouncilOathRings(address to_, uint256 quantity_) public onlyMinter {
         require(councilCount.current() + quantity_ - COUNT_OFFSET <= councilQuantity, 'quantity exceeds max supply');
         for (uint256 i; i < quantity_; i++) {
             _safeMint(to_, councilCount.current());
@@ -127,12 +125,12 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     }
 
     /**
-     * @dev mintToGuild
+     * @dev mintToGuildOathRings
      * @notice mint guild to token
      * @param to_ address to mint
      * @param quantity_ quantity per mint
      */
-    function mintToGuild(address to_, uint256 quantity_) public onlyMinter {
+    function mintToGuildOathRings(address to_, uint256 quantity_) public onlyMinter {
         require(
             guildCount.current() - councilQuantity + quantity_ - 2 * COUNT_OFFSET <= guildQuantity,
             'quantity exceeds max supply'
@@ -151,7 +149,7 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
      * @notice The IPFS URI of contract-level metadata.
      */
     function contractURI() public view returns (string memory) {
-        return string(abi.encodePacked('ipfs://', contractURIHash));
+        return contractURIHash;
     }
 
     /**
@@ -185,16 +183,16 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
      */
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), 'non-existent tokenId');
-        return oathRingsDescriptor.genericDataURI(tokenId.toString(), getTokenType(tokenId));
+        return oathRingsDescriptor.genericDataURI(tokenId.toString(), hasCouncilRole(tokenId));
     }
 
     /**
-     * @dev getTokenType.
-     * @notice get token type.
+     * @dev isCouncilRole.
+     * @notice get token Role council=True, guild=False.
      * @param tokenId token id
      */
-    function getTokenType(uint256 tokenId) public view returns (uint256) {
-        return tokenId <= councilQuantity ? 0 : 1;
+    function hasCouncilRole(uint256 tokenId) public view returns (bool) {
+        return tokenId <= councilQuantity ? true : false;
     }
 
     // ============ OWNER-ONLY ADMIN FUNCTIONS ============
@@ -251,7 +249,7 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
      * @dev Only callable by the owner.
      */
     function setSellerFeeBasisPoints(uint16 _sellerFeeBasisPoints) external onlyOwner {
-        require(_sellerFeeBasisPoints <= 200, 'Max royalty check failed! > 20%');
+        require(_sellerFeeBasisPoints <= 2500, 'Max royalty check failed! > 20%');
         sellerFeeBasisPoints = _sellerFeeBasisPoints;
     }
 
@@ -306,6 +304,6 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
         returns (address receiver, uint256 royaltyAmount)
     {
         require(_exists(tokenId), 'non-existent tokenId');
-        return (royaltyPayout, SafeMath.div(SafeMath.mul(salePrice, sellerFeeBasisPoints), 1000));
+        return (royaltyPayout, SafeMath.div(SafeMath.mul(salePrice, sellerFeeBasisPoints), 10000));
     }
 }

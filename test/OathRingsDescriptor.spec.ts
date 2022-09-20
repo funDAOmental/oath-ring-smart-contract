@@ -12,7 +12,7 @@ describe.only('OathRingsDescriptor', async () => {
       descriptor.deployed();
     });
 
-    it('should return correct gold base64 encoded metadata', async () => {
+    it('should return correct Council base64 encoded metadata', async () => {
       const name = 'Council ';
       const description = await descriptor.collectionCouncilDetails();
       const image = await descriptor.collectionCouncilImage();
@@ -23,7 +23,7 @@ describe.only('OathRingsDescriptor', async () => {
       const expected_prefix = 'data:application/json;base64,';
       const tokenId = '1';
 
-      const result = await descriptor.genericDataURI(tokenId, 0);
+      const result = await descriptor.genericDataURI(tokenId, true);
       // Extract and base64 decode metadata
       const metadata = JSON.parse(atob(result.split(',')[1]));
 
@@ -45,7 +45,7 @@ describe.only('OathRingsDescriptor', async () => {
       expect(metadata.attributes[1].value).to.equal(attributeValues[1]);
     });
 
-    it('should return correct silver base64 encoded metadata', async () => {
+    it('should return correct guild base64 encoded metadata', async () => {
       const name = 'Guild ';
       const description = await descriptor.collectionGuildDetails();
       const image = await descriptor.collectionGuildImage();
@@ -56,7 +56,7 @@ describe.only('OathRingsDescriptor', async () => {
       const expected_prefix = 'data:application/json;base64,';
       const tokenId = '1';
 
-      const result = await descriptor.genericDataURI(tokenId, 1);
+      const result = await descriptor.genericDataURI(tokenId, false);
 
       // Extract and base64 decode metadata
       const metadata = JSON.parse(atob(result.split(',')[1]));

@@ -5,5 +5,5 @@
 pragma solidity ^0.8.16;
 
 interface IOathRingsDescriptor {
-    function genericDataURI(string memory tokenId, uint256 tokenType) external view returns (string memory);
+    function genericDataURI(string memory tokenId, bool isCouncil) external view returns (string memory);
 }
