@@ -9,69 +9,92 @@ contract OathRingsDescriptor is Ownable {
     string[2] public __attributes = ['Role', 'Access Pass'];
     string public __collectionPrefix = 'Oath Ring #';
 
-    string public collectionCouncilImage = 'https://ipfs.io/ipfs/QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
-    string public collectionGuildImage = 'https://ipfs.io/ipfs/QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
-    string public collectionCouncilPrefix = 'Council ';
-    string public collectionCouncilDetails =
-        'funDAOmental is improving governance and helping people form reciprocal, cooperative communities. A High Council Oath Ring provides access to funDAOmental High Council governance and its reward pool, and VIP access to the team, community, releases and drops.';
-    string public collectionGuildPrefix = 'Guild ';
-    string public collectionGuildDetails =
-        'funDAOmental is improving governance and helping people form reciprocal, cooperative communities. A Low Council Oath Ring provides access to funDAOmental Low Council governance and its reward pool.';
-
+    string public councilImage = 'ipfs://QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
+    string public guildImage = 'ipfs://QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
+    string public councilAnimationUrl = 'ipfs://';
+    string public guildAnimationUrl = 'ipfs://';
+    string public councilPrefix = 'Council ';
+    string public councilDetails =
+        'funDAOmental is improving governance and helping people form reciprocal, cooperative communities.'
+        'A Council Oath Ring provides access to '
+        'funDAOmental governance and its reward pool, and VIP '
+        'access to the team, community, releases and drops.';
+    string public guildPrefix = 'Guild ';
+    string public guildDetails =
+        'funDAOmental is improving governance and helping people form reciprocal, cooperative communities. '
+        'A Guild Oath Ring provides access to '
+        'funDAOmental governance and its reward pool.';
     struct TokenURIParams {
         string name;
         string description;
         string[2] attributes;
         string[2] attributeValues;
         string image;
+        string animationUrl;
     }
 
     /**
-     * @notice Set the collectionCouncilImage IPFS image.
+     * @notice Set the councilImage IPFS image.
      * @dev Only callable by the owner.
      */
-    function setCollectionCouncilImage(string memory collectionCouncilImage_) external onlyOwner {
-        collectionCouncilImage = collectionCouncilImage_;
+    function setCouncilImage(string memory image_) external onlyOwner {
+        councilImage = image_;
     }
 
     /**
-     * @notice Set the collectionImage IPFS image.
+     * @notice Set the councilImage IPFS image.
      * @dev Only callable by the owner.
      */
-    function setCollectionGuildImage(string memory collectionGuildImage_) external onlyOwner {
-        collectionGuildImage = collectionGuildImage_;
+    function setCouncilAnimationUrl(string memory animationUrl_) external onlyOwner {
+        councilAnimationUrl = animationUrl_;
     }
 
     /**
-     * @notice Set the collectionCouncilDetails text.
+     * @notice Set the Image IPFS image.
      * @dev Only callable by the owner.
      */
-    function setCollectionCouncilDetails(string memory collectionCouncilDetails_) external onlyOwner {
-        collectionCouncilDetails = collectionCouncilDetails_;
+    function setGuildImage(string memory image_) external onlyOwner {
+        guildImage = image_;
     }
 
     /**
-     * @notice Set the collectionCouncilDetails text.
+     * @notice Set the annimation ipfs.
      * @dev Only callable by the owner.
      */
-    function setCollectionGuildDetails(string memory collectionGuildDetails_) external onlyOwner {
-        collectionGuildDetails = collectionGuildDetails_;
+    function setGuildAnimationUrl(string memory animationUrl_) external onlyOwner {
+        guildAnimationUrl = animationUrl_;
     }
 
     /**
-     * @notice Set the collectionCouncilPrefix.
+     * @notice Set the CouncilDetails text.
      * @dev Only callable by the owner.
      */
-    function setCollectionCouncilPrefix(string memory collectionCouncilPrefix_) external onlyOwner {
-        collectionCouncilPrefix = collectionCouncilPrefix_;
+    function setCouncilDetails(string memory details_) external onlyOwner {
+        councilDetails = details_;
     }
 
     /**
-     * @notice Set the collectionGuildPrefix.
+     * @notice Set the CouncilDetails text.
      * @dev Only callable by the owner.
      */
-    function setCollectionGuildPrefix(string memory collectionGuildPrefix_) external onlyOwner {
-        collectionGuildPrefix = collectionGuildPrefix_;
+    function setGuildDetails(string memory details_) external onlyOwner {
+        guildDetails = details_;
+    }
+
+    /**
+     * @notice Set the CouncilPrefix.
+     * @dev Only callable by the owner.
+     */
+    function setCouncilPrefix(string memory prefix_) external onlyOwner {
+        councilPrefix = prefix_;
+    }
+
+    /**
+     * @notice Set the GuildPrefix.
+     * @dev Only callable by the owner.
+     */
+    function setGuildPrefix(string memory prefix_) external onlyOwner {
+        guildPrefix = prefix_;
     }
 
     /**
@@ -113,7 +136,11 @@ contract OathRingsDescriptor is Ownable {
                 Base64.encode(
                     bytes(
                         abi.encodePacked(
-                        '{"name":"', params.name, '","description":"', params.description, '","attributes":', attributes,',"image": "', params.image, '"}')
+                        '{"name":"', params.name, '"',
+                        ',"description":"', params.description, '"',
+                        ',"attributes":', attributes,'',
+                        ',"image":"', params.image, '"',
+                        ',"animation_url":"', params.animationUrl, '"}')
                     )
                 )
             )
@@ -131,18 +158,19 @@ contract OathRingsDescriptor is Ownable {
      * @notice Given a name, description, and seed, construct a base64 encoded data URI.
      */
     function _getTokenURIParams(string memory tokenId, bool isCouncil) internal view returns (TokenURIParams memory) {
-        string memory _prefix = collectionGuildPrefix;
-        string memory _details = collectionGuildDetails;
-        string memory _image = collectionGuildImage;
-
+        string memory _prefix = guildPrefix;
+        string memory _details = guildDetails;
+        string memory _image = guildImage;
+        string memory _annimationUrl = guildAnimationUrl;
         string[2] memory _attributeValues = ['Guild', 'False'];
 
         // overwrite for council role
         if (isCouncil) {
-            _prefix = collectionCouncilPrefix;
-            _details = collectionCouncilDetails;
-            _image = collectionCouncilImage;
+            _prefix = councilPrefix;
+            _details = councilDetails;
+            _image = councilImage;
             _attributeValues = ['Council', 'True'];
+            _annimationUrl = councilAnimationUrl;
         }
 
         _prefix = string(abi.encodePacked(_prefix, __collectionPrefix, tokenId));
@@ -152,7 +180,8 @@ contract OathRingsDescriptor is Ownable {
                 description: _details,
                 attributes: __attributes,
                 attributeValues: _attributeValues,
-                image: _image
+                image: _image,
+                animationUrl: _annimationUrl
             });
     }
 }
