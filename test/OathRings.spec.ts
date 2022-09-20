@@ -22,7 +22,7 @@ describe.only('OathRings', async () => {
 
   const receiver1: string = '0x58933D8678b574349bE3CdDd3de115468e8cb3f0';
 
-  describe.skip('Constructor', async () => {
+  describe('Constructor', async () => {
     beforeEach(async () => {
       OathRingsDescriptor = await ethers.getContractFactory('OathRingsDescriptor');
       oathRingsDescriptor = await OathRingsDescriptor.deploy();
@@ -81,56 +81,58 @@ describe.only('OathRings', async () => {
     });
 
     it('should allow owner with minter role', async () => {
-      await (await oathRings.mintCouncil(1)).wait();
+      await (await oathRings.mintCouncilOathRings(1)).wait();
       expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
     });
 
     it('should allow owner reinstate minter role', async () => {
       await (await oathRings.removeMinter(deployer.address)).wait();
-      await expect(oathRings.mintCouncil(1)).to.be.revertedWith('caller is not the minter');
+      await expect(oathRings.mintCouncilOathRings(1)).to.be.revertedWith(
+        'caller is not the minter',
+      );
       await (await oathRings.addMinter(deployer.address)).wait();
-      await (await oathRings.mintCouncil(1)).wait();
+      await (await oathRings.mintCouncilOathRings(1)).wait();
       expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
     });
 
     it('should allow minter when added', async () => {
       await (await oathRings.addMinter(minter.address)).wait();
-      await (await oathRings.connect(minter).mintCouncil(1)).wait();
+      await (await oathRings.connect(minter).mintCouncilOathRings(1)).wait();
       expect(await oathRings.balanceOf(minter.address)).to.equal(1);
     });
 
     it('should allow reject minter after revoke minter role', async () => {
       await (await oathRings.addMinter(minter.address)).wait();
-      await (await oathRings.connect(minter).mintCouncil(1)).wait();
+      await (await oathRings.connect(minter).mintCouncilOathRings(1)).wait();
       expect(await oathRings.balanceOf(minter.address)).to.equal(1);
       await (await oathRings.removeMinter(minter.address)).wait();
-      await expect(oathRings.connect(minter).mintCouncil(1)).to.be.revertedWith(
+      await expect(oathRings.connect(minter).mintCouncilOathRings(1)).to.be.revertedWith(
         'caller is not the minter',
       );
     });
 
-    it('should reject mintCouncil when not minter role', async () => {
-      await expect(oathRings.connect(minter).mintCouncil(1)).to.be.revertedWith(
+    it('should reject mintCouncilOathRings when not minter role', async () => {
+      await expect(oathRings.connect(minter).mintCouncilOathRings(1)).to.be.revertedWith(
         'caller is not the minter',
       );
     });
 
-    it('should reject mintToCouncil when not minter role', async () => {
-      await expect(oathRings.connect(minter).mintToCouncil(minter.address, 1)).to.be.revertedWith(
+    it('should reject mintToCouncilOathRings when not minter role', async () => {
+      await expect(
+        oathRings.connect(minter).mintToCouncilOathRings(minter.address, 1),
+      ).to.be.revertedWith('caller is not the minter');
+    });
+
+    it('should reject mintCouncilOathRings when not mintGuildOathRings role', async () => {
+      await expect(oathRings.connect(minter).mintGuildOathRings(1)).to.be.revertedWith(
         'caller is not the minter',
       );
     });
 
-    it('should reject mintCouncil when not mintGuild role', async () => {
-      await expect(oathRings.connect(minter).mintGuild(1)).to.be.revertedWith(
-        'caller is not the minter',
-      );
-    });
-
-    it('should reject mintToGuild when not minter role', async () => {
-      await expect(oathRings.connect(minter).mintToGuild(minter.address, 1)).to.be.revertedWith(
-        'caller is not the minter',
-      );
+    it('should reject mintToGuildOathRings when not minter role', async () => {
+      await expect(
+        oathRings.connect(minter).mintToGuildOathRings(minter.address, 1),
+      ).to.be.revertedWith('caller is not the minter');
     });
 
     it('should updated oathRingsDescriptor', async () => {
@@ -150,9 +152,9 @@ describe.only('OathRings', async () => {
 
     it('should update oathRings hash url', async () => {
       const url1: string = await oathRings.contractURI();
-      expect(url1).to.equal('ipfs://TODO');
+      expect(url1).to.equal('ipfs://');
 
-      const blockChain = await oathRings.setContractURIHash('ABCDEF');
+      const blockChain = await oathRings.setContractURIHash('ipfs://ABCDEF');
       await blockChain.wait();
 
       const url2: string = await oathRings.contractURI();
@@ -160,7 +162,7 @@ describe.only('OathRings', async () => {
     });
 
     it('should reject oathRings royalty (Max royalty check failed! > 20%)', async () => {
-      await expect(oathRings.setSellerFeeBasisPoints(201)).to.be.revertedWith(
+      await expect(oathRings.setSellerFeeBasisPoints(2501)).to.be.revertedWith(
         'Max royalty check failed! > 20%',
       );
     });
@@ -184,7 +186,7 @@ describe.only('OathRings', async () => {
 
     it('should get oathRings royalty 1', async () => {
       // Setup
-      await (await oathRings.mintCouncil(1)).wait();
+      await (await oathRings.mintCouncilOathRings(1)).wait();
       await (await oathRings.setRoyaltyPayout(receiver1)).wait();
 
       const royaltyInfo = await oathRings.royaltyInfo(1, mainCost);
@@ -214,13 +216,15 @@ describe.only('OathRings', async () => {
     });
 
     it('should reject oathRings mint maxSupply reached', async () => {
-      await (await oathRings.mintCouncil(5)).wait();
-      await (await oathRings.mintCouncil(2)).wait();
-      await expect(oathRings.mintCouncil(2)).to.be.revertedWith('quantity exceeds max supply');
+      await (await oathRings.mintCouncilOathRings(5)).wait();
+      await (await oathRings.mintCouncilOathRings(2)).wait();
+      await expect(oathRings.mintCouncilOathRings(2)).to.be.revertedWith(
+        'quantity exceeds max supply',
+      );
     });
 
-    it('should mintToCouncil user oathRings 1', async () => {
-      const tx = await oathRings.mintToCouncil(user.address, 1);
+    it('should mintToCouncilOathRings user oathRings 1', async () => {
+      const tx = await oathRings.mintToCouncilOathRings(user.address, 1);
       const result = await tx.wait();
       const blockChainEvent = result.events[0];
       const newTokenId: number = Number(blockChainEvent.args['tokenId']);
@@ -229,7 +233,7 @@ describe.only('OathRings', async () => {
     });
 
     it('should mint oathRings 1', async () => {
-      const blockChain = await oathRings.mintCouncil(1);
+      const blockChain = await oathRings.mintCouncilOathRings(1);
       const blockChainWait = await blockChain.wait();
 
       const blockChainEvent = blockChainWait.events[0];
@@ -238,7 +242,7 @@ describe.only('OathRings', async () => {
     });
 
     it('should get oathRings token 1 type council', async () => {
-      await await oathRings.mintCouncil(1);
+      await await oathRings.mintCouncilOathRings(1);
 
       const collectionPrefix = await oathRingsDescriptor.__collectionPrefix();
 
@@ -282,12 +286,14 @@ describe.only('OathRings', async () => {
     });
 
     it('should reject oathRings mint maxSupply reached', async () => {
-      await oathRings.mintGuild(7);
-      await expect(oathRings.mintGuild(2)).to.be.revertedWith('quantity exceeds max supply');
+      await oathRings.mintGuildOathRings(7);
+      await expect(oathRings.mintGuildOathRings(2)).to.be.revertedWith(
+        'quantity exceeds max supply',
+      );
     });
 
     it('should mint oathRings 1', async () => {
-      const blockChain = await oathRings.mintGuild(1);
+      const blockChain = await oathRings.mintGuildOathRings(1);
       const blockChainWait = await blockChain.wait();
 
       const blockChainEvent = blockChainWait.events[0];
@@ -295,8 +301,8 @@ describe.only('OathRings', async () => {
       expect(newTokenId).to.equal(8);
     });
 
-    it('should mintToGuild user oathRings 1', async () => {
-      const tx = await oathRings.mintToGuild(user.address, 1);
+    it('should mintToGuildOathRings user oathRings 1', async () => {
+      const tx = await oathRings.mintToGuildOathRings(user.address, 1);
       const result = await tx.wait();
       const blockChainEvent = result.events[0];
       const newTokenId: number = Number(blockChainEvent.args['tokenId']);
@@ -305,7 +311,7 @@ describe.only('OathRings', async () => {
     });
 
     it('should get oathRings token 1 type guild', async () => {
-      await await oathRings.mintGuild(1);
+      await await oathRings.mintGuildOathRings(1);
       const collectionPrefix = await oathRingsDescriptor.__collectionPrefix();
 
       const tokenId = 8;
@@ -350,14 +356,14 @@ describe.only('OathRings', async () => {
     it('should mint all Oath rings', async () => {
       const maxCouncil = 337;
       const maxGuild = 1000;
-      await (await oathRings.mintCouncil(137)).wait();
-      await (await oathRings.mintCouncil(100)).wait();
-      await (await oathRings.mintCouncil(100)).wait();
+      await (await oathRings.mintCouncilOathRings(137)).wait();
+      await (await oathRings.mintCouncilOathRings(100)).wait();
+      await (await oathRings.mintCouncilOathRings(100)).wait();
 
       expect(await oathRings.getTotalCouncilOathRings()).to.equal(maxCouncil);
 
       for (let i = 0; i < 10; i++) {
-        await (await oathRings.mintGuild(100)).wait();
+        await (await oathRings.mintGuildOathRings(100)).wait();
       }
       expect(await oathRings.getTotalGuildOathRings()).to.equal(maxGuild);
 

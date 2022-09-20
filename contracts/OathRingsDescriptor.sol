@@ -123,26 +123,22 @@ contract OathRingsDescriptor is Ownable {
     /**
      * @notice Given a name, description, and seed, construct a base64 encoded data URI.
      */
-    function genericDataURI(string memory tokenId, uint256 tokenType) external view returns (string memory) {
-        return constructTokenURI(_getTokenURIParams(tokenId, tokenType));
+    function genericDataURI(string memory tokenId, bool isCouncil) external view returns (string memory) {
+        return constructTokenURI(_getTokenURIParams(tokenId, isCouncil));
     }
 
     /**
      * @notice Given a name, description, and seed, construct a base64 encoded data URI.
      */
-    function _getTokenURIParams(string memory tokenId, uint256 tokenType)
-        internal
-        view
-        returns (TokenURIParams memory)
-    {
+    function _getTokenURIParams(string memory tokenId, bool isCouncil) internal view returns (TokenURIParams memory) {
         string memory _prefix = collectionGuildPrefix;
         string memory _details = collectionGuildDetails;
         string memory _image = collectionGuildImage;
 
         string[2] memory _attributeValues = ['Guild', 'False'];
 
-        // overwrite for type 0
-        if (tokenType == 0) {
+        // overwrite for council role
+        if (isCouncil) {
             _prefix = collectionCouncilPrefix;
             _details = collectionCouncilDetails;
             _image = collectionCouncilImage;
