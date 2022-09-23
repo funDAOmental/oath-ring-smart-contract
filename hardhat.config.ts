@@ -4,6 +4,7 @@ import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-etherscan';
 import '@typechain/hardhat';
+import 'hardhat-deploy';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
 import './tasks';
@@ -42,10 +43,12 @@ export default {
       allowUnlimitedContractSize: false,
     },
     goerli: {
+      chainId: 5,
       url: `https://goerli.infura.io/v3/${process.env.WEB3_INFURA_PROJECT_ID}`,
       accounts: [process.env.PRIVATE_KEY],
     },
     mainnet: {
+      chainId: 1,
       url: `https://mainnet.infura.io/v3/${process.env.WEB3_INFURA_PROJECT_ID}`,
       accounts: [process.env.PRIVATE_KEY],
     },
