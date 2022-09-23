@@ -63,7 +63,7 @@ describe.only('OathRings', async () => {
     });
   });
 
-  describe.only('Admin functions', async () => {
+  describe('Admin functions', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       minter = (await ethers.getSigners())[1];
@@ -200,7 +200,7 @@ describe.only('OathRings', async () => {
     });
   });
 
-  describe.skip('Mint functions Council', async () => {
+  describe('Mint functions Council', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
@@ -250,11 +250,11 @@ describe.only('OathRings', async () => {
       const base64EncodedData: string = await oathRings.tokenURI(tokenId);
 
       const name = 'Council ';
-      const description = await oathRingsDescriptor.collectionCouncilDetails();
-      const image = await oathRingsDescriptor.collectionCouncilImage();
+      const description = await oathRingsDescriptor.councilDetails();
+      const image = await oathRingsDescriptor.councilImage();
 
       expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
-      expect(await oathRings.getTokenType(tokenId)).to.equal(0);
+      expect(await oathRings.hasCouncilRole(tokenId)).to.equal(true);
       expect(base64EncodedData).to.include(dataUriPrefix);
 
       const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
@@ -270,7 +270,7 @@ describe.only('OathRings', async () => {
     });
   });
 
-  describe.skip('Mint functions Guild', async () => {
+  describe('Mint functions Guild', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
@@ -318,11 +318,11 @@ describe.only('OathRings', async () => {
       const base64EncodedData: string = await oathRings.tokenURI(tokenId);
 
       const name = 'Guild ';
-      const description = await oathRingsDescriptor.collectionGuildDetails();
-      const image = await oathRingsDescriptor.collectionGuildImage();
+      const description = await oathRingsDescriptor.guildDetails();
+      const image = await oathRingsDescriptor.guildImage();
 
       expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
-      expect(await oathRings.getTokenType(tokenId)).to.equal(1);
+      expect(await oathRings.hasCouncilRole(tokenId)).to.equal(false);
       expect(base64EncodedData).to.include(dataUriPrefix);
 
       const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
@@ -338,7 +338,7 @@ describe.only('OathRings', async () => {
     });
   });
 
-  describe.skip('Mint All', async () => {
+  describe('Mint All', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
