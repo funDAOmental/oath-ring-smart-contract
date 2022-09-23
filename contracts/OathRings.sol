@@ -3,6 +3,7 @@
 pragma solidity ^0.8.16;
 
 import '@openzeppelin/contracts/interfaces/IERC2981.sol';
+import '@openzeppelin/contracts/interfaces/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
@@ -15,6 +16,10 @@ import { IProxyRegistry } from './external/opensea/IProxyRegistry.sol';
 
 contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     error InvalidAddress();
+    event PaymentReceived(address from, uint256 amount);
+    event EthWithdrawn(address to, uint256 amount);
+    event TokensWithdrawn(address token, address to, uint256 amount);
+
     using Strings for uint256;
     using Counters for Counters.Counter;
     mapping(address => bool) private isMinter;
@@ -305,5 +310,38 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     {
         require(_exists(tokenId), 'non-existent tokenId');
         return (royaltyPayout, SafeMath.div(SafeMath.mul(salePrice, sellerFeeBasisPoints), 10000));
+    }
+
+    /**
+     * @dev The Ether received will be logged with {PaymentReceived} events. Note that these events are not fully
+     * reliable: it's possible for a contract to receive Ether without triggering this function. This only affects the
+     * reliability of the events, and not the actual splitting of Ether.
+     *
+     * To learn more about this see the Solidity documentation for
+     * https://solidity.readthedocs.io/en/latest/contracts.html#fallback-function[fallback
+     * functions].
+     */
+    receive() external payable virtual {
+        emit PaymentReceived(_msgSender(), msg.value);
+    }
+
+    fallback() external payable {
+        emit PaymentReceived(_msgSender(), msg.value);
+    }
+
+    function withdraw(address to_) public onlyOwner {
+        if (to_ == address(0)) revert InvalidAddress();
+        uint256 _balance = address(this).balance;
+        require(_balance > 0, 'Contract balance is zero');
+        payable(to_).transfer(_balance);
+        emit EthWithdrawn(to_, _balance);
+    }
+
+    function withdrawTokens(IERC20 token, address to_) public onlyOwner {
+        if (to_ == address(0)) revert InvalidAddress();
+        uint256 _tokenBalance = token.balanceOf(address(this));
+        require(_tokenBalance > 0, 'Contract Token balance is zero');
+        token.transfer(to_, _tokenBalance);
+        emit TokensWithdrawn(address(token), to_, _tokenBalance);
     }
 }

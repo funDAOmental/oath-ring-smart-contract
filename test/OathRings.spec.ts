@@ -1,11 +1,13 @@
 import { expect } from 'chai';
-import { BigNumber, Contract } from 'ethers';
+import { BigNumber, Contract, ContractFactory } from 'ethers';
 import { ethers } from 'hardhat';
 import { ethers as tsEthers } from 'ethers';
 
 describe.only('OathRings', async () => {
-  let OathRings: any;
+  let OathRings: ContractFactory;
+  let TestToken: ContractFactory;
   let oathRings: Contract;
+  let testToken: Contract;
 
   let deployer: any;
   let minter: any;
@@ -63,13 +65,17 @@ describe.only('OathRings', async () => {
     });
   });
 
-  describe.only('Admin functions', async () => {
+  describe('Admin functions', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       minter = (await ethers.getSigners())[1];
+      TestToken = await ethers.getContractFactory('TestToken');
+      testToken = await TestToken.deploy('TestToken', 'Test');
+      testToken.deployed();
       OathRingsDescriptor = await ethers.getContractFactory('OathRingsDescriptor');
       oathRingsDescriptor = await OathRingsDescriptor.deploy();
       oathRingsDescriptor.deployed();
+
       OathRings = await ethers.getContractFactory('OathRings');
       oathRings = await OathRings.deploy(
         openseaProxy,
@@ -198,9 +204,82 @@ describe.only('OathRings', async () => {
       const tokenCount: number = await oathRings.getTotalOathRings();
       expect(tokenCount).to.equal(0);
     });
+    describe('Receive/Withdraw', () => {
+      it('should receive ether and emit event', async () => {
+        const tx = await deployer.sendTransaction({
+          to: oathRings.address,
+          value: ethers.utils.parseEther('1.0'), // Sends exactly 1.0 ether
+        });
+        await expect(tx)
+          .to.emit(oathRings, 'PaymentReceived')
+          .withArgs(deployer.address, ethers.utils.parseEther('1.0'));
+      });
+
+      it('should revert withdraw for non owner', async () => {
+        await expect(oathRings.connect(minter).withdraw(minter.address)).to.be.revertedWith(
+          'Ownable: caller is not the owner',
+        );
+      });
+
+      it('should revert withdraw for zero address', async () => {
+        await expect(oathRings.withdraw(ethers.constants.AddressZero)).to.be.revertedWith(
+          'InvalidAddress()',
+        );
+      });
+
+      it('should revert withdraw when contract balance is zero', async () => {
+        await expect(oathRings.withdraw(minter.address)).to.be.revertedWith(
+          'Contract balance is zero',
+        );
+      });
+
+      it('should revert withdrawTokens for non owner', async () => {
+        await expect(
+          oathRings.connect(minter).withdrawTokens(testToken.address, minter.address),
+        ).to.be.revertedWith('Ownable: caller is not the owner');
+      });
+
+      it('should revert withdrawTokens for zero address', async () => {
+        await expect(
+          oathRings.withdrawTokens(testToken.address, ethers.constants.AddressZero),
+        ).to.be.revertedWith('InvalidAddress()');
+      });
+
+      it('should revert withdrawTokens when contract token balance is zero', async () => {
+        await expect(
+          oathRings.withdrawTokens(testToken.address, minter.address),
+        ).to.be.revertedWith('Contract Token balance is zero');
+      });
+
+      it('should revert withdrawTokens for non ERC20 address', async () => {
+        await expect(oathRings.withdrawTokens(oathRings.address, minter.address)).to.be.reverted;
+      });
+
+      it('should withdraw for onlyOwner', async () => {
+        const expectedValue = ethers.utils.parseEther('1.0');
+        const tx = await deployer.sendTransaction({
+          to: oathRings.address,
+          value: expectedValue, // Sends exactly 1.0 ether
+        });
+        await expect(oathRings.withdraw(minter.address))
+          .to.emit(oathRings, 'EthWithdrawn')
+          .withArgs(minter.address, expectedValue);
+      });
+
+      it('should withdrawTokens for onlyOwner', async () => {
+        // test setup
+        const expectedAmount = ethers.utils.parseUnits('10', 18);
+        await (await testToken.transfer(oathRings.address, expectedAmount)).wait();
+
+        // Test
+        await expect(await oathRings.withdrawTokens(testToken.address, minter.address))
+          .to.emit(oathRings, 'TokensWithdrawn')
+          .withArgs(testToken.address, minter.address, expectedAmount);
+      });
+    });
   });
 
-  describe.skip('Mint functions Council', async () => {
+  describe('Mint functions Council', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
@@ -250,11 +329,11 @@ describe.only('OathRings', async () => {
       const base64EncodedData: string = await oathRings.tokenURI(tokenId);
 
       const name = 'Council ';
-      const description = await oathRingsDescriptor.collectionCouncilDetails();
-      const image = await oathRingsDescriptor.collectionCouncilImage();
+      const description = await oathRingsDescriptor.councilDetails();
+      const image = await oathRingsDescriptor.councilImage();
 
       expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
-      expect(await oathRings.getTokenType(tokenId)).to.equal(0);
+      expect(await oathRings.hasCouncilRole(tokenId)).to.equal(true);
       expect(base64EncodedData).to.include(dataUriPrefix);
 
       const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
@@ -270,7 +349,7 @@ describe.only('OathRings', async () => {
     });
   });
 
-  describe.skip('Mint functions Guild', async () => {
+  describe('Mint functions Guild', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
@@ -318,11 +397,11 @@ describe.only('OathRings', async () => {
       const base64EncodedData: string = await oathRings.tokenURI(tokenId);
 
       const name = 'Guild ';
-      const description = await oathRingsDescriptor.collectionGuildDetails();
-      const image = await oathRingsDescriptor.collectionGuildImage();
+      const description = await oathRingsDescriptor.guildDetails();
+      const image = await oathRingsDescriptor.guildImage();
 
       expect(await oathRings.balanceOf(deployer.address)).to.equal(1);
-      expect(await oathRings.getTokenType(tokenId)).to.equal(1);
+      expect(await oathRings.hasCouncilRole(tokenId)).to.equal(false);
       expect(base64EncodedData).to.include(dataUriPrefix);
 
       const metadata = JSON.parse(atob(base64EncodedData.split(',')[1]));
@@ -338,7 +417,7 @@ describe.only('OathRings', async () => {
     });
   });
 
-  describe.skip('Mint All', async () => {
+  describe('Mint All', async () => {
     beforeEach(async () => {
       deployer = (await ethers.getSigners())[0];
       user = new ethers.Wallet(
