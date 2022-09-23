@@ -15,6 +15,7 @@ import { IProxyRegistry } from './external/opensea/IProxyRegistry.sol';
 
 contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     error InvalidAddress();
+    event PaymentReceived(address from, uint256 amount);
     using Strings for uint256;
     using Counters for Counters.Counter;
     mapping(address => bool) private isMinter;
@@ -305,5 +306,22 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     {
         require(_exists(tokenId), 'non-existent tokenId');
         return (royaltyPayout, SafeMath.div(SafeMath.mul(salePrice, sellerFeeBasisPoints), 10000));
+    }
+
+    /**
+     * @dev The Ether received will be logged with {PaymentReceived} events. Note that these events are not fully
+     * reliable: it's possible for a contract to receive Ether without triggering this function. This only affects the
+     * reliability of the events, and not the actual splitting of Ether.
+     *
+     * To learn more about this see the Solidity documentation for
+     * https://solidity.readthedocs.io/en/latest/contracts.html#fallback-function[fallback
+     * functions].
+     */
+    receive() external payable virtual {
+        emit PaymentReceived(_msgSender(), msg.value);
+    }
+
+    fallback() external payable {
+        emit PaymentReceived(_msgSender(), msg.value);
     }
 }

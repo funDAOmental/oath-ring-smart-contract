@@ -198,6 +198,15 @@ describe.only('OathRings', async () => {
       const tokenCount: number = await oathRings.getTotalOathRings();
       expect(tokenCount).to.equal(0);
     });
+    it('should receive ether and emit event', async () => {
+      const tx = await deployer.sendTransaction({
+        to: oathRings.address,
+        value: ethers.utils.parseEther('1.0'), // Sends exactly 1.0 ether
+      });
+      await expect(tx)
+        .to.emit(oathRings, 'PaymentReceived')
+        .withArgs(deployer.address, ethers.utils.parseEther('1.0'));
+    });
   });
 
   describe('Mint functions Council', async () => {
