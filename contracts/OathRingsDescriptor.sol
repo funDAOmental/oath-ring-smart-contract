@@ -9,10 +9,10 @@ contract OathRingsDescriptor is Ownable {
     string[2] public __attributes = ['Role', 'Access Pass'];
     string public __collectionPrefix = 'Oath Ring #';
 
-    string public councilImage = 'ipfs://QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
-    string public guildImage = 'ipfs://QmTLdSeV4tozsJgW8EZus73GYYTgK48JgGMP45Txeyx4QJ';
-    string public councilAnimationUrl = 'ipfs://';
-    string public guildAnimationUrl = 'ipfs://';
+    string public councilImage = 'ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4';
+    string public guildImage = 'ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4';
+    string public councilAnimationUrl = 'ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4';
+    string public guildAnimationUrl = 'ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4';
     string public councilPrefix = 'Council ';
     string public councilDetails =
         'funDAOmental is improving governance and helping people form reciprocal, cooperative communities.'
