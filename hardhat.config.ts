@@ -8,6 +8,19 @@ import 'hardhat-deploy';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
 import './tasks';
+import console from 'console';
+
+const testMnemonic = {
+  mnemonic: 'test test test test test test test test test test test junk',
+  path: "m/44'/60'/0'/0",
+  initialIndex: 0,
+  count: 20,
+  passphrase: '',
+};
+const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : testMnemonic;
+if (process.env.PRIVATE_KEY) {
+  console.log('Warning: Private key env is undefined test key !!!!!!!!!!!!!');
+}
 
 export default {
   paths: {
@@ -33,24 +46,18 @@ export default {
   networks: {
     hardhat: {
       chainId: 1337,
-      accounts: {
-        mnemonic: 'test test test test test test test test test test test junk',
-        path: "m/44'/60'/0'/0",
-        initialIndex: 0,
-        count: 20,
-        passphrase: '',
-      },
+      accounts: testMnemonic,
       allowUnlimitedContractSize: false,
     },
     goerli: {
       chainId: 5,
       url: `https://goerli.infura.io/v3/${process.env.WEB3_INFURA_PROJECT_ID}`,
-      accounts: [process.env.PRIVATE_KEY],
+      accounts: accounts,
     },
     mainnet: {
       chainId: 1,
       url: `https://mainnet.infura.io/v3/${process.env.WEB3_INFURA_PROJECT_ID}`,
-      accounts: [process.env.PRIVATE_KEY],
+      accounts: accounts,
     },
   },
   namedAccounts: {
