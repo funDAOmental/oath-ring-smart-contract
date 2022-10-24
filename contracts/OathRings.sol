@@ -43,16 +43,16 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     IOathRingsDescriptor public oathRingsDescriptor;
 
     // IPFS content hash of contract-level metadata
-    string private contractURIHash = 'ipfs://'; //TODO
+    string private contractURIHash = 'ipfs://bafkreieqlwueeyrgf3ramhpw3aw2oeoryidtdib57fmjhpyfr4r2uz6uou';
 
     // ============ ACCESS CONTROL/SANITY MODIFIERS ============
 
     /**
      * @dev
      * @param openSeaProxyRegistry_ address for OpenSea proxy.
-     * @param oathRingsDescriptor_ address for OpenSea proxy.
-     * @param councilQuantity_	total number of councilToken
-     * @param guildQuantity_	total number of councilToken
+     * @param oathRingsDescriptor_ address for nft descriptor.
+     * @param councilQuantity_	total number of council tokens
+     * @param guildQuantity_	total number of guild Token
      */
     constructor(
         address openSeaProxyRegistry_,
@@ -233,7 +233,7 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
      * @notice Set the _contractURIHash.
      * @dev Only callable by the owner.
      */
-    function setContractURIHash(string memory _contractURIHash) external onlyOwner {
+    function setContractURI(string memory _contractURIHash) external onlyOwner {
         contractURIHash = _contractURIHash;
     }
 

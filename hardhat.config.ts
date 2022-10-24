@@ -1,19 +1,34 @@
-import * as dotenv from 'dotenv';
-import { HardhatUserConfig } from 'hardhat/config';
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig();
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-etherscan';
 import '@typechain/hardhat';
+import 'hardhat-deploy';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
 import './tasks';
+import console from 'console';
 
-dotenv.config();
+const testMnemonic = {
+  mnemonic: 'test test test test test test test test test test test junk',
+  path: "m/44'/60'/0'/0",
+  initialIndex: 0,
+  count: 20,
+  passphrase: '',
+};
+const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : testMnemonic;
+if (process.env.PRIVATE_KEY) {
+  console.log('Warning: Private key env is undefined test key !!!!!!!!!!!!!');
+}
 
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
-
-const config: HardhatUserConfig = {
+export default {
+  paths: {
+    sources: './contracts',
+    cache: './cache',
+    artifacts: './build',
+    tests: './tests',
+  },
   defaultNetwork: 'hardhat',
   solidity: {
     compilers: [
@@ -29,13 +44,27 @@ const config: HardhatUserConfig = {
     ],
   },
   networks: {
-    [process.env.ETHEREUM_NETWORK as string]: {
-      url: process.env.ETHEREUM_URL || '',
-      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    hardhat: {
+      chainId: 1337,
+      accounts: testMnemonic,
+      allowUnlimitedContractSize: false,
+    },
+    goerli: {
+      chainId: 5,
+      url: `https://goerli.infura.io/v3/${process.env.WEB3_INFURA_PROJECT_ID}`,
+      accounts: accounts,
+    },
+    mainnet: {
+      chainId: 1,
+      url: `https://mainnet.infura.io/v3/${process.env.WEB3_INFURA_PROJECT_ID}`,
+      accounts: accounts,
     },
   },
+  namedAccounts: {
+    deployer: 0,
+  },
   gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined && process.env.REPORT_GAS == '1',
+    enabled: true,
     showTimeSpent: true,
     token: 'ETH',
     gasPriceApi: 'https://api.etherscan.io/api?module=proxy&action=eth_gasPrice',
@@ -52,5 +81,3 @@ const config: HardhatUserConfig = {
     externalArtifacts: ['externalArtifacts/*.json'],
   },
 };
-
-export default config;

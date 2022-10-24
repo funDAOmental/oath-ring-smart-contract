@@ -1,0 +1,8 @@
+{
+  "name": "Oath Rings",
+  "description": "funDAOmental is improving governance and helping people form reciprocal, cooperative communities. A Guild Oath Ring provides access to funDAOmental governance and its reward pool.",
+  "image": "ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4",
+  "external_link": "www.funDAOmental.com",
+  "seller_fee_basis_points": 1500,
+  "fee_recipient": "0x332693d287952AaFF741D6CFd2e3A1E5a7DE3bFA"
+}
