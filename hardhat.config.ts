@@ -8,7 +8,6 @@ import 'hardhat-deploy';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
 import './tasks';
-import console from 'console';
 
 const testMnemonic = {
   mnemonic: 'test test test test test test test test test test test junk',
@@ -18,7 +17,7 @@ const testMnemonic = {
   passphrase: '',
 };
 const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : testMnemonic;
-if (process.env.PRIVATE_KEY) {
+if (!process.env.PRIVATE_KEY) {
   console.log('Warning: Private key env is undefined test key !!!!!!!!!!!!!');
 }
 

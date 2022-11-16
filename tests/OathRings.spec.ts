@@ -158,7 +158,7 @@ describe.only('OathRings', async () => {
 
     it('should update oathRings hash url', async () => {
       const url1: string = await oathRings.contractURI();
-      expect(url1).to.equal('ipfs://bafkreieqlwueeyrgf3ramhpw3aw2oeoryidtdib57fmjhpyfr4r2uz6uou');
+      expect(url1).to.equal('ipfs://bafkreibu2lslaqfacejjhfeogzbyscmakznus4fe6mfiheoqlmxwaxkd6a');
 
       const blockChain = await oathRings.setContractURI('ipfs://ABCDEF');
       await blockChain.wait();
@@ -197,7 +197,7 @@ describe.only('OathRings', async () => {
 
       const royaltyInfo = await oathRings.royaltyInfo(1, mainCost);
       expect(royaltyInfo['receiver']).to.equal(receiver1);
-      expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.01'));
+      expect(royaltyInfo['royaltyAmount']).to.equal(ethers.utils.parseEther('0.0075'));
     });
 
     it('should get OathRingsCount 0', async () => {

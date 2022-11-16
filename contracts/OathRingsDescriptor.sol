@@ -15,15 +15,16 @@ contract OathRingsDescriptor is Ownable {
     string public guildAnimationUrl = 'ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4';
     string public councilPrefix = 'Council ';
     string public councilDetails =
-        'funDAOmental is improving governance and helping people form reciprocal, cooperative communities.'
-        'A Council Oath Ring provides access to '
-        'funDAOmental governance and its reward pool, and VIP '
-        'access to the team, community, releases and drops.';
+        'funDAOmental is an open ecosystem working on pluralistic, cooperative coordination. '
+        'The Oath Rings are a set of 1337 NFTs that unlock access to the funDAOmental governance system, '
+        'that are designed to reward aligned contributors with a long-term interest in our work. '
+        'Each of the 337 Council Oath Rings additionally provide a seat on our council, '
+        'as well as unique holder benefits and deep access to our community, ecosystem, team, and work.';
     string public guildPrefix = 'Guild ';
     string public guildDetails =
-        'funDAOmental is improving governance and helping people form reciprocal, cooperative communities. '
-        'A Guild Oath Ring provides access to '
-        'funDAOmental governance and its reward pool.';
+        'funDAOmental is an open ecosystem working on pluralistic, cooperative coordination. '
+        'The Oath Rings are a set of 1337 NFTs that unlock access to the funDAOmental governance system, '
+        'that are designed to reward aligned contributors with a long-term interest in our work.';
     struct TokenURIParams {
         string name;
         string description;
