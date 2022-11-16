@@ -1,10 +1,10 @@
 {
-  "councilImage": "ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4",
-  "guildImage": "ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4",
-  "councilAnimationUrl": "ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4",
-  "guildAnimationUrl": "ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4",
+  "councilImage": "ipfs://bafybeibiwdqb5klgvtjxgjd67omjcna6sm7cqc4lsbixocxmqxtblqt4ea",
+  "guildImage": "ipfs://bafybeibiwdqb5klgvtjxgjd67omjcna6sm7cqc4lsbixocxmqxtblqt4ea",
+  "councilAnimationUrl": "ipfs://bafybeihvsottfphhges3wubdomvplyhbktcd2reovbyr5fmytemaadcgvy",
+  "guildAnimationUrl": "ipfs://bafybeihvsottfphhges3wubdomvplyhbktcd2reovbyr5fmytemaadcgvy",
   "councilPrefix": "Council ",
-  "councilDetails": "funDAOmental is improving governance and helping people form reciprocal, cooperative communities.A Council Oath Ring provides access to funDAOmental governance and its reward pool, and VIP access to the team, community, releases and drops.",
+  "councilDetails": "funDAOmental is an open ecosystem working on pluralistic, cooperative coordination. The Oath Rings are a set of 1337 NFTs that unlock access to the funDAOmental governance system, that are designed to reward aligned contributors with a long-term interest in our work. Each of the 337 Council Oath Rings additionally provide a seat on our council, as well as unique holder benefits and deep access to our community, ecosystem, team, and work.",
   "guildPrefix": "Guild ",
-  "guildDetails": "funDAOmental is improving governance and helping people form reciprocal, cooperative communities. A Guild Oath Ring provides access to funDAOmental governance and its reward pool."
+  "guildDetails": "funDAOmental is an open ecosystem working on pluralistic, cooperative coordination. The Oath Rings are a set of 1337 NFTs that unlock access to the funDAOmental governance system, that are designed to reward aligned contributors with a long-term interest in our work."
 }
