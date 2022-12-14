@@ -67,13 +67,4 @@ task('metadata', 'Update contract metadata')
         console.log(await tx.wait());
       }
     }
-    if (updateDescriptor.length > 0 && update) {
-      for (const prop of updateDescriptor) {
-        const updateCommand = 'set' + prop.charAt(0).toUpperCase() + prop.slice(1);
-        const newValue = descriptorMetadata[prop as keyof typeof descriptorMetadata];
-        console.log(`Update oathRings descriptor ${updateCommand}`);
-        const tx = await descriptor[updateCommand](newValue);
-        console.log(await tx.wait());
-      }
-    }
   });

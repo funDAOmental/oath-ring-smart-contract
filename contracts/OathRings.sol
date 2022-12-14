@@ -32,8 +32,8 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     address private royaltyPayout;
     bool private isOpenSeaProxyActive = true;
 
-    // seller fee basis points 750 == 7.5%
-    uint16 public sellerFeeBasisPoints = 750;
+    // seller fee basis points 1000 == 10%
+    uint16 public sellerFeeBasisPoints = 1000;
     uint256 public totalOathRings;
     uint256 public councilQuantity;
     uint256 public guildQuantity;
