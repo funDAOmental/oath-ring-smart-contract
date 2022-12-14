@@ -32,8 +32,8 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     address private royaltyPayout;
     bool private isOpenSeaProxyActive = true;
 
-    // seller fee basis points 750 == 7.5%
-    uint16 public sellerFeeBasisPoints = 750;
+    // seller fee basis points 1000 == 10%
+    uint16 public sellerFeeBasisPoints = 1000;
     uint256 public totalOathRings;
     uint256 public councilQuantity;
     uint256 public guildQuantity;
@@ -43,7 +43,7 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     IOathRingsDescriptor public oathRingsDescriptor;
 
     // IPFS content hash of contract-level metadata
-    string private contractURIHash = 'ipfs://bafkreibu2lslaqfacejjhfeogzbyscmakznus4fe6mfiheoqlmxwaxkd6a';
+    string private contractURIHash = 'ipfs://bafkreidtlc3zjymk7cjas7x22ubpyfymtm7ngsjm4dxsmyhw555r3x3h2a';
 
     // ============ ACCESS CONTROL/SANITY MODIFIERS ============
 
