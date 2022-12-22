@@ -9,21 +9,21 @@ contract OathRingsDescriptor is Ownable {
     string[2] public __attributes = ['Role', 'Access Pass'];
     string public __collectionPrefix = 'Oath Ring #';
 
-    string public councilImage = 'ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4';
-    string public guildImage = 'ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4';
-    string public councilAnimationUrl = 'ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4';
-    string public guildAnimationUrl = 'ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4';
+    string public councilImage = 'ipfs://bafybeia77wnwguesvfvmq6hemepm2ugk46gv3h6cowihqrqzruy6leik4i';
+    string public guildImage = 'ipfs://bafybeia77wnwguesvfvmq6hemepm2ugk46gv3h6cowihqrqzruy6leik4i';
+    string public councilAnimationUrl = 'ipfs://bafybeihvsottfphhges3wubdomvplyhbktcd2reovbyr5fmytemaadcgvy';
+    string public guildAnimationUrl = 'ipfs://bafybeihvsottfphhges3wubdomvplyhbktcd2reovbyr5fmytemaadcgvy';
     string public councilPrefix = 'Council ';
     string public councilDetails =
-        'funDAOmental is an open ecosystem working on pluralistic, cooperative coordination. '
-        'The Oath Rings are a set of 1337 NFTs that unlock access to the funDAOmental governance system, '
+        'funDAOmental is an open ecosystem working on cooperative coordination. '
+        'The Oath Rings are a set of 1337 NFTs that unlock access to the funDAOmental governance system '
         'and reward aligned contributors with a long-term interest in our work. '
         'Each of the 337 Council Oath Rings additionally provide a seat on our council, '
         'as well as unique holder benefits and deep access to our community, ecosystem, team, and work.';
     string public guildPrefix = 'Guild ';
     string public guildDetails =
-        'funDAOmental is an open ecosystem working on pluralistic, cooperative coordination. '
-        'The Oath Rings are a set of 1337 NFTs that unlock access to the funDAOmental governance system, '
+        'funDAOmental is an open ecosystem working on cooperative coordination. '
+        'The Oath Rings are a set of 1337 NFTs that unlock access to the funDAOmental governance system '
         'and reward aligned contributors with a long-term interest in our work.';
     struct TokenURIParams {
         string name;

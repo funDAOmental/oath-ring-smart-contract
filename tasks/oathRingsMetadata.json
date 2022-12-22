@@ -1,8 +1,8 @@
 {
   "name": "Oath Rings",
-  "description": "funDAOmental is an open ecosystem working on cooperative coordination. The Oath Rings are a set of 1337 NFTs that unlock access to the funDAOmental governance system, and reward aligned contributors with a long-term interest in our work. Council Oath Rings additionally provide a seat on our council, as well as unique holder benefits and deep access to our community, ecosystem, team, and work.",
-  "image": "ipfs://bafybeiepqjxt5oneuao7ntzg74svotk4m455zugzsicjt4w3g2p6llhzc4",
+  "description": "funDAOmental is an open ecosystem working on cooperative coordination. The Oath Rings are a set of 1337 NFTs that unlock access to the funDAOmental governance system and reward aligned contributors with a long-term interest in our work. Each of the 337 Council Oath Rings additionally provide a seat on our council, as well as unique holder benefits and deep access to our community, ecosystem, team, and work.",
+  "image": "ipfs://bafybeia77wnwguesvfvmq6hemepm2ugk46gv3h6cowihqrqzruy6leik4i",
   "external_link": "https://funDAOmental.com",
   "seller_fee_basis_points": 1000,
-  "fee_recipient": "0xbBdc9862558cf841a34612Ff4643fe50AF5A806e"
+  "fee_recipient": "0xd960341b1c1442f96B96b2Cb0148930B45E82035"
 }

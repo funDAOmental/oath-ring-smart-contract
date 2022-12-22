@@ -43,7 +43,7 @@ contract OathRings is IERC2981, Ownable, ERC721Enumerable {
     IOathRingsDescriptor public oathRingsDescriptor;
 
     // IPFS content hash of contract-level metadata
-    string private contractURIHash = 'ipfs://bafkreidtlc3zjymk7cjas7x22ubpyfymtm7ngsjm4dxsmyhw555r3x3h2a';
+    string private contractURIHash = 'ipfs://bafkreigbu5fdkic4bmmvwahr7q7m2dgbc5r2jfdwlkpvjyxp6zq7svqx54';
 
     // ============ ACCESS CONTROL/SANITY MODIFIERS ============
 
