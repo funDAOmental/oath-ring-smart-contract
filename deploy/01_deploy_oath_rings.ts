@@ -8,7 +8,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const councilQuantity = 337;
   const guildQuantity = 1000;
   const openseaProxy =
-    hre.network.name == 'mainnet' ? '' : '0x1E0049783F008A0085193E00003D00cd54003c71';
+    hre.network.name == 'mainnet'
+      ? '0xa5409ec958C83C3f309868babACA7c86DCB077c1'
+      : '0x1E0049783F008A0085193E00003D00cd54003c71';
   const { deployer } = await getNamedAccounts();
 
   const nftDescriptor: DeployResult = await deploy('OathRingsDescriptor', {

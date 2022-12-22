@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.16;
+pragma solidity ^0.8.17;
 
 import '@openzeppelin/contracts/interfaces/IERC2981.sol';
 import '@openzeppelin/contracts/interfaces/IERC20.sol';
@@ -9,8 +9,6 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Counters.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
-
-import 'hardhat/console.sol';
 import { IOathRingsDescriptor } from './interfaces/IOathRingsDescriptor.sol';
 import { IProxyRegistry } from './external/opensea/IProxyRegistry.sol';
 
