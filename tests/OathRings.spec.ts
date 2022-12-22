@@ -158,7 +158,7 @@ describe.only('OathRings', async () => {
 
     it('should update oathRings hash url', async () => {
       const url1: string = await oathRings.contractURI();
-      expect(url1).to.equal('ipfs://bafkreidtlc3zjymk7cjas7x22ubpyfymtm7ngsjm4dxsmyhw555r3x3h2a');
+      expect(url1).to.equal('ipfs://bafkreigbu5fdkic4bmmvwahr7q7m2dgbc5r2jfdwlkpvjyxp6zq7svqx54');
 
       const blockChain = await oathRings.setContractURI('ipfs://ABCDEF');
       await blockChain.wait();
